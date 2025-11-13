@@ -1,212 +1,139 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Chessboard } from "react-chessboard";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// PuzzleChess.tsx
+import React, { useEffect, useRef, useState } from "react";
 import { Chess, Square } from "chess.js";
+import { Chessboard } from "react-chessboard";
 
-type SquareHandlerArgs = {
-  piece: { pieceType: string } | null;
-  square: string;
-};
+// ---- Puzzle data ----
+const PUZZLE_PGN =
+  "e4 e6 Nf3 d5 exd5 exd5 d4 Nf6 Nc3 Bb4 Bd2 O-O a3 Ba5 Qe2 Re8 Be3 Bxc3+ bxc3 Ne4 Qd3 Bf5 c4 g6 Be2 Nxf2 Qb3 Nxh1 Qxb7 Nd7 Qxd5 Nb6 Qxd8 Raxd8 Kd2 Nxc4+ Bxc4 c5 c3 cxd4 cxd4 Be4 Rxh1 Bxf3 gxf3 Rc8 Kd3 Re7 Bd5 Rec7 a4 Rc3+ Kd2 Ra3 Rc1";
 
-type PieceDropHandlerArgs = {
-  piece: { isSparePiece: boolean; position: string; pieceType: string };
-  sourceSquare: string;
-  targetSquare: string | null;
-};
+const PUZZLE_SOLUTION = ["c8c1", "d2c1", "a3e3"]; // UCI moves
+const PUZZLE_INITIAL_PLY = 55;
 
-type PuzzleData = {
-  game: {
-    id: string;
-    pgn: string;
-    clock: string;
-  };
-  puzzle: {
-    id: string;
-    rating: number;
-    plays: number;
-    solution: string[];
-    themes: string[];
-    initialPly: number;
-  };
-};
+// helper: UCI string -> chess.js move object
+const uciToMove = (uci: string) => ({
+  from: uci.slice(0, 2),
+  to: uci.slice(2, 4),
+  promotion: "q" as const,
+});
 
-export default function ChessPuzzle() {
+export const PuzzleChess: React.FC = () => {
+  // keep full chess.js game in a ref
   const chessGameRef = useRef(new Chess());
   const chessGame = chessGameRef.current;
 
-  // Puzzle data
-  const puzzleData: PuzzleData = {
-    game: {
-      id: "VH0NEQZ8",
-      pgn: "e4 c5 Nf3 d6 Bc4 Nc6 c3 Nf6 Qe2 a6 Bb3 g6 O-O Bg7 d4 cxd4 Nxd4 O-O Nxc6 bxc6 f3 a5 Na3 Ba6 Bc4 Bxc4 Nxc4 d5 exd5 cxd5 Ne5 e6 Bf4 Nd7 Rf2 Nxe5 Bxe5 Qb6 Rd1 Qa6 Bxg7 Qxe2 Rxe2 Kxg7 Kf2 Rab8 Ke3 Rb5 b3 Rc8 Kd4 Rbc5 Re3 Kf8 g4 Ke7 f4 Kd6 g5 a4 Rb1 a3 Rbe1 R5c7 R1e2 Re8 c4 Rc5 Rc3 Rb8 Re5 Rb4 Rh3 dxc4",
-      clock: "15+15",
-    },
-    puzzle: {
-      id: "4pr4N",
-      rating: 1571,
-      plays: 15507,
-      solution: ["e5c5", "c4b3", "c5c4", "b3a2", "h3a3"],
-      themes: ["endgame", "crushing", "rookEndgame", "long"],
-      initialPly: 73,
-    },
-  };
-
-  const [chessPosition, setChessPosition] = useState("");
+  // react state
+  // eslint-disable-next-line react-hooks/refs
+  const [chessPosition, setChessPosition] = useState(chessGame.fen());
   const [moveFrom, setMoveFrom] = useState("");
-  const [optionSquares, setOptionSquares] = useState({});
+  const [optionSquares, setOptionSquares] = useState<
+    Record<string, React.CSSProperties>
+  >({});
+  const [status, setStatus] = useState("Loading puzzle...");
   const [solutionIndex, setSolutionIndex] = useState(0);
-  const [puzzleStatus, setPuzzleStatus] = useState<
-    "playing" | "correct" | "incorrect" | "complete"
-  >("playing");
-  const [boardOrientation, setBoardOrientation] = useState<"white" | "black">(
-    "white"
-  );
-  const [arrows, setArrows] = useState<
-    Array<{ startSquare: string; endSquare: string; color: string }>
-  >([]);
-  const [userColor, setUserColor] = useState<"w" | "b">("w");
-  const [isUserTurn, setIsUserTurn] = useState(true);
 
-  // Initialize puzzle
+  // ----- Load initial puzzle position from PGN + initialPly -----
   useEffect(() => {
-    // Load the game from PGN
-    chessGame.loadPgn(puzzleData.game.pgn);
+    const fullGame = new Chess();
+    fullGame.loadPgn(PUZZLE_PGN);
 
-    // The user plays the side whose turn it is after the PGN
-    const playerColor = chessGame.turn();
-    setUserColor(playerColor);
+    const moves = fullGame.history(); // SAN moves of entire game
 
-    // Set board orientation to match user's color
-    const orientation = playerColor === "w" ? "white" : "black";
-    setBoardOrientation(orientation);
-
-    setChessPosition(chessGame.fen());
-    setIsUserTurn(true);
-
-    // The first move in the solution is the user's move
-    // If the solution starts with a computer move, play it immediately
-    if (puzzleData.puzzle.solution.length > 0) {
-      // Check if we need to play computer's first move
-      // eslint-disable-next-line react-hooks/immutability
-      const firstMove = parseMove(puzzleData.puzzle.solution[0]);
-      const testGame = new Chess(chessGame.fen());
-      try {
-        testGame.move({ from: firstMove.from, to: firstMove.to });
-        // If after this move the turn changes to the player's color,
-        // it means the first move was the computer's
-        if (testGame.turn() === playerColor) {
-          // eslint-disable-next-line react-hooks/immutability
-          setTimeout(() => makeComputerMove(), 500);
-        }
-      } catch (e) {
-        // First move is user's move, do nothing
-      }
+    const startGame = new Chess();
+    for (let i = 0; i < PUZZLE_INITIAL_PLY; i++) {
+      startGame.move(moves[i]);
     }
+
+    chessGameRef.current = startGame;
+    setChessPosition(startGame.fen());
+    setStatus("Black to move – find the winning line!");
+    setMoveFrom("");
+    setOptionSquares({});
+    setSolutionIndex(0);
   }, []);
 
-  // Convert move notation (e.g., "e5c5") to from/to format
-  function parseMove(moveStr: string): { from: string; to: string } {
-    return {
-      from: moveStr.slice(0, 2),
-      to: moveStr.slice(2, 4),
-    };
-  }
+  // ----- Shared puzzle logic: try a user move, check vs solution -----
+  function handleUserMove(from: string, to: string): boolean {
+    const game = chessGameRef.current;
+    const prevFen = game.fen();
+    const expected = PUZZLE_SOLUTION[solutionIndex];
 
-  // Make computer's move from solution
-  function makeComputerMove() {
-    if (solutionIndex >= puzzleData.puzzle.solution.length) {
-      setPuzzleStatus("complete");
-      return;
-    }
-
-    const computerMoveStr = puzzleData.puzzle.solution[solutionIndex];
-    const { from, to } = parseMove(computerMoveStr);
-
-    try {
-      chessGame.move({ from, to, promotion: "q" });
-      setChessPosition(chessGame.fen());
-      setSolutionIndex(solutionIndex + 1);
-      setIsUserTurn(true);
-
-      // Show computer's move with arrow
-      setArrows([
-        {
-          startSquare: from,
-          endSquare: to,
-          color: "rgb(255, 170, 0)",
-        },
-      ]);
-      setTimeout(() => setArrows([]), 1000);
-
-      // Check if puzzle is complete
-      if (solutionIndex + 1 >= puzzleData.puzzle.solution.length) {
-        setPuzzleStatus("complete");
-      }
-    } catch (error) {
-      console.error("Error making computer move:", error);
-    }
-  }
-
-  // Check if player's move matches the solution
-  function checkPlayerMove(from: string, to: string): boolean {
-    if (solutionIndex >= puzzleData.puzzle.solution.length) {
+    if (!expected) {
+      // already solved
       return false;
     }
 
-    const expectedMove = parseMove(puzzleData.puzzle.solution[solutionIndex]);
-    return from === expectedMove.from && to === expectedMove.to;
-  }
-
-  // Show hint arrow
-  function showHint() {
-    if (solutionIndex < puzzleData.puzzle.solution.length && isUserTurn) {
-      const nextMove = parseMove(puzzleData.puzzle.solution[solutionIndex]);
-      setArrows([
-        {
-          startSquare: nextMove.from,
-          endSquare: nextMove.to,
-          color: "rgb(0, 128, 0)",
-        },
-      ]);
-
-      // Clear arrow after 2 seconds
-      setTimeout(() => setArrows([]), 2000);
+    // try to make the move according to chess.js logic
+    let move;
+    try {
+      move = game.move({
+        from,
+        to,
+        promotion: "q",
+      });
+    } catch {
+      return false;
     }
-  }
 
-  // Reset puzzle
-  function resetPuzzle() {
-    chessGame.loadPgn(puzzleData.game.pgn);
-    const playerColor = chessGame.turn();
-    setUserColor(playerColor);
-    const orientation = playerColor === "w" ? "white" : "black";
-    setBoardOrientation(orientation);
-    setChessPosition(chessGame.fen());
-    setSolutionIndex(0);
-    setPuzzleStatus("playing");
-    setMoveFrom("");
-    setOptionSquares({});
-    setArrows([]);
-    setIsUserTurn(true);
-
-    // Check if computer moves first
-    if (puzzleData.puzzle.solution.length > 0) {
-      const firstMove = parseMove(puzzleData.puzzle.solution[0]);
-      const testGame = new Chess(chessGame.fen());
-      try {
-        testGame.move({ from: firstMove.from, to: firstMove.to });
-        if (testGame.turn() === playerColor) {
-          setTimeout(() => makeComputerMove(), 500);
-        }
-      } catch (e) {
-        // First move is user's move
-      }
+    if (!move) {
+      return false;
     }
+
+    const playedUci = `${move.from}${move.to}`;
+    
+    // Wrong move: undo and snap back
+    if (playedUci !== expected) {
+      setChessPosition(game.fen());
+      setTimeout(() => {
+        game.undo();
+        setStatus("❌ Wrong move, try again!");
+        setChessPosition(prevFen);
+      }, 500);
+      return false;
+      
+    }
+
+    // Correct user move
+    let newIndex = solutionIndex + 1;
+    setChessPosition(game.fen());
+    setStatus("✅ Correct!");
+
+    // Opponent reply (next move in PUZZLE_SOLUTION)
+    if (newIndex < PUZZLE_SOLUTION.length) {
+      const replyUci = PUZZLE_SOLUTION[newIndex];
+      setTimeout(() => {
+        game.move(uciToMove(replyUci));
+        setChessPosition(game.fen());
+      }, 500);
+      newIndex += 1;
+    }
+
+    setSolutionIndex(newIndex);
+
+    if (newIndex >= PUZZLE_SOLUTION.length) {
+      setStatus("✅ Puzzle solved!");
+    } else {
+      const turn = game.turn() === "w" ? "White" : "Black";
+      setStatus(`✅ Correct! Now it's ${turn} to move.`);
+    }
+
+    setSolutionIndex(newIndex);
+
+    if (newIndex >= PUZZLE_SOLUTION.length) {
+      setStatus("✅ Puzzle solved!");
+    } else {
+      const turn = game.turn() === "w" ? "White" : "Black";
+      setStatus(`✅ Correct! Now it's ${turn} to move.`);
+    }
+
+    return true;
   }
 
-  // Get move options for a square
-  function getMoveOptions(square: Square) {
+  // ----- Helpers from docs (for click-to-move) -----
+  function getMoveOptions(square: string) {
     const moves = chessGame.moves({
-      square,
+      square: square as any,
       verbose: true,
     });
 
@@ -218,12 +145,14 @@ export default function ChessPuzzle() {
     const newSquares: Record<string, React.CSSProperties> = {};
 
     for (const move of moves) {
+      const isCapture =
+        chessGame.get(move.to as Square) &&
+        chessGame.get(move.to as Square)?.color !== chessGame.get(square as Square)?.color;
+
       newSquares[move.to] = {
-        background:
-          chessGame.get(move.to) &&
-          chessGame.get(move.to)?.color !== chessGame.get(square)?.color
-            ? "radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)"
-            : "radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)",
+        background: isCapture
+          ? "radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)"
+          : "radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)",
         borderRadius: "50%",
       };
     }
@@ -236,141 +165,73 @@ export default function ChessPuzzle() {
     return true;
   }
 
-  function onSquareClick({ square, piece }: SquareHandlerArgs) {
-    if (puzzleStatus !== "playing" || !isUserTurn) return;
-
-    // Clear arrows on click
-    setArrows([]);
-
+  // ----- Click-to-move handler (from docs, with puzzle logic plugged in) -----
+  function onSquareClick({
+    square,
+    piece,
+  }: {
+    square: string;
+    piece?: string;
+  }) {
+    // 1) No piece selected yet: click a piece to see its moves
     if (!moveFrom && piece) {
-      const hasMoveOptions = getMoveOptions(square as Square);
+      const hasMoveOptions = getMoveOptions(square);
       if (hasMoveOptions) {
         setMoveFrom(square);
       }
       return;
     }
 
+    // 2) A piece is selected: try to move it to `square`
     const moves = chessGame.moves({
-      square: moveFrom as Square,
+      square: moveFrom as any,
       verbose: true,
     });
-    const foundMove = moves.find((m) => m.from === moveFrom && m.to === square);
+    const foundMove = moves.find(
+      (m) => m.from === moveFrom && m.to === square
+    );
 
+    // Not a valid move from that square: maybe selecting a different piece
     if (!foundMove) {
-      const hasMoveOptions = getMoveOptions(square as Square);
+      const hasMoveOptions = getMoveOptions(square);
       setMoveFrom(hasMoveOptions ? square : "");
       return;
     }
 
-    // Check if this is the correct move
-    const isCorrect = checkPlayerMove(moveFrom, square);
+    // Valid chess.js move: now check if it matches the puzzle solution
+    const success = handleUserMove(moveFrom, square);
 
-    if (!isCorrect) {
-      alert("Wrong move! Try again.");
+    // On success, clear selection and highlights
+    if (success) {
       setMoveFrom("");
       setOptionSquares({});
-      return;
-    }
-
-    // Make the move
-    try {
-      chessGame.move({
-        from: moveFrom,
-        to: square,
-        promotion: "q",
-      });
-
-      setChessPosition(chessGame.fen());
-      setSolutionIndex(solutionIndex + 1);
-      setPuzzleStatus("correct");
-      setIsUserTurn(false);
-
-      // Show player's move with arrow
-      setArrows([
-        {
-          startSquare: moveFrom,
-          endSquare: square,
-          color: "rgb(0, 255, 0)",
-        },
-      ]);
-
+    } else {
+      // if failed, keep selection cleared / options cleared
       setMoveFrom("");
       setOptionSquares({});
-
-      // Check if puzzle is complete
-      if (solutionIndex + 1 >= puzzleData.puzzle.solution.length) {
-        setPuzzleStatus("complete");
-        setTimeout(() => setArrows([]), 1000);
-      } else {
-        // Computer makes next move
-        setTimeout(() => {
-          setArrows([]);
-          setPuzzleStatus("playing");
-          makeComputerMove();
-        }, 800);
-      }
-    } catch (error) {
-      console.error("Error making move:", error);
     }
   }
 
-  function onPieceDrop({ sourceSquare, targetSquare }: PieceDropHandlerArgs) {
-    if (!targetSquare || puzzleStatus !== "playing" || !isUserTurn) {
+  // ----- Drag-and-drop handler (docs-style, with puzzle logic) -----
+  function onPieceDrop({
+    sourceSquare,
+    targetSquare,
+  }: {
+    sourceSquare: string;
+    targetSquare: string | null;
+  }) {
+    if (!targetSquare) return false;
+
+    const success = handleUserMove(sourceSquare, targetSquare);
+
+    if (!success) {
+      // snap back
       return false;
     }
 
-    // Clear arrows
-    setArrows([]);
-
-    // Check if this is the correct move
-    const isCorrect = checkPlayerMove(sourceSquare, targetSquare);
-
-    if (!isCorrect) {
-      alert("Wrong move! Try again.");
-      return false;
-    }
-
-    try {
-      chessGame.move({
-        from: sourceSquare,
-        to: targetSquare,
-        promotion: "q",
-      });
-
-      setChessPosition(chessGame.fen());
-      setSolutionIndex(solutionIndex + 1);
-      setPuzzleStatus("correct");
-      setIsUserTurn(false);
-
-      // Show player's move with arrow
-      setArrows([
-        {
-          startSquare: sourceSquare,
-          endSquare: targetSquare,
-          color: "rgb(0, 255, 0)",
-        },
-      ]);
-
-      setMoveFrom("");
-      setOptionSquares({});
-
-      // Check if puzzle is complete
-      if (solutionIndex + 1 >= puzzleData.puzzle.solution.length) {
-        setPuzzleStatus("complete");
-        setTimeout(() => setArrows([]), 1000);
-      } else {
-        // Computer makes next move
-        setTimeout(() => {
-          setArrows([]);
-          setPuzzleStatus("playing");
-          makeComputerMove();
-        }, 800);
-      }
-
-      return true;
-    } catch {
-      return false;
-    }
+    setMoveFrom("");
+    setOptionSquares({});
+    return true;
   }
 
   const chessboardOptions = {
@@ -378,77 +239,33 @@ export default function ChessPuzzle() {
     onSquareClick,
     position: chessPosition,
     squareStyles: optionSquares,
-    boardOrientation,
-    arrows,
     id: "puzzle-board",
+    boardOrientation: "black" as const, // user plays Black in this puzzle
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
-      <div style={{ marginBottom: "20px", textAlign: "center" }}>
-        <h2>Chess Puzzle #{puzzleData.puzzle.id}</h2>
-        <p>
-          Rating: {puzzleData.puzzle.rating} | Themes:{" "}
-          {puzzleData.puzzle.themes.join(", ")}
-        </p>
-        <p>
-          You are playing as:{" "}
-          <strong>{userColor === "w" ? "White" : "Black"}</strong>
-        </p>
-        <div
-          style={{ fontSize: "18px", fontWeight: "bold", marginTop: "10px" }}
-        >
-          {puzzleStatus === "playing" &&
-            isUserTurn &&
-            "Your turn - Find the best move!"}
-          {puzzleStatus === "playing" &&
-            !isUserTurn &&
-            "Computer is thinking..."}
-          {puzzleStatus === "correct" && (
-            <span style={{ color: "green" }}>✓ Correct!</span>
-          )}
-          {puzzleStatus === "complete" && (
-            <span style={{ color: "blue" }}>🎉 Puzzle Complete!</span>
-          )}
-        </div>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-slate-900 text-slate-100">
+      <h1 className="text-2xl font-semibold">Chess Puzzle MVP</h1>
+      <p className="text-sm text-slate-300">
+        Black to move and win. Play the correct sequence!
+      </p>
+
+      <div className="shadow-lg rounded-xl overflow-hidden">
+        {/* If your version of react-chessboard uses direct props, do:
+            <Chessboard {...chessboardOptions} />
+            or
+            <Chessboard
+              position={chessPosition}
+              onSquareClick={onSquareClick}
+              onPieceDrop={(source, target) => onPieceDrop({ sourceSquare: source, targetSquare: target })}
+              boardOrientation="black"
+              customSquareStyles={optionSquares}
+            />
+        */}
+        <Chessboard options={chessboardOptions as any} />
       </div>
 
-      <Chessboard options={chessboardOptions} />
-
-      <div
-        style={{
-          marginTop: "20px",
-          display: "flex",
-          gap: "10px",
-          justifyContent: "center",
-        }}
-      >
-        <button
-          onClick={showHint}
-          disabled={puzzleStatus !== "playing" || !isUserTurn}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            cursor:
-              puzzleStatus === "playing" && isUserTurn
-                ? "pointer"
-                : "not-allowed",
-            opacity: puzzleStatus === "playing" && isUserTurn ? 1 : 0.5,
-          }}
-        >
-          Show Hint
-        </button>
-        <button
-          onClick={resetPuzzle}
-          style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            cursor: "pointer",
-          }}
-        >
-          Reset Puzzle
-        </button>
-      </div>
+      <p className="text-sm mt-2">{status}</p>
     </div>
   );
-}
+};
