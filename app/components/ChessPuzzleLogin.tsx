@@ -74,22 +74,17 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
         const game = new Chess();
         game.loadPgn(data.game.pgn);
 
-        // Lichess puzzles: the solution starts AFTER the last move in PGN
-        // The first move in the solution is the opponent's move (that creates the puzzle position)
-        // We need to apply it to show the starting position
+        // Lichess puzzles: the PGN ends at the starting position of the puzzle
+        // The solution array contains all the moves to solve the puzzle:
+        // - solution[0] = user's first move (the correct move to find)
+        // - solution[1] = opponent's reply
+        // - solution[2] = user's second move, etc.
         const solution = data.puzzle.solution;
 
         if (solution.length > 0) {
-          // Apply the first move (opponent's move) to set up the puzzle position
-          const setupMove = solution[0];
-          game.move(uciToMove(setupMove));
-
-          // The rest are the moves the user needs to play (and responses)
-          const userSolution = solution.slice(1);
-
           chessGameRef.current = game;
           setChessPosition(game.fen());
-          setPuzzleSolution(userSolution);
+          setPuzzleSolution(solution);
 
           // Determine board orientation based on whose turn it is
           const playerColor = game.turn();
