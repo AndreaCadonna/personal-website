@@ -6,6 +6,7 @@ import ChessPuzzleLogin from './components/ChessPuzzleLogin';
 import Portfolio from './components/Portfolio';
 
 type PageState = 'welcome' | 'puzzle' | 'portfolio';
+import { PuzzleChess } from "./components/chessPuzzle";
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState<PageState>('welcome');
