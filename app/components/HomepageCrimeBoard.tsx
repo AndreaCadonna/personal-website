@@ -269,8 +269,14 @@ export default function HomepageCrimeBoard() {
                 CASE FILE <span className="text-[#cc0000]">#2024-SWE</span>
               </h1>
               <div className="stamp-classified mb-3">CLASSIFIED</div>
-              <p className="typewriter text-sm text-[#666]">
-                SUBJECT: SOFTWARE ENGINEER &middot; STATUS: AT LARGE &middot; THREAT LEVEL: EXCEPTIONAL
+              <p className="typewriter text-xs sm:text-sm text-[#666]">
+                SUBJECT: SOFTWARE ENGINEER
+                <br className="sm:hidden" />
+                <span className="hidden sm:inline"> &middot; </span>
+                STATUS: AT LARGE
+                <br className="sm:hidden" />
+                <span className="hidden sm:inline"> &middot; </span>
+                THREAT LEVEL: EXCEPTIONAL
               </p>
             </div>
           </header>
@@ -280,10 +286,10 @@ export default function HomepageCrimeBoard() {
             {/* Photo */}
             <div className="flex justify-center">
               <div className="card-photo" style={{ transform: 'rotate(-3deg)' }}>
-                <div className="w-48 h-56 bg-[#ddd] flex items-center justify-center text-6xl select-none">
+                <div className="w-36 h-44 sm:w-48 sm:h-56 bg-[#ddd] flex items-center justify-center text-5xl sm:text-6xl select-none">
                   ♞
                 </div>
-                <p className="handwriting text-center text-lg mt-2 text-[#555]">
+                <p className="handwriting text-center text-base sm:text-lg mt-2 text-[#555]">
                   Subject — current photo
                 </p>
               </div>

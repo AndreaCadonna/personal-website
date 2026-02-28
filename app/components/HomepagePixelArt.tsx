@@ -180,9 +180,13 @@ export default function HomepagePixelArt() {
         }
 
         .pixel-knight {
-          font-size: 64px;
+          font-size: 48px;
           animation: float 3s ease-in-out infinite;
           filter: drop-shadow(0 4px 0 #000);
+        }
+
+        @media (min-width: 640px) {
+          .pixel-knight { font-size: 64px; }
         }
       `}</style>
 
@@ -192,7 +196,7 @@ export default function HomepagePixelArt() {
           <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0f0f2d]">
             <div className="boot-text text-center">
               <p className="text-[#00ff88] text-xs mb-4">LOADING PORTFOLIO.EXE...</p>
-              <div className="w-64 h-4 border-2 border-[#00ff88] mx-auto">
+              <div className="w-48 sm:w-64 h-4 border-2 border-[#00ff88] mx-auto">
                 <div className="h-full bg-[#00ff88]" style={{
                   animation: 'fillBar 1s steps(10) forwards',
                   width: '100%'
@@ -206,21 +210,21 @@ export default function HomepagePixelArt() {
         {showContent && (
           <div className="max-w-4xl mx-auto px-4 py-8 relative z-10">
             {/* Header Bar */}
-            <div className="pixel-border-gold bg-[#1a1a3d] p-3 mb-8 flex justify-between items-center fade-in">
-              <span className="text-[#ffcc00] text-xs">
-                ♟ PORTFOLIO QUEST v2.0
+            <div className="pixel-border-gold bg-[#1a1a3d] p-2 sm:p-3 mb-6 sm:mb-8 flex justify-between items-center fade-in">
+              <span className="text-[#ffcc00] text-[8px] sm:text-xs">
+                ♟ PORTFOLIO QUEST
               </span>
-              <span className="text-[8px] text-[#888]">
+              <span className="text-[7px] sm:text-[8px] text-[#888] hidden sm:inline">
                 HP: 999/999 | MP: 420/420
               </span>
             </div>
 
             {/* Hero - Character Select */}
-            <section className="pixel-border bg-[#1a1a3d] p-8 mb-8 fade-in" style={{ animationDelay: '0.1s' }}>
-              <h2 className="text-[#ffcc00] text-xs mb-6 text-center tracking-wider">
+            <section className="pixel-border bg-[#1a1a3d] p-4 sm:p-8 mb-8 fade-in" style={{ animationDelay: '0.1s' }}>
+              <h2 className="text-[#ffcc00] text-[10px] sm:text-xs mb-4 sm:mb-6 text-center tracking-wider">
                 ── CHARACTER SELECT ──
               </h2>
-              <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="flex flex-col md:flex-row items-center gap-4 sm:gap-8">
                 <div className="pixel-knight select-none">♞</div>
                 <div className="text-center md:text-left">
                   <h1 className="text-lg md:text-xl text-[#ffffff] mb-2 leading-relaxed">
@@ -262,10 +266,10 @@ export default function HomepagePixelArt() {
               <div className="space-y-4">
                 {SKILLS.map((skill, i) => (
                   <div key={skill.name} className="flex items-center gap-3">
-                    <span className="text-[8px] w-28 text-[#aaaadd] shrink-0">
+                    <span className="text-[8px] w-16 sm:w-28 text-[#aaaadd] shrink-0">
                       {skill.name}
                     </span>
-                    <div className="flex-1 h-5 border-2 border-[#444488] bg-[#0a0a1a] relative overflow-hidden">
+                    <div className="flex-1 h-5 border-2 border-[#444488] bg-[#0a0a1a] relative overflow-hidden min-w-[60px]">
                       <div
                         className="skill-bar-fill h-full absolute left-0 top-0"
                         style={{
@@ -281,8 +285,8 @@ export default function HomepagePixelArt() {
                         }}
                       />
                     </div>
-                    <span className="text-[8px] text-[#ffcc00] w-12 text-right shrink-0">
-                      {animatedSkills[i]}/100
+                    <span className="text-[8px] text-[#ffcc00] w-8 sm:w-12 text-right shrink-0">
+                      {animatedSkills[i]}
                     </span>
                   </div>
                 ))}
@@ -346,7 +350,7 @@ export default function HomepagePixelArt() {
                   ★ SPECIAL ABILITY: CHESS MASTERY ★
                 </h2>
                 <div className="text-center">
-                  <div className="text-4xl mb-4 select-none" style={{ filter: 'drop-shadow(0 0 8px #ffcc0066)' }}>
+                  <div className="text-2xl sm:text-4xl mb-4 select-none" style={{ filter: 'drop-shadow(0 0 8px #ffcc0066)' }}>
                     ♚ ♛ ♜ ♝ ♞ ♟
                   </div>
                   <p className="text-[8px] text-[#ccccee] leading-[2.2] max-w-md mx-auto">

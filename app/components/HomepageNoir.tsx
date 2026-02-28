@@ -342,7 +342,7 @@ export default function HomepageNoir() {
           <section className="mb-16 text-center noir-fade" style={{ animationDelay: '0.6s' }}>
             <p className="chapter-num mb-6">Act V</p>
             <h2 className="serif text-3xl md:text-4xl text-white mb-8 italic">The Endgame</h2>
-            <div className="text-4xl mb-8 select-none tracking-[8px] opacity-40">
+            <div className="text-4xl mb-8 select-none opacity-40">
               ♚
             </div>
             <div className="pull-quote max-w-lg mx-auto mb-8">
