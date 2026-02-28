@@ -76,12 +76,10 @@ export function useChessGame(initialFen?: string) {
    */
   const loadPgn = useCallback((pgn: string) => {
     try {
-      const success = gameRef.current.loadPgn(pgn);
-      if (success) {
-        setPosition(getFen(gameRef.current));
-        setStatus(getGameStatus(gameRef.current));
-      }
-      return success;
+      gameRef.current.loadPgn(pgn);
+      setPosition(getFen(gameRef.current));
+      setStatus(getGameStatus(gameRef.current));
+      return true;
     } catch {
       return false;
     }

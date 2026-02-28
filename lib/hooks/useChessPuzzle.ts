@@ -10,6 +10,7 @@ import {
   getPuzzleProgress,
 } from '../chess/puzzle';
 import { createGame, getFen } from '../chess/engine';
+import { uciToMoveArgs } from '../chess/moves';
 
 /**
  * Hook for managing chess puzzle state and validation
@@ -41,9 +42,10 @@ export function useChessPuzzle(puzzle: Puzzle) {
    */
   const makeMove = useCallback(
     (from: Square, to: Square, promotion?: string): boolean => {
-      const move = gameRef.current.move({ from, to, promotion: promotion || 'q' });
-
-      if (!move) {
+      let move;
+      try {
+        move = gameRef.current.move({ from, to, promotion });
+      } catch {
         setStatus('Illegal move');
         return false;
       }
@@ -85,7 +87,7 @@ export function useChessPuzzle(puzzle: Puzzle) {
 
         if (opponentMoveStr) {
           try {
-            gameRef.current.move(opponentMoveStr);
+            gameRef.current.move(uciToMoveArgs(opponentMoveStr));
             setPosition(getFen(gameRef.current));
             setCurrentStep(prev => prev + 1);
             setStatus('Your turn');

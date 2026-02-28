@@ -66,8 +66,8 @@ export function getGameStatus(game: Chess): GameStatus {
  * @param pgn - PGN string
  * @returns True if PGN was loaded successfully
  */
-export function loadPgn(game: Chess, pgn: string): boolean {
-  return game.loadPgn(pgn);
+export function loadPgn(game: Chess, pgn: string): void {
+  game.loadPgn(pgn);
 }
 
 /**

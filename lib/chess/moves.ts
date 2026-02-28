@@ -2,6 +2,20 @@ import { Chess, Square } from 'chess.js';
 import type { SquareHighlight } from '../types/chess';
 
 /**
+ * Convert a UCI string (e.g. "e7e8n") to chess.js move args
+ *
+ * @param uci - Move in UCI format
+ * @returns Object with from, to, and optional promotion
+ */
+export function uciToMoveArgs(uci: string): { from: Square; to: Square; promotion?: string } {
+  return {
+    from: uci.slice(0, 2) as Square,
+    to: uci.slice(2, 4) as Square,
+    ...(uci.length > 4 ? { promotion: uci[4] } : {}),
+  };
+}
+
+/**
  * Get all legal moves from a specific square
  *
  * @param game - Chess game instance

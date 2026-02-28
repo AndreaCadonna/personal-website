@@ -1,3 +1,4 @@
+import { Chess } from 'chess.js';
 import type { Puzzle, LichessPuzzleResponse } from '../types/chess';
 
 /**
@@ -67,26 +68,30 @@ export function getPuzzleProgress(
 /**
  * Parse puzzle from Lichess API response
  *
+ * Loads the full PGN with chess.js, then replays up to `initialPly` to
+ * derive the correct starting FEN. This handles both standard-start games
+ * (no FEN header) and games with a custom start position.
+ *
  * @param data - Lichess API response
  * @returns Parsed puzzle object
  */
 export function parseLichessPuzzle(data: LichessPuzzleResponse): Puzzle {
-  // Extract FEN from the PGN
-  // Lichess provides the position in the game PGN
-  const pgnLines = data.game.pgn.split('\n');
-  const fenLine = pgnLines.find(line => line.startsWith('[FEN'));
-  let fen = '';
+  const game = new Chess();
+  game.loadPgn(data.game.pgn);
 
-  if (fenLine) {
-    const fenMatch = fenLine.match(/\[FEN "(.+)"\]/);
-    if (fenMatch) {
-      fen = fenMatch[1];
-    }
+  const history = game.history();
+  const startFen = game.getHeaders()['FEN'] || undefined;
+
+  // Replay from the correct start position up to initialPly
+  const puzzleGame = new Chess(startFen);
+  const initialPly = data.puzzle.initialPly;
+  for (let i = 0; i < initialPly && i < history.length; i++) {
+    puzzleGame.move(history[i]);
   }
 
   return {
     id: data.puzzle.id,
-    fen,
+    fen: puzzleGame.fen(),
     moves: data.puzzle.solution,
     rating: data.puzzle.rating,
     themes: data.puzzle.themes,

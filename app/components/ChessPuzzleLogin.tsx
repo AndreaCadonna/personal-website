@@ -4,6 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Chess, Square } from 'chess.js';
 import { Chessboard } from 'react-chessboard';
+import { uciToMoveArgs } from '../../lib/chess/moves';
 
 interface ChessPuzzleLoginProps {
   onPuzzleSolved: () => void;
@@ -24,14 +25,12 @@ interface LichessPuzzle {
   };
 }
 
-/**
- * Helper: convert a UCI string like "c8c1" into a chess.js move object.
- */
-const uciToMove = (uci: string) => ({
-  from: uci.slice(0, 2),
-  to: uci.slice(2, 4),
-  promotion: uci.length > 4 ? (uci[4] as 'q' | 'r' | 'b' | 'n') : 'q',
-});
+const PROMOTION_PIECES = [
+  { piece: 'q', white: '\u2655', black: '\u265B', label: 'Queen' },
+  { piece: 'r', white: '\u2656', black: '\u265C', label: 'Rook' },
+  { piece: 'b', white: '\u2657', black: '\u265D', label: 'Bishop' },
+  { piece: 'n', white: '\u2658', black: '\u265E', label: 'Knight' },
+] as const;
 
 /**
  * ChessPuzzleLogin Component
@@ -53,6 +52,7 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
   const [error, setError] = useState<string | null>(null);
   const [boardOrientation, setBoardOrientation] = useState<'white' | 'black'>('white');
   const [puzzleInfo, setPuzzleInfo] = useState<{ rating: number; themes: string[] } | null>(null);
+  const [pendingPromotion, setPendingPromotion] = useState<{ from: string; to: string } | null>(null);
 
   /**
    * Fetch a puzzle from Lichess API on mount
@@ -70,24 +70,27 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
 
         const data: LichessPuzzle = await response.json();
 
-        // Load the PGN into chess.js
+        // Load the PGN and replay up to initialPly for the puzzle starting position
         const game = new Chess();
         game.loadPgn(data.game.pgn);
+        const history = game.history();
+        const startFen = game.getHeaders()['FEN'] || undefined;
 
-        // Lichess puzzles: the PGN ends at the starting position of the puzzle
-        // The solution array contains all the moves to solve the puzzle:
-        // - solution[0] = user's first move (the correct move to find)
-        // - solution[1] = opponent's reply
-        // - solution[2] = user's second move, etc.
+        const puzzleGame = new Chess(startFen);
+        const initialPly = data.puzzle.initialPly;
+        for (let i = 0; i < initialPly && i < history.length; i++) {
+          puzzleGame.move(history[i]);
+        }
+
         const solution = data.puzzle.solution;
 
         if (solution.length > 0) {
-          chessGameRef.current = game;
-          setChessPosition(game.fen());
+          chessGameRef.current = puzzleGame;
+          setChessPosition(puzzleGame.fen());
           setPuzzleSolution(solution);
 
           // Determine board orientation based on whose turn it is
-          const playerColor = game.turn();
+          const playerColor = puzzleGame.turn();
           setBoardOrientation(playerColor === 'w' ? 'white' : 'black');
 
           // Set puzzle info
@@ -114,7 +117,13 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
   /**
    * Core puzzle logic
    */
-  function handleUserMove(from: string, to: string): boolean {
+  function isPromotionMove(from: string, to: string): boolean {
+    const piece = chessGameRef.current.get(from as Square);
+    if (!piece || piece.type !== 'p') return false;
+    return (piece.color === 'w' && to[1] === '8') || (piece.color === 'b' && to[1] === '1');
+  }
+
+  function handleUserMove(from: string, to: string, promotion?: string): boolean {
     const game = chessGameRef.current;
     const prevFen = game.fen();
     const expected = puzzleSolution[solutionIndex];
@@ -128,16 +137,12 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     let move;
     try {
       move = game.move({
-        from,
-        to,
-        promotion: 'q',
+        from: from as Square,
+        to: to as Square,
+        promotion,
       });
     } catch {
       return false; // illegal move according to chess.js
-    }
-
-    if (!move) {
-      return false;
     }
 
     const playedUci = `${move.from}${move.to}${move.promotion || ''}`;
@@ -162,7 +167,7 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     if (newIndex < puzzleSolution.length) {
       const replyUci = puzzleSolution[newIndex];
       setTimeout(() => {
-        game.move(uciToMove(replyUci));
+        game.move(uciToMoveArgs(replyUci));
         setChessPosition(game.fen());
       }, 500);
       newIndex += 1;
@@ -246,6 +251,13 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
       return;
     }
 
+    if (isPromotionMove(moveFrom, square)) {
+      setPendingPromotion({ from: moveFrom, to: square });
+      setMoveFrom('');
+      setOptionSquares({});
+      return;
+    }
+
     handleUserMove(moveFrom, square);
     setMoveFrom('');
     setOptionSquares({});
@@ -262,6 +274,11 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     targetSquare: string | null;
   }) {
     if (!targetSquare) return false;
+
+    if (isPromotionMove(sourceSquare, targetSquare)) {
+      setPendingPromotion({ from: sourceSquare, to: targetSquare });
+      return false;
+    }
 
     const success = handleUserMove(sourceSquare, targetSquare);
 
@@ -326,8 +343,32 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
         )}
       </div>
 
-      <div className="shadow-2xl rounded-xl overflow-hidden max-w-[600px] w-full">
+      <div className="shadow-2xl rounded-xl overflow-hidden max-w-[600px] w-full relative">
         <Chessboard options={chessboardOptions as any} />
+
+        {pendingPromotion && (
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+            <div className="bg-slate-800 rounded-lg p-4 shadow-xl border border-slate-600">
+              <p className="text-white text-sm mb-3 text-center">Promote to:</p>
+              <div className="flex gap-2">
+                {PROMOTION_PIECES.map(({ piece, white, black, label }) => (
+                  <button
+                    key={piece}
+                    onClick={() => {
+                      const { from, to } = pendingPromotion;
+                      setPendingPromotion(null);
+                      handleUserMove(from, to, piece);
+                    }}
+                    className="w-14 h-14 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center text-3xl transition-colors"
+                    title={label}
+                  >
+                    {boardOrientation === 'white' ? white : black}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="text-center">
