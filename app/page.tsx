@@ -1,6 +1,5 @@
 "use client";
 
-import "react-chessboard-ui/dist/index.css";
 import { PuzzleChess } from "./components/chessPuzzle";
 
 export default function Home() {
