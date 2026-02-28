@@ -1,37 +1,33 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { profile, skills, getExperienceSorted, getFeaturedProjects, allSkillNames } from '@/lib/data';
 
-const TECH_MARQUEE = 'REACT \u2022 NEXT.JS \u2022 TYPESCRIPT \u2022 PYTHON \u2022 NODE.JS \u2022 AWS \u2022 DOCKER \u2022 GRAPHQL \u2022 POSTGRESQL \u2022 GIT \u2022 LINUX \u2022 CI/CD \u2022 ';
+const sortedExp = getExperienceSorted();
+const featured = getFeaturedProjects();
+
+const TECH_MARQUEE = allSkillNames.slice(0, 14).join(' \u2022 ') + ' \u2022 ';
 
 const SKILLS_LIST = [
-  'React', 'Next.js', 'TypeScript', 'JavaScript', 'Python',
-  'Node.js', 'AWS', 'Docker', 'GraphQL', 'REST APIs',
-  'PostgreSQL', 'MongoDB', 'Git', 'Linux', 'CI/CD', 'Tailwind',
-];
+  ...skills.frontend.skills.slice(0, 4).map(s => s.name),
+  ...skills.backend.skills.slice(0, 3).map(s => s.name),
+  ...skills.databaseAndCloud.skills.slice(0, 3).map(s => s.name),
+  ...skills.aiAndAutomation.skills.slice(0, 3).map(s => s.name),
+  ...skills.devopsAndPractices.skills.slice(0, 3).map(s => s.name),
+].slice(0, 16);
 
-const EXPERIENCE = [
-  {
-    role: 'SENIOR SOFTWARE ENGINEER',
-    company: 'COMPANY_NAME',
-    period: '2020\u2014PRESENT',
-    bullets: [
-      'Full-stack web application development at scale',
-      'Cross-functional team collaboration & technical leadership',
-      'Drove 30% improvement in user engagement metrics',
-    ],
-  },
-  {
-    role: 'SOFTWARE DEVELOPER',
-    company: 'PREVIOUS_CO',
-    period: '2018\u20142020',
-    bullets: [
-      'Responsive web interface engineering',
-      'Code review processes & quality standards',
-      'Foundation in modern development practices',
-    ],
-  },
-];
+const EXPERIENCE = sortedExp.slice(0, 3).map(exp => ({
+  role: exp.role.toUpperCase(),
+  company: exp.company.toUpperCase(),
+  period: `${exp.startDate.split('-')[0]}\u2014${exp.endDate === 'present' ? 'PRESENT' : exp.endDate.split('-')[0]}`,
+  bullets: exp.achievements.slice(0, 3).map(a => a.description),
+}));
+
+const PROJECTS = featured.slice(0, 2).map(p => ({
+  name: p.name,
+  tagline: p.tagline,
+  technologies: p.technologies.slice(0, 3),
+}));
 
 export default function HomepageBrutalism() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -183,7 +179,7 @@ export default function HomepageBrutalism() {
 
         {/* Top Bar */}
         <div className="border-b-4 border-black flex justify-between items-center px-4 sm:px-6 py-3">
-          <span className="label-tag hidden sm:inline">PORTFOLIO_2024.HTML</span>
+          <span className="label-tag hidden sm:inline">PORTFOLIO_{profile.lastName.toUpperCase()}.HTML</span>
           <span className="font-bold text-sm font-mono">{time}</span>
           <span className="label-tag hidden sm:inline">SCROLL DOWN OR DON&apos;T</span>
         </div>
@@ -191,22 +187,21 @@ export default function HomepageBrutalism() {
         {/* Hero */}
         <section className="px-6 md:px-12 pt-16 pb-8 relative">
           <div className="rotate-tag right-6 top-20 hidden md:block">
-            SINCE 2018
+            SINCE 2020
           </div>
           <p className="label-tag mb-4">&lt;h1&gt;</p>
-          <h1 className="brutal-heading text-[clamp(36px,12vw,180px)] text-black">
-            SOFT
-            <span className="pink-accent">WARE</span>
+          <h1 className="brutal-heading text-[clamp(36px,10vw,140px)] text-black">
+            {profile.firstName.toUpperCase()}
           </h1>
-          <h1 className="brutal-heading text-[clamp(36px,12vw,180px)] text-black -mt-2 md:-mt-6">
-            ENGI
-            <span className="yellow-bg text-black">NEER</span>
+          <h1 className="brutal-heading text-[clamp(36px,10vw,140px)] text-black -mt-2 md:-mt-6">
+            <span className="pink-accent">CADO</span>
+            <span className="yellow-bg text-black">NNA</span>
           </h1>
           <p className="label-tag mt-4">&lt;/h1&gt;</p>
 
           <div className="mt-8 max-w-xl">
             <p className="text-lg leading-relaxed">
-              I build things for the web.
+              {profile.title} based in {profile.contact.location}.
               <br />
               <span className="strikethrough text-gray-400">Sometimes they even work.</span>
               <br />
@@ -243,7 +238,7 @@ export default function HomepageBrutalism() {
                 className="brutal-card p-4 bg-white"
                 style={{ transform: `rotate(${(i % 3 - 1) * 1.5}deg)` }}
               >
-                <span className="label-tag block mb-1">0{i + 1}</span>
+                <span className="label-tag block mb-1">{String(i + 1).padStart(2, '0')}</span>
                 <span className="font-bold text-sm uppercase">{skill}</span>
               </div>
             ))}
@@ -285,40 +280,29 @@ export default function HomepageBrutalism() {
             THINGS I <span className="blue-accent">MADE</span>
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="brutal-card p-5 sm:p-8 bg-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 yellow-bg"
-                style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }} />
-              <span className="label-tag">PROJECT_01</span>
-              <h3 className="brutal-heading text-xl sm:text-3xl mt-2 mb-4">FULL-STACK PLATFORM</h3>
-              <p className="text-sm mb-4 leading-relaxed">
-                A production-grade web application built with React, Node.js, and MongoDB.
-                Handles real users, real data, real problems.
-              </p>
-              <div className="flex gap-2 flex-wrap">
-                {['React', 'Node.js', 'MongoDB'].map(t => (
-                  <span key={t} className="border-2 border-black px-2 py-1 text-[10px] font-bold uppercase">
-                    {t}
-                  </span>
-                ))}
+            {PROJECTS.map((proj, i) => (
+              <div
+                key={proj.name}
+                className={`brutal-card p-5 sm:p-8 relative overflow-hidden ${i % 2 === 0 ? 'bg-white' : 'bg-black text-white'}`}
+              >
+                <div
+                  className={`absolute top-0 right-0 w-24 h-24 ${i % 2 === 0 ? 'yellow-bg' : 'bg-[#FF0066]'}`}
+                  style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }}
+                />
+                <span className={`label-tag ${i % 2 !== 0 ? 'text-gray-500' : ''}`}>PROJECT_{String(i + 1).padStart(2, '0')}</span>
+                <h3 className="brutal-heading text-xl sm:text-3xl mt-2 mb-2">{proj.name.toUpperCase()}</h3>
+                <p className={`text-sm mb-4 leading-relaxed ${i % 2 !== 0 ? 'text-gray-300' : ''}`}>
+                  {proj.tagline}
+                </p>
+                <div className="flex gap-2 flex-wrap">
+                  {proj.technologies.map(t => (
+                    <span key={t} className={`border-2 ${i % 2 === 0 ? 'border-black' : 'border-white'} px-2 py-1 text-[10px] font-bold uppercase`}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="brutal-card p-5 sm:p-8 bg-black text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-[#FF0066]"
-                style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }} />
-              <span className="label-tag text-gray-500">PROJECT_02</span>
-              <h3 className="brutal-heading text-xl sm:text-3xl mt-2 mb-4">OPEN SOURCE TOOL</h3>
-              <p className="text-sm mb-4 leading-relaxed text-gray-300">
-                TypeScript-powered developer tool with Next.js frontend
-                and PostgreSQL backend. Community-driven. Battle-tested.
-              </p>
-              <div className="flex gap-2 flex-wrap">
-                {['TypeScript', 'Next.js', 'PostgreSQL'].map(t => (
-                  <span key={t} className="border-2 border-white px-2 py-1 text-[10px] font-bold uppercase">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
         </section>
 
@@ -344,7 +328,7 @@ export default function HomepageBrutalism() {
               </span>
             </p>
             <div className="mt-6 text-2xl sm:text-4xl md:text-6xl select-none tracking-wide sm:tracking-[8px]">
-              ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+              &#9820; &#9822; &#9821; &#9819; &#9818; &#9821; &#9822; &#9820;
             </div>
           </div>
         </section>
@@ -356,14 +340,14 @@ export default function HomepageBrutalism() {
             LET&apos;S <span className="text-[#0000FF]">TALK</span>
           </h2>
           <div className="flex gap-4 flex-wrap">
-            <a href="https://github.com" className="brutal-link" target="_blank" rel="noopener noreferrer">
-              GITHUB ↗
+            <a href={profile.contact.github} className="brutal-link" target="_blank" rel="noopener noreferrer">
+              GITHUB &#8599;
             </a>
-            <a href="https://linkedin.com" className="brutal-link" target="_blank" rel="noopener noreferrer">
-              LINKEDIN ↗
+            <a href={profile.contact.linkedin} className="brutal-link" target="_blank" rel="noopener noreferrer">
+              LINKEDIN &#8599;
             </a>
-            <a href="mailto:contact@example.com" className="brutal-link">
-              EMAIL ↗
+            <a href={`mailto:${profile.contact.email}`} className="brutal-link">
+              EMAIL &#8599;
             </a>
           </div>
           <p className="label-tag mt-12">&lt;/footer&gt;</p>

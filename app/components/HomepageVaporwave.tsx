@@ -1,22 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { profile, getExperienceSorted, getFeaturedProjects, allSkillNames } from '@/lib/data';
 
-const SKILLS = [
-  'React', 'Next.js', 'TypeScript', 'Python',
-  'Node.js', 'AWS', 'Docker', 'GraphQL',
-  'PostgreSQL', 'MongoDB', 'Git', 'Linux',
-];
+const sortedExp = getExperienceSorted();
+const featured = getFeaturedProjects();
 
-const EXPERIENCE = [
-  { role: 'SENIOR SOFTWARE ENGINEER', company: 'Company Name', period: '2020 — NOW' },
-  { role: 'SOFTWARE DEVELOPER', company: 'Previous Co', period: '2018 — 2020' },
-];
+const SKILLS = allSkillNames.slice(0, 12);
 
-const PROJECTS = [
-  { name: 'Full-Stack Platform', tech: 'React + Node.js + MongoDB' },
-  { name: 'Open Source Tool', tech: 'TypeScript + Next.js + PostgreSQL' },
-];
+const EXPERIENCE = sortedExp.slice(0, 3).map(exp => ({
+  role: exp.role.toUpperCase(),
+  company: exp.company,
+  period: `${exp.startDate.split('-')[0]} \u2014 ${exp.endDate === 'present' ? 'NOW' : exp.endDate.split('-')[0]}`,
+}));
+
+const PROJECTS = featured.slice(0, 4).map(p => ({
+  name: p.name,
+  tech: p.technologies.slice(0, 3).join(' + '),
+}));
 
 export default function HomepageVaporwave() {
   const [glitchActive, setGlitchActive] = useState(false);
@@ -269,7 +270,7 @@ export default function HomepageVaporwave() {
           {/* Header */}
           <div className="flex justify-between items-center mb-12 sm:mb-20">
             <span className="aesthetic-text neon-pink text-[10px] sm:text-xs">PORTFOLIO.EXE</span>
-            <span className="aesthetic-text neon-cyan text-[10px] sm:text-xs">2 0 2 4</span>
+            <span className="aesthetic-text neon-cyan text-[10px] sm:text-xs">2 0 2 5</span>
           </div>
 
           {/* Sun + Hero */}
@@ -277,18 +278,18 @@ export default function HomepageVaporwave() {
             <div className="vapor-sun mb-12 !w-[140px] !h-[140px] sm:!w-[200px] sm:!h-[200px]" />
             <h1
               className="display-font text-4xl md:text-6xl lg:text-7xl neon-pink glitch-text mb-6"
-              data-text="SOFTWARE"
+              data-text={profile.firstName.toUpperCase()}
             >
-              SOFTWARE
+              {profile.firstName.toUpperCase()}
             </h1>
             <h1
               className="display-font text-4xl md:text-6xl lg:text-7xl neon-cyan glitch-text mb-8"
-              data-text="ENGINEER"
+              data-text={profile.lastName.toUpperCase()}
             >
-              ENGINEER
+              {profile.lastName.toUpperCase()}
             </h1>
             <p className="aesthetic-text text-[#8866aa] tracking-[0.2em] sm:tracking-[0.8em] text-[10px] sm:text-xs">
-              FULL-STACK DEVELOPER
+              {profile.title.toUpperCase()}
             </p>
             <p className="mt-4 text-sm text-[#6644aa]">
               ソフトウェアエンジニア &mdash; チェス愛好家
@@ -299,9 +300,7 @@ export default function HomepageVaporwave() {
           <section className="vapor-card mb-8">
             <p className="aesthetic-text neon-pink mb-4 text-[10px]">// ABOUT.TXT</p>
             <p className="text-lg leading-relaxed text-[#c0a0e0]">
-              A digital architect building in the space between logic and aesthetics.
-              Every line of code is a brushstroke. Every system, a composition.
-              When not crafting software, calculating forced checkmates on the 64 squares.
+              {profile.shortBio} When not crafting software, calculating forced checkmates on the 64 squares.
             </p>
           </section>
 
@@ -349,7 +348,7 @@ export default function HomepageVaporwave() {
           {/* Chess */}
           <section className="vapor-card mb-8 text-center">
             <div className="text-5xl mb-4 select-none" style={{ animation: 'floatUp 4s ease-in-out infinite', filter: 'drop-shadow(0 0 20px #ff00ff66)' }}>
-              ♛
+              &#9819;
             </div>
             <h2 className="display-font text-2xl md:text-3xl neon-pink mb-4">CHESS</h2>
             <p className="text-sm text-[#8866aa] max-w-md mx-auto leading-relaxed">
@@ -365,13 +364,13 @@ export default function HomepageVaporwave() {
               C O N N E C T
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
-              <a href="https://github.com" className="vapor-btn" target="_blank" rel="noopener noreferrer">
+              <a href={profile.contact.github} className="vapor-btn" target="_blank" rel="noopener noreferrer">
                 <span>GITHUB</span>
               </a>
-              <a href="https://linkedin.com" className="vapor-btn" target="_blank" rel="noopener noreferrer">
+              <a href={profile.contact.linkedin} className="vapor-btn" target="_blank" rel="noopener noreferrer">
                 <span>LINKEDIN</span>
               </a>
-              <a href="mailto:contact@example.com" className="vapor-btn">
+              <a href={`mailto:${profile.contact.email}`} className="vapor-btn">
                 <span>EMAIL</span>
               </a>
             </div>

@@ -1,45 +1,30 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { profile, getExperienceSorted, getFeaturedProjects, allSkillNames } from '@/lib/data';
 
-const SKILLS = [
-  'React', 'Next.js', 'TypeScript', 'Python',
-  'Node.js', 'AWS', 'Docker', 'GraphQL',
-  'PostgreSQL', 'Git', 'Linux', 'CI/CD',
-];
+const sortedExp = getExperienceSorted();
+const featured = getFeaturedProjects();
 
-const TIMELINE = [
-  {
-    date: '2020 — PRESENT',
-    title: 'Senior Software Engineer',
-    location: 'Company Name',
-    notes: 'Subject promoted to senior position. Now leads full-stack initiatives. Team reports 30% engagement increase under their watch. Considered dangerous.',
-  },
-  {
-    date: '2018 — 2020',
-    title: 'Software Developer',
-    location: 'Previous Company',
-    notes: 'First known sighting. Built responsive interfaces. Established code review protocols. Left organization in suspiciously good shape.',
-  },
-];
+const SKILLS = allSkillNames.slice(0, 14);
 
-const EVIDENCE = [
-  {
-    id: 'EV-001',
-    label: 'Full-Stack Platform',
-    detail: 'React + Node.js + MongoDB. Production deployment confirmed. Zero critical incidents.',
-  },
-  {
-    id: 'EV-002',
-    label: 'Open Source Tool',
-    detail: 'TypeScript + Next.js + PostgreSQL. Community-driven. Multiple accomplices (contributors).',
-  },
-  {
-    id: 'EV-003',
-    label: 'Chess Puzzle App',
-    detail: 'Next.js + Chess.js + Lichess API. Daily puzzle-solving habit. Obsessive pattern recognition.',
-  },
-];
+const TIMELINE = sortedExp.slice(0, 4).map(exp => ({
+  date: `${exp.startDate.split('-')[0]} \u2014 ${exp.endDate === 'present' ? 'PRESENT' : exp.endDate.split('-')[0]}`,
+  title: exp.role,
+  location: exp.company,
+  notes: exp.summary,
+}));
+
+const EVIDENCE = featured.slice(0, 3).map((p, i) => ({
+  id: `EV-${String(i + 1).padStart(3, '0')}`,
+  label: p.name,
+  detail: `${p.technologies.slice(0, 3).join(' + ')}. ${p.tagline}.`,
+  annotation: [
+    '\u2192 Clean deployment. Suspicious.',
+    '\u2192 Open source? What is he building?',
+    '\u2192 Chess connection CONFIRMED',
+  ][i] || '\u2192 Under investigation.',
+}));
 
 export default function HomepageCrimeBoard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -266,11 +251,11 @@ export default function HomepageCrimeBoard() {
                 FEDERAL BUREAU OF ENGINEERING
               </p>
               <h1 className="typewriter text-3xl md:text-5xl mb-3 tracking-wider">
-                CASE FILE <span className="text-[#cc0000]">#2024-SWE</span>
+                CASE FILE <span className="text-[#cc0000]">#2025-{profile.lastName.toUpperCase()}</span>
               </h1>
               <div className="stamp-classified mb-3">CLASSIFIED</div>
               <p className="typewriter text-xs sm:text-sm text-[#666]">
-                SUBJECT: SOFTWARE ENGINEER
+                SUBJECT: {profile.fullName.toUpperCase()}
                 <br className="sm:hidden" />
                 <span className="hidden sm:inline"> &middot; </span>
                 STATUS: AT LARGE
@@ -287,10 +272,10 @@ export default function HomepageCrimeBoard() {
             <div className="flex justify-center">
               <div className="card-photo" style={{ transform: 'rotate(-3deg)' }}>
                 <div className="w-36 h-44 sm:w-48 sm:h-56 bg-[#ddd] flex items-center justify-center text-5xl sm:text-6xl select-none">
-                  ♞
+                  &#9822;
                 </div>
                 <p className="handwriting text-center text-base sm:text-lg mt-2 text-[#555]">
-                  Subject — current photo
+                  Subject &mdash; {profile.contact.location}
                 </p>
               </div>
             </div>
@@ -301,15 +286,16 @@ export default function HomepageCrimeBoard() {
                 <div className="tape tape-corner" />
                 <h2 className="typewriter text-lg mb-3 underline-red">SUBJECT PROFILE</h2>
                 <div className="typewriter text-sm leading-loose">
-                  <p><strong>OCCUPATION:</strong> Full-Stack Software Engineer</p>
-                  <p><strong>KNOWN ALIASES:</strong> <span className="redacted">REDACTED</span>, Senior SWE, &ldquo;The Chess Guy&rdquo;</p>
-                  <p><strong>SPECIALIZATION:</strong> Modern web applications, scalable architectures</p>
-                  <p><strong>DISTINGUISHING TRAIT:</strong> Strategic thinking from chess obsession</p>
+                  <p><strong>NAME:</strong> {profile.fullName}</p>
+                  <p><strong>OCCUPATION:</strong> {profile.title}</p>
+                  <p><strong>LOCATION:</strong> {profile.contact.location}</p>
+                  <p><strong>KNOWN ALIASES:</strong> <span className="redacted">REDACTED</span>, Lead Developer, &ldquo;The Chess Guy&rdquo;</p>
+                  <p><strong>SPECIALIZATION:</strong> AI-augmented development, fullstack architecture, MCP servers</p>
                   <p><strong>MOTIVE:</strong> Building things that actually work</p>
                   <p className="mt-3 text-xs text-[#888]">
-                    NOTE: Subject approaches every problem like a chess position — analyzing deeply,
+                    NOTE: Subject approaches every problem like a chess position &mdash; analyzing deeply,
                     calculating variations, and finding the most efficient path. Consider armed
-                    with a keyboard and <span className="underline-red">extremely dangerous</span>.
+                    with Claude Code and <span className="underline-red">extremely dangerous</span>.
                   </p>
                 </div>
               </div>
@@ -379,9 +365,7 @@ export default function HomepageCrimeBoard() {
                   <h3 className="typewriter text-sm font-bold mb-2">{item.label}</h3>
                   <p className="typewriter text-xs text-[#666] leading-relaxed">{item.detail}</p>
                   <p className="handwriting text-sm text-[#cc0000] mt-3">
-                    {i === 0 && '→ Clean deployment. Suspicious.'}
-                    {i === 1 && '→ Open source? What is he hiding?'}
-                    {i === 2 && '→ Chess connection CONFIRMED'}
+                    {item.annotation}
                   </p>
                 </div>
               ))}
@@ -394,7 +378,7 @@ export default function HomepageCrimeBoard() {
               <div className="tape tape-top" style={{ left: '45%' }} />
               <h2 className="typewriter text-lg mb-4 underline-red">PATTERN OF BEHAVIOR: CHESS</h2>
               <div className="text-4xl mb-4 select-none tracking-widest">
-                ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+                &#9820; &#9822; &#9821; &#9819; &#9818; &#9821; &#9822; &#9820;
               </div>
               <p className="handwriting text-xl text-[#444] max-w-md mx-auto leading-relaxed">
                 &ldquo;Subject exhibits strategic thinking consistent with chess training.
@@ -402,7 +386,7 @@ export default function HomepageCrimeBoard() {
                 for long-term architecture. Pattern is clear.&rdquo;
               </p>
               <p className="typewriter text-xs text-[#888] mt-4">
-                — FIELD AGENT REPORT, CONFIDENTIAL
+                &mdash; FIELD AGENT REPORT, CONFIDENTIAL
               </p>
             </div>
           </section>
@@ -413,13 +397,13 @@ export default function HomepageCrimeBoard() {
               IF YOU HAVE INFORMATION REGARDING THIS SUBJECT:
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
-              <a href="https://github.com" className="crime-link" target="_blank" rel="noopener noreferrer">
+              <a href={profile.contact.github} className="crime-link" target="_blank" rel="noopener noreferrer">
                 GITHUB
               </a>
-              <a href="https://linkedin.com" className="crime-link" target="_blank" rel="noopener noreferrer">
+              <a href={profile.contact.linkedin} className="crime-link" target="_blank" rel="noopener noreferrer">
                 LINKEDIN
               </a>
-              <a href="mailto:contact@example.com" className="crime-link">
+              <a href={`mailto:${profile.contact.email}`} className="crime-link">
                 EMAIL
               </a>
             </div>

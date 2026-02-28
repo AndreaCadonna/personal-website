@@ -1,31 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { profile, getExperienceSorted, getFeaturedProjects, allSkillNames } from '@/lib/data';
 
-const SKILLS = [
-  'React', 'Next.js', 'TypeScript', 'Python',
-  'Node.js', 'AWS', 'Docker', 'GraphQL',
-  'PostgreSQL', 'MongoDB', 'Git', 'Linux',
-];
+const sortedExp = getExperienceSorted();
+const featured = getFeaturedProjects();
 
-const CASES = [
-  {
-    title: 'The Full-Stack Platform',
-    year: '2022',
-    tools: 'React, Node.js, MongoDB',
-    narration: 'A client needed a platform that could handle the real world. Real users. Real data. Real problems. I built it from the ground up — every endpoint, every query, every pixel. It shipped clean. No bodies.',
-  },
-  {
-    title: 'The Open Source Caper',
-    year: '2021',
-    tools: 'TypeScript, Next.js, PostgreSQL',
-    narration: 'Started as a solo job. Then the contributors showed up — one by one, from every timezone. What began in a dark IDE at 2 AM became something bigger than any of us. The code is free now. It belongs to everyone.',
-  },
-];
+const SKILLS = allSkillNames.slice(0, 14);
+
+const CASES = featured.slice(0, 2).map(p => ({
+  title: `The ${p.name}`,
+  year: p.startDate.split('-')[0],
+  tools: p.technologies.slice(0, 3).join(', '),
+  narration: p.description,
+}));
 
 export default function HomepageNoir() {
   const [typed, setTyped] = useState('');
-  const fullText = 'Software Engineer.';
+  const fullText = `${profile.fullName}.`;
 
   useEffect(() => {
     let i = 0;
@@ -238,7 +230,7 @@ export default function HomepageNoir() {
               <span className="typewriter-cursor">{typed}</span>
             </h1>
             <p className="text-sm text-[#5a5548] mt-8 tracking-widest uppercase">
-              A story of code, chess, and questionable coffee habits
+              A story of code, chess, and AI-augmented workflows
             </p>
           </header>
 
@@ -255,10 +247,10 @@ export default function HomepageNoir() {
                 than a politician&apos;s browser history.
               </p>
               <p>
-                They call me a software engineer. I call myself a digital detective &mdash;
-                hunting down bugs in the dark, architecting solutions nobody asked for
-                but everybody needs. I work with React, TypeScript, Python, and whatever
-                else the job demands.
+                They call me {profile.fullName}. A {profile.title.toLowerCase()} based in {profile.contact.location}.
+                Five years hunting down bugs in the dark, architecting solutions nobody asked for
+                but everybody needs. I work with Angular, React, TypeScript, Python, and whatever
+                else the job demands. These days, I orchestrate AI agents and MCP servers too.
               </p>
               <p>
                 When I&apos;m not untangling spaghetti code, I&apos;m at the chessboard.
@@ -290,29 +282,21 @@ export default function HomepageNoir() {
             <p className="chapter-num mb-6">Act III</p>
             <h2 className="serif text-3xl md:text-4xl text-white mb-8 italic">The Record</h2>
 
-            <div className="noir-card mb-6">
-              <p className="chapter-num mb-2">2020 — Present</p>
-              <h3 className="serif text-xl text-white mb-2">Senior Software Engineer</h3>
-              <p className="text-sm text-[#5a5548] mb-3">Company Name</p>
-              <p className="leading-[1.8]">
-                The promotion came after I solved a problem nobody else would touch.
-                Now I lead the full-stack initiatives. The team moves faster.
-                The metrics climb. The code stays clean.
-                <span className="noir-red"> That&apos;s the job.</span>
-              </p>
-            </div>
-
-            <div className="noir-card">
-              <p className="chapter-num mb-2">2018 — 2020</p>
-              <h3 className="serif text-xl text-white mb-2">Software Developer</h3>
-              <p className="text-sm text-[#5a5548] mb-3">Previous Company</p>
-              <p className="leading-[1.8]">
-                Where it all started. Responsive interfaces built from nothing.
-                Code reviews that taught me more than any bootcamp.
-                I left the place better than I found it.
-                <span className="noir-red"> That&apos;s always the goal.</span>
-              </p>
-            </div>
+            {sortedExp.slice(0, 3).map((exp, i) => (
+              <div key={exp.id} className={`noir-card ${i < 2 ? 'mb-6' : ''}`}>
+                <p className="chapter-num mb-2">
+                  {exp.startDate.split('-')[0]} &mdash; {exp.endDate === 'present' ? 'Present' : exp.endDate.split('-')[0]}
+                </p>
+                <h3 className="serif text-xl text-white mb-2">{exp.role}</h3>
+                <p className="text-sm text-[#5a5548] mb-3">{exp.company}, {exp.location}</p>
+                <p className="leading-[1.8]">
+                  {exp.summary}
+                  {i === 0 && <span className="noir-red"> That&apos;s the job.</span>}
+                  {i === 1 && <span className="noir-red"> The AI never sleeps.</span>}
+                  {i === 2 && <span className="noir-red"> Left the place better than I found it.</span>}
+                </p>
+              </div>
+            ))}
           </section>
 
           <div className="noir-divider" />
@@ -343,7 +327,7 @@ export default function HomepageNoir() {
             <p className="chapter-num mb-6">Act V</p>
             <h2 className="serif text-3xl md:text-4xl text-white mb-8 italic">The Endgame</h2>
             <div className="text-4xl mb-8 select-none opacity-40">
-              ♚
+              &#9818;
             </div>
             <div className="pull-quote max-w-lg mx-auto mb-8">
               &ldquo;Every chess game is a story. Every position has a truth hiding in it.
@@ -366,13 +350,13 @@ export default function HomepageNoir() {
               If you&apos;ve got a case that needs solving, you know where to look.
             </p>
             <div className="flex gap-4 justify-center flex-wrap">
-              <a href="https://github.com" className="noir-btn" target="_blank" rel="noopener noreferrer">
+              <a href={profile.contact.github} className="noir-btn" target="_blank" rel="noopener noreferrer">
                 GitHub
               </a>
-              <a href="https://linkedin.com" className="noir-btn" target="_blank" rel="noopener noreferrer">
+              <a href={profile.contact.linkedin} className="noir-btn" target="_blank" rel="noopener noreferrer">
                 LinkedIn
               </a>
-              <a href="mailto:contact@example.com" className="noir-btn">
+              <a href={`mailto:${profile.contact.email}`} className="noir-btn">
                 Email
               </a>
             </div>
