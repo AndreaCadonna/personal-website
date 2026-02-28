@@ -1,22 +1,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { profile, getExperienceSorted, getFeaturedProjects, allSkillNames } from '@/lib/data';
+
+const sortedExp = getExperienceSorted();
+const featured = getFeaturedProjects();
 
 const SKILLS = [
-  { name: 'React & Next.js', stars: 5 },
+  { name: 'Angular & React', stars: 5 },
   { name: 'TypeScript', stars: 5 },
-  { name: 'Python', stars: 4 },
+  { name: 'Next.js & Astro', stars: 5 },
   { name: 'Node.js', stars: 5 },
-  { name: 'AWS & Cloud', stars: 4 },
-  { name: 'Docker', stars: 4 },
-  { name: 'GraphQL', stars: 4 },
-  { name: 'PostgreSQL', stars: 4 },
+  { name: 'Python & Java', stars: 4 },
+  { name: 'AI/RAG/MCP', stars: 5 },
+  { name: 'Firebase & Supabase', stars: 5 },
+  { name: 'Docker & CI/CD', stars: 4 },
 ];
 
+const MARQUEE_SKILLS = allSkillNames.slice(0, 12).join(' \u2605 ') + ' \u2605 ';
+
 const GUESTBOOK = [
-  { name: 'xX_CodeMaster_Xx', date: '02/14/2024', msg: 'Cool site!! Love the chess stuff :D' },
-  { name: 'h4ck3r_girl', date: '01/28/2024', msg: 'OMG your projects are amazing!!! *~*~*' },
-  { name: 'JavaFan2000', date: '12/15/2023', msg: 'Nice homepage!! Bookmarked!! :-) :-) :-)' },
+  { name: 'xX_CodeMaster_Xx', date: '02/14/2025', msg: 'Cool site!! Love the chess puzzle login :D' },
+  { name: 'AI_Agent_Fan', date: '01/28/2025', msg: 'OMG your MCP servers are amazing!!! *~*~*' },
+  { name: 'AngularDev2000', date: '12/15/2024', msg: 'Nice homepage!! The brutalism theme is fire!! :-) :-) :-)' },
 ];
 
 export default function HomepageY2K() {
@@ -236,7 +242,7 @@ export default function HomepageY2K() {
         {/* Sparkles on click */}
         {sparkles.map(s => (
           <div key={s.id} className="sparkle" style={{ left: s.x - 10, top: s.y - 10 }}>
-            ✦
+            &#10022;
           </div>
         ))}
 
@@ -244,17 +250,17 @@ export default function HomepageY2K() {
           {/* Under construction banner */}
           <div className="under-construction mb-4">
             <div className="under-construction-inner">
-              🚧 THIS SITE IS UNDER CONSTRUCTION 🚧 CHECK BACK SOON FOR UPDATES!! 🚧
+              &#128679; THIS SITE IS UNDER CONSTRUCTION &#128679; CHECK BACK SOON FOR UPDATES!! &#128679;
             </div>
           </div>
 
           {/* Title */}
           <div className="text-center mb-4">
             <h1 className="y2k-title">
-              ~*~ Welcome To My Homepage!! ~*~
+              ~*~ {profile.fullName}&apos;s Homepage!! ~*~
             </h1>
             <p className="text-lg rainbow-text font-bold mt-2">
-              ★ Software Engineer & Chess Enthusiast ★
+              &#9733; {profile.title} &amp; Chess Enthusiast &#9733;
             </p>
           </div>
 
@@ -263,7 +269,7 @@ export default function HomepageY2K() {
           {/* Marquee */}
           <div className="y2k-marquee mb-4">
             <div className="y2k-marquee-inner text-sm text-[#00ffff]">
-              {'★ React ★ Next.js ★ TypeScript ★ Python ★ Node.js ★ AWS ★ Docker ★ GraphQL ★ PostgreSQL ★ MongoDB ★ Git ★ Linux ★ '.repeat(3)}
+              {MARQUEE_SKILLS.repeat(3)}
             </div>
           </div>
 
@@ -299,7 +305,7 @@ export default function HomepageY2K() {
                   </p>
                   <hr className="y2k-hr my-3" />
                   <div className="text-center">
-                    <div className="badge">MADE WITH<br />♥ AND HTML</div>
+                    <div className="badge">MADE WITH<br />&#9829; AND HTML</div>
                   </div>
                 </td>
 
@@ -307,13 +313,13 @@ export default function HomepageY2K() {
                   {/* About */}
                   <section id="about" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-2">
-                      {blink ? '►' : '▻'} About Me!!
+                      {blink ? '\u25BA' : '\u25BB'} About Me!!
                     </h2>
                     <p className="text-sm leading-relaxed text-[#ccccff]">
-                      Hey there!! Welcome to my corner of the internet!! I&apos;m a full-stack
-                      software engineer who LOVES building web apps and playing chess!! I believe
-                      in clean code, good documentation, and always thinking three moves ahead
-                      (just like in chess LOL) ^_^
+                      Hey there!! Welcome to my corner of the internet!! I&apos;m {profile.fullName},
+                      a {profile.title.toLowerCase()} from {profile.contact.location} who LOVES building web apps,
+                      integrating AI tools, and playing chess!! I believe in clean code, good architecture,
+                      and always thinking three moves ahead (just like in chess LOL) ^_^
                     </p>
                     <p className="text-xs text-[#ff88ff] mt-2">
                       {'>>'} Currently: Available for new opportunities!! Email me!! {'<<'}
@@ -325,7 +331,7 @@ export default function HomepageY2K() {
                   {/* Skills */}
                   <section id="skills" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '►' : '▻'} My Skillz!!
+                      {blink ? '\u25BA' : '\u25BB'} My Skillz!!
                     </h2>
                     <table className="w-full text-sm">
                       <tbody>
@@ -333,7 +339,7 @@ export default function HomepageY2K() {
                           <tr key={skill.name} className="border-b border-[#333366]">
                             <td className="py-1 text-[#ccccff]">{skill.name}</td>
                             <td className="py-1 star-rating text-right">
-                              {'★'.repeat(skill.stars)}{'☆'.repeat(5 - skill.stars)}
+                              {'\u2605'.repeat(skill.stars)}{'\u2606'.repeat(5 - skill.stars)}
                             </td>
                           </tr>
                         ))}
@@ -346,32 +352,25 @@ export default function HomepageY2K() {
                   {/* Experience */}
                   <section id="work" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '►' : '▻'} Work Experience
+                      {blink ? '\u25BA' : '\u25BB'} Work Experience
                     </h2>
                     <div className="space-y-4">
-                      <div>
-                        <p className="font-bold text-[#ffcc00]">
-                          <span className="blink text-[#ff0000]">[NEW!]</span>{' '}
-                          Senior Software Engineer @ Company
-                        </p>
-                        <p className="text-xs text-[#8888cc]">2020 - Present</p>
-                        <ul className="text-sm text-[#ccccff] mt-1 list-disc list-inside">
-                          <li>Leading full-stack web development initiatives!!</li>
-                          <li>Boosted user engagement by 30% (!!!)</li>
-                          <li>Architecting scalable solutions for real users</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <p className="font-bold text-[#ffcc00]">
-                          Software Developer @ Previous Company
-                        </p>
-                        <p className="text-xs text-[#8888cc]">2018 - 2020</p>
-                        <ul className="text-sm text-[#ccccff] mt-1 list-disc list-inside">
-                          <li>Built responsive web interfaces from scratch</li>
-                          <li>Code review champion B-)</li>
-                          <li>Learned ALL the best practices</li>
-                        </ul>
-                      </div>
+                      {sortedExp.slice(0, 3).map((exp, i) => (
+                        <div key={exp.id}>
+                          <p className="font-bold text-[#ffcc00]">
+                            {i === 0 && <span className="blink text-[#ff0000]">[NEW!] </span>}
+                            {exp.role} @ {exp.company}
+                          </p>
+                          <p className="text-xs text-[#8888cc]">
+                            {exp.startDate.split('-')[0]} - {exp.endDate === 'present' ? 'Present' : exp.endDate.split('-')[0]}
+                          </p>
+                          <ul className="text-sm text-[#ccccff] mt-1 list-disc list-inside">
+                            {exp.achievements.slice(0, 3).map((a, j) => (
+                              <li key={j}>{a.description}{a.metric ? ` (${a.metric})` : ''}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
                     </div>
                   </section>
 
@@ -380,27 +379,18 @@ export default function HomepageY2K() {
                   {/* Projects */}
                   <section id="projects" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '►' : '▻'} Cool Projects!!
+                      {blink ? '\u25BA' : '\u25BB'} Cool Projects!!
                     </h2>
                     <div className="space-y-3">
-                      <div className="border-2 ridge border-[#6666aa] p-3" style={{ background: 'rgba(0,0,60,0.5)' }}>
-                        <p className="font-bold text-[#ff88ff]">
-                          <span className="badge">HOT!</span> Full-Stack Platform
-                        </p>
-                        <p className="text-xs text-[#8888cc] mb-1">React + Node.js + MongoDB</p>
-                        <p className="text-sm text-[#ccccff]">
-                          A real production app!! Real users!! Real data!! Check it out!! :D
-                        </p>
-                      </div>
-                      <div className="border-2 ridge border-[#6666aa] p-3" style={{ background: 'rgba(0,0,60,0.5)' }}>
-                        <p className="font-bold text-[#ff88ff]">
-                          <span className="badge">NEW!</span> Open Source Tool
-                        </p>
-                        <p className="text-xs text-[#8888cc] mb-1">TypeScript + Next.js + PostgreSQL</p>
-                        <p className="text-sm text-[#ccccff]">
-                          Community-driven dev tool. Contributors welcome!! Fork it!! Star it!!
-                        </p>
-                      </div>
+                      {featured.slice(0, 3).map((project, i) => (
+                        <div key={project.id} className="border-2 ridge border-[#6666aa] p-3" style={{ background: 'rgba(0,0,60,0.5)' }}>
+                          <p className="font-bold text-[#ff88ff]">
+                            <span className="badge">{i === 0 ? 'HOT!' : 'NEW!'}</span> {project.name}
+                          </p>
+                          <p className="text-xs text-[#8888cc] mb-1">{project.technologies.slice(0, 3).join(' + ')}</p>
+                          <p className="text-sm text-[#ccccff]">{project.tagline}</p>
+                        </div>
+                      ))}
                     </div>
                   </section>
 
@@ -409,10 +399,10 @@ export default function HomepageY2K() {
                   {/* Chess */}
                   <section id="chess" className="mb-6 text-center">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      ♟ CHESS CORNER ♟
+                      &#9823; CHESS CORNER &#9823;
                     </h2>
                     <div className="text-3xl mb-3 select-none">
-                      ♜♞♝♛♚♝♞♜
+                      &#9820;&#9822;&#9821;&#9819;&#9818;&#9821;&#9822;&#9820;
                     </div>
                     <p className="text-sm text-[#ccccff]">
                       I play chess EVERY DAY on Lichess!! It makes me a better coder
@@ -428,13 +418,13 @@ export default function HomepageY2K() {
                   {/* Guestbook */}
                   <section id="guestbook" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '►' : '▻'} Guestbook (Sign it!!)
+                      {blink ? '\u25BA' : '\u25BB'} Guestbook (Sign it!!)
                     </h2>
                     {GUESTBOOK.map((entry) => (
                       <div key={entry.name} className="guestbook-entry">
                         <p className="text-xs">
                           <span className="text-[#00ff00] font-bold">{entry.name}</span>
-                          <span className="text-[#666]"> — {entry.date}</span>
+                          <span className="text-[#666]"> &mdash; {entry.date}</span>
                         </p>
                         <p className="text-sm text-[#ccccff]">{entry.msg}</p>
                       </div>
@@ -449,15 +439,15 @@ export default function HomepageY2K() {
 
           {/* Links & Contact */}
           <section id="links" className="text-center mb-6">
-            <h2 className="text-lg font-bold text-[#ffcc00] mb-3">~*~ Cool Links & Contact ~*~</h2>
+            <h2 className="text-lg font-bold text-[#ffcc00] mb-3">~*~ Cool Links &amp; Contact ~*~</h2>
             <div className="flex gap-3 justify-center flex-wrap">
-              <a href="https://github.com" className="y2k-button" target="_blank" rel="noopener noreferrer">
+              <a href={profile.contact.github} className="y2k-button" target="_blank" rel="noopener noreferrer">
                 [GitHub]
               </a>
-              <a href="https://linkedin.com" className="y2k-button" target="_blank" rel="noopener noreferrer">
+              <a href={profile.contact.linkedin} className="y2k-button" target="_blank" rel="noopener noreferrer">
                 [LinkedIn]
               </a>
-              <a href="mailto:contact@example.com" className="y2k-button">
+              <a href={`mailto:${profile.contact.email}`} className="y2k-button">
                 [Email Me!!]
               </a>
             </div>
@@ -479,7 +469,7 @@ export default function HomepageY2K() {
           <footer className="text-center text-[10px] text-[#6666aa] py-4">
             <p>Made with {'<3'} and lots of HTML &middot; Last updated: TODAY!</p>
             <p className="mt-1">This page is best viewed in Netscape Navigator 4.0+ at 1024x768</p>
-            <p className="mt-1">&copy; 2024 &middot; All rights reserved &middot; You are visitor #{hits}</p>
+            <p className="mt-1">&copy; 2025 &middot; {profile.fullName} &middot; You are visitor #{hits}</p>
           </footer>
         </div>
       </div>

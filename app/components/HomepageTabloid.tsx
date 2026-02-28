@@ -1,24 +1,31 @@
 'use client';
 
+import { profile, skills, getExperienceSorted, getFeaturedProjects } from '@/lib/data';
+
+const sortedExp = getExperienceSorted();
+const featured = getFeaturedProjects();
+
 const SKILLS_CLASSIFIED = [
-  { category: 'FRONTEND', items: 'React, Next.js, TypeScript, Tailwind CSS, JavaScript, HTML/CSS' },
-  { category: 'BACKEND', items: 'Node.js, Python, GraphQL, REST APIs, Microservices' },
-  { category: 'INFRA', items: 'AWS, Docker, CI/CD, Linux, Kubernetes' },
-  { category: 'DATA', items: 'PostgreSQL, MongoDB, Redis, Elasticsearch' },
+  { category: 'FRONTEND', items: skills.frontend.skills.map(s => s.name).join(', ') },
+  { category: 'BACKEND', items: skills.backend.skills.map(s => s.name).join(', ') },
+  { category: 'AI & AUTOMATION', items: skills.aiAndAutomation.skills.slice(0, 5).map(s => s.name).join(', ') },
+  { category: 'DATABASE & CLOUD', items: skills.databaseAndCloud.skills.map(s => s.name).join(', ') },
 ];
 
 const EXPERIENCE = [
   {
-    headline: 'ENGINEER PROMOTED TO SENIOR ROLE AFTER DEVASTATING DISPLAY OF COMPETENCE',
-    sub: 'Company Name, 2020 — Present',
-    body: 'Sources confirm the individual has been "leading full-stack development initiatives" and "architecting scalable solutions" at an alarming rate. Colleagues report a 30% increase in user engagement metrics. "We tried to stop them," said one anonymous coworker, "but the pull requests just kept coming."',
+    headline: `ENGINEER AT ${sortedExp[0].company.toUpperCase()} SPOTTED BUILDING GEOSPATIAL VISUALIZATION LIBRARIES`,
+    sub: `${sortedExp[0].company}, ${sortedExp[0].startDate.split('-')[0]} \u2014 Present`,
+    body: `Sources confirm the individual has been "developing frontend libraries for georeferenced imagery visualization" and "validating AI coding tools for complex library development." Colleagues report systematic AI-assisted workflows. "We tried to keep up," said one anonymous coworker, "but the Claude Code sessions just kept producing."`,
   },
   {
-    headline: 'JUNIOR DEVELOPER BUILDS ENTIRE RESPONSIVE WEB INTERFACE, REFUSES TO ELABORATE',
-    sub: 'Previous Company, 2018 — 2020',
-    body: 'Witnesses describe the accused as "quietly productive" and "suspiciously good at code reviews." Established quality standards that persist to this day. Left the company in a state of "good development practices." No arrests were made.',
+    headline: `LEAD DEVELOPER AT ${sortedExp[1].company.toUpperCase()} AUTOMATES ENTIRE CONTENT PIPELINE WITH AI`,
+    sub: `${sortedExp[1].company}, ${sortedExp[1].startDate.split('-')[0]} \u2014 ${sortedExp[1].endDate === 'present' ? 'Present' : sortedExp[1].endDate.split('-')[0]}`,
+    body: `Witnesses describe the accused as "dangerously productive" and "suspiciously good at integrating AI agents, RAG systems, and MCP servers." Achieved a 40%+ reduction in manual content creation time. Built scalable AI-driven platforms supporting multiple client projects. No arrests were made.`,
   },
 ];
+
+const FEATURED_PROJECTS = featured.slice(0, 2);
 
 export default function HomepageTabloid() {
   const today = new Date().toLocaleDateString('en-US', {
@@ -202,9 +209,9 @@ export default function HomepageTabloid() {
             <p className="text-[10px] tracking-[0.3em] uppercase mb-1 text-[#666]">
               &ldquo;All the Code That&apos;s Fit to Ship&rdquo;
             </p>
-            <h1 className="masthead-title">The Daily Engineer</h1>
+            <h1 className="masthead-title">The {profile.lastName} Gazette</h1>
             <p className="text-[10px] tracking-[0.3em] uppercase mt-1 text-[#666]">
-              VOL. XLII &middot; NO. 365 &middot; ESTABLISHED 2018
+              VOL. XLII &middot; NO. 365 &middot; ESTABLISHED 2020 &middot; {profile.contact.location.toUpperCase()}
             </p>
           </div>
 
@@ -216,26 +223,26 @@ export default function HomepageTabloid() {
           {/* Main Headline */}
           <section className="mb-6">
             <h2 className="headline-font text-xl sm:text-3xl md:text-5xl lg:text-6xl leading-[1.05] mb-3 text-center">
-              LOCAL SOFTWARE ENGINEER CAUGHT
+              {profile.contact.location.toUpperCase()} SOFTWARE ENGINEER CAUGHT
               {' '}
               <span className="text-[#cc0000]">BUILDING THINGS THAT ACTUALLY WORK</span>
             </h2>
             <p className="text-center text-sm italic text-[#666] mb-4">
-              Authorities baffled by clean code and passing tests; investigation ongoing
+              Authorities baffled by AI-augmented workflows and passing tests; investigation ongoing
             </p>
             <div className="rule-thick mb-4" />
 
             <div className="newspaper-body two-col col-rule">
               <p className="drop-cap mb-4">
-                Reports are flooding in from across the industry of a software engineer who has
+                Reports are flooding in from across the industry of {profile.fullName}, a software engineer who has
                 been, against all odds, consistently delivering production-ready code. The individual,
-                who identifies as a &ldquo;full-stack developer,&rdquo; has been spotted architecting scalable
-                web applications with reckless competence.
+                who identifies as a &ldquo;{profile.title.toLowerCase()},&rdquo; has been spotted architecting scalable
+                web applications with AI-augmented development workflows at an alarming rate.
               </p>
               <p className="mb-4">
                 &ldquo;We&apos;ve never seen anything like it,&rdquo; said one anonymous tech lead.
-                &ldquo;The tests pass. The documentation exists. The git history is clean.
-                Frankly, it&apos;s suspicious.&rdquo;
+                &ldquo;The RAG systems work. The MCP servers are production-ready. The AI agents
+                deliver consistent results. Frankly, it&apos;s suspicious.&rdquo;
               </p>
               <p>
                 The suspect is also known to be an avid chess player, which sources say explains
@@ -276,7 +283,7 @@ export default function HomepageTabloid() {
               {SKILLS_CLASSIFIED.map((group) => (
                 <div key={group.category} className="classified-box">
                   <p className="headline-font text-sm font-bold mb-1">
-                    {group.category} SKILLS — AVAILABLE IMMEDIATELY
+                    {group.category} SKILLS &mdash; AVAILABLE IMMEDIATELY
                   </p>
                   <p className="text-xs leading-relaxed text-[#444]">
                     {group.items}. Serious inquiries only. References available upon request.
@@ -294,30 +301,20 @@ export default function HomepageTabloid() {
             <h3 className="headline-font text-xl mb-4 tracking-wider">FEATURED INVESTIGATIONS</h3>
             <div className="rule-thin mb-4" />
             <div className="grid md:grid-cols-2 gap-6">
-              <article>
-                <div className="article-img-placeholder h-32 mb-3">[EXHIBIT A]</div>
-                <h4 className="headline-font text-lg leading-tight mb-1">
-                  FULL-STACK PLATFORM DEPLOYED WITHOUT INCIDENT
-                </h4>
-                <p className="text-xs italic text-[#888] mb-2">React &middot; Node.js &middot; MongoDB</p>
-                <p className="newspaper-body text-sm">
-                  A production-grade web application handling real data was found running
-                  in the wild with zero critical bugs at time of press. DevOps teams are
-                  calling it &ldquo;unprecedented.&rdquo;
-                </p>
-              </article>
-              <article>
-                <div className="article-img-placeholder h-32 mb-3">[EXHIBIT B]</div>
-                <h4 className="headline-font text-lg leading-tight mb-1">
-                  OPEN SOURCE TOOL GAINS CULT FOLLOWING AMONG DEVELOPERS
-                </h4>
-                <p className="text-xs italic text-[#888] mb-2">TypeScript &middot; Next.js &middot; PostgreSQL</p>
-                <p className="newspaper-body text-sm">
-                  Community-driven and battle-tested, this developer tool has attracted
-                  contributors from around the globe. The README is described as
-                  &ldquo;actually helpful.&rdquo;
-                </p>
-              </article>
+              {FEATURED_PROJECTS.map((project, i) => (
+                <article key={project.id}>
+                  <div className="article-img-placeholder h-32 mb-3">[EXHIBIT {String.fromCharCode(65 + i)}]</div>
+                  <h4 className="headline-font text-lg leading-tight mb-1">
+                    {project.name.toUpperCase()}: {project.tagline.toUpperCase()}
+                  </h4>
+                  <p className="text-xs italic text-[#888] mb-2">
+                    {project.technologies.slice(0, 3).join(' \u00b7 ')}
+                  </p>
+                  <p className="newspaper-body text-sm">
+                    {project.description}
+                  </p>
+                </article>
+              ))}
             </div>
           </section>
 
@@ -329,7 +326,7 @@ export default function HomepageTabloid() {
             <div className="rule-thin mb-4" />
             <div className="chess-puzzle-box max-w-sm mx-auto">
               <h4 className="blackletter text-3xl mb-3">Chess Corner</h4>
-              <div className="text-4xl mb-4 select-none">♚ ♛ ♜ ♝ ♞ ♟</div>
+              <div className="text-4xl mb-4 select-none">&#9818; &#9819; &#9820; &#9821; &#9822; &#9823;</div>
               <p className="text-sm italic text-[#666] leading-relaxed">
                 &ldquo;The chessboard is the world, the pieces are the phenomena of the Universe,
                 the rules of the game are what we call the laws of Nature.&rdquo;
@@ -350,19 +347,19 @@ export default function HomepageTabloid() {
               Reach out. I don&apos;t bite. (Usually.)
             </p>
             <div className="flex gap-4 justify-center flex-wrap mb-8">
-              <a href="https://github.com" className="tabloid-link" target="_blank" rel="noopener noreferrer">
+              <a href={profile.contact.github} className="tabloid-link" target="_blank" rel="noopener noreferrer">
                 GitHub
               </a>
-              <a href="https://linkedin.com" className="tabloid-link" target="_blank" rel="noopener noreferrer">
+              <a href={profile.contact.linkedin} className="tabloid-link" target="_blank" rel="noopener noreferrer">
                 LinkedIn
               </a>
-              <a href="mailto:contact@example.com" className="tabloid-link">
+              <a href={`mailto:${profile.contact.email}`} className="tabloid-link">
                 Email
               </a>
             </div>
             <div className="rule-thin mb-4" />
             <p className="text-[10px] tracking-[0.2em] uppercase text-[#999]">
-              &copy; THE DAILY ENGINEER &middot; ALL RIGHTS RESERVED &middot; PRINTED ON RECYCLED ELECTRONS
+              &copy; THE {profile.lastName.toUpperCase()} GAZETTE &middot; ALL RIGHTS RESERVED &middot; PRINTED ON RECYCLED ELECTRONS
             </p>
           </footer>
         </div>

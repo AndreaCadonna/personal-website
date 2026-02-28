@@ -1,45 +1,35 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { profile, skills, getExperienceSorted, getFeaturedProjects } from '@/lib/data';
+
+const sortedExp = getExperienceSorted();
+const featured = getFeaturedProjects();
 
 const SKILLS = [
-  { name: 'REACT/NEXT', level: 95, color: '#61DAFB' },
-  { name: 'TYPESCRIPT', level: 90, color: '#3178C6' },
-  { name: 'PYTHON', level: 85, color: '#FFD43B' },
+  { name: 'ANGULAR/REACT', level: 95, color: '#DD0031' },
+  { name: 'TYPESCRIPT', level: 95, color: '#3178C6' },
+  { name: 'NEXT.JS/ASTRO', level: 88, color: '#ffffff' },
   { name: 'NODE.JS', level: 88, color: '#68A063' },
-  { name: 'AWS/CLOUD', level: 80, color: '#FF9900' },
-  { name: 'DOCKER', level: 82, color: '#2496ED' },
+  { name: 'PYTHON/JAVA', level: 85, color: '#FFD43B' },
+  { name: 'AI/RAG/MCP', level: 88, color: '#c084fc' },
+  { name: 'FIREBASE', level: 90, color: '#FF9900' },
+  { name: 'DOCKER/CI-CD', level: 82, color: '#2496ED' },
 ];
 
-const QUESTS = [
-  {
-    title: 'SENIOR SOFTWARE ENGINEER',
-    guild: 'Current Company',
-    period: '2020 - NOW',
-    xp: '+9500 XP',
-    tasks: [
-      'Led full-stack web application raids',
-      'Boosted team synergy by 30%',
-      'Achieved S-rank code quality',
-    ],
-  },
-  {
-    title: 'SOFTWARE DEVELOPER',
-    guild: 'Previous Guild',
-    period: '2018 - 2020',
-    xp: '+4200 XP',
-    tasks: [
-      'Crafted responsive UI enchantments',
-      'Mastered code review jutsu',
-      'Unlocked best practices skill tree',
-    ],
-  },
-];
+const QUESTS = sortedExp.slice(0, 3).map((exp, i) => ({
+  title: exp.role.toUpperCase(),
+  guild: exp.company,
+  period: `${exp.startDate.split('-')[0]} - ${exp.endDate === 'present' ? 'NOW' : exp.endDate.split('-')[0]}`,
+  xp: `+${(9500 - i * 2500)}  XP`,
+  tasks: exp.achievements.slice(0, 3).map(a => a.description),
+}));
 
-const ACHIEVEMENTS = [
-  { name: 'Full-Stack Platform', desc: 'React + Node.js + MongoDB', rarity: 'LEGENDARY' },
-  { name: 'Open Source Tool', desc: 'TypeScript + Next.js + PostgreSQL', rarity: 'EPIC' },
-];
+const ACHIEVEMENTS = featured.slice(0, 4).map(p => ({
+  name: p.name,
+  desc: p.technologies.slice(0, 3).join(' + '),
+  rarity: p.status === 'production' ? 'LEGENDARY' as const : 'EPIC' as const,
+}));
 
 export default function HomepagePixelArt() {
   const [booted, setBooted] = useState(false);
@@ -212,7 +202,7 @@ export default function HomepagePixelArt() {
             {/* Header Bar */}
             <div className="pixel-border-gold bg-[#1a1a3d] p-2 sm:p-3 mb-6 sm:mb-8 flex justify-between items-center fade-in">
               <span className="text-[#ffcc00] text-[8px] sm:text-xs">
-                ♟ PORTFOLIO QUEST
+                &#9823; PORTFOLIO QUEST
               </span>
               <span className="text-[7px] sm:text-[8px] text-[#888] hidden sm:inline">
                 HP: 999/999 | MP: 420/420
@@ -222,20 +212,18 @@ export default function HomepagePixelArt() {
             {/* Hero - Character Select */}
             <section className="pixel-border bg-[#1a1a3d] p-4 sm:p-8 mb-8 fade-in" style={{ animationDelay: '0.1s' }}>
               <h2 className="text-[#ffcc00] text-[10px] sm:text-xs mb-4 sm:mb-6 text-center tracking-wider">
-                ── CHARACTER SELECT ──
+                &#9472;&#9472; CHARACTER SELECT &#9472;&#9472;
               </h2>
               <div className="flex flex-col md:flex-row items-center gap-4 sm:gap-8">
-                <div className="pixel-knight select-none">♞</div>
+                <div className="pixel-knight select-none">&#9822;</div>
                 <div className="text-center md:text-left">
                   <h1 className="text-lg md:text-xl text-[#ffffff] mb-2 leading-relaxed">
-                    SOFTWARE
-                    <br />
-                    ENGINEER
+                    {profile.fullName.toUpperCase()}
                   </h1>
                   <p className="text-[8px] text-[#aaaadd] mb-4 leading-loose">
-                    CLASS: FULL-STACK | LVL: 99
+                    CLASS: {profile.title.toUpperCase()} | LVL: 99
                     <br />
-                    GUILD: CHESS ENTHUSIASTS
+                    GUILD: {profile.contact.location.toUpperCase()}
                   </p>
                   <div className="flex gap-3 flex-wrap justify-center md:justify-start">
                     <span className="text-[8px] px-3 py-1 bg-[#00ff88] text-[#0f0f2d]">
@@ -251,18 +239,19 @@ export default function HomepagePixelArt() {
 
             {/* About - Lore */}
             <section className="pixel-border bg-[#1a1a3d] p-6 mb-8 fade-in" style={{ animationDelay: '0.2s' }}>
-              <h2 className="text-[#00ff88] text-xs mb-4">▸ BACKSTORY</h2>
+              <h2 className="text-[#00ff88] text-xs mb-4">&#9654; BACKSTORY</h2>
               <p className="text-[8px] leading-[2.2] text-[#ccccee]">
-                A SEASONED WARRIOR OF THE DIGITAL REALM, SPECIALIZING IN CRAFTING
-                LEGENDARY WEB APPLICATIONS. COMBINES THE STRATEGIC MIND OF A CHESS
-                GRANDMASTER WITH THE TECHNICAL PROWESS OF A CODE ARCHITECT. KNOWN
-                FOR TURNING COMPLEX DUNGEONS INTO ELEGANT SOLUTIONS.
+                A SEASONED WARRIOR OF THE DIGITAL REALM WITH {new Date().getFullYear() - 2020}+ YEARS OF EXPERIENCE.
+                SPECIALIZING IN AI-AUGMENTED DEVELOPMENT WORKFLOWS, FULLSTACK ENGINEERING, AND
+                STRATEGIC SYSTEM ARCHITECTURE. COMBINES THE ANALYTICAL MIND OF A CHESS PLAYER
+                WITH THE TECHNICAL PROWESS OF A CODE ARCHITECT. KNOWN FOR TURNING COMPLEX
+                DUNGEONS INTO ELEGANT SOLUTIONS.
               </p>
             </section>
 
             {/* Stats - Skills */}
             <section className="pixel-border bg-[#1a1a3d] p-6 mb-8 fade-in" style={{ animationDelay: '0.3s' }}>
-              <h2 className="text-[#00ff88] text-xs mb-6">▸ STATS</h2>
+              <h2 className="text-[#00ff88] text-xs mb-6">&#9654; STATS</h2>
               <div className="space-y-4">
                 {SKILLS.map((skill, i) => (
                   <div key={skill.name} className="flex items-center gap-3">
@@ -295,7 +284,7 @@ export default function HomepagePixelArt() {
 
             {/* Quest Log - Experience */}
             <section className="pixel-border bg-[#1a1a3d] p-6 mb-8 fade-in" style={{ animationDelay: '0.4s' }}>
-              <h2 className="text-[#00ff88] text-xs mb-6">▸ QUEST LOG</h2>
+              <h2 className="text-[#00ff88] text-xs mb-6">&#9654; QUEST LOG</h2>
               <div className="space-y-6">
                 {QUESTS.map((quest) => (
                   <div key={quest.title} className="border-2 border-[#444488] p-4 bg-[#12122a]">
@@ -326,12 +315,12 @@ export default function HomepagePixelArt() {
 
             {/* Achievements - Projects */}
             <section className="pixel-border bg-[#1a1a3d] p-6 mb-8 fade-in" style={{ animationDelay: '0.5s' }}>
-              <h2 className="text-[#00ff88] text-xs mb-6">▸ ACHIEVEMENTS UNLOCKED</h2>
+              <h2 className="text-[#00ff88] text-xs mb-6">&#9654; ACHIEVEMENTS UNLOCKED</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {ACHIEVEMENTS.map((a) => (
                   <div key={a.name} className="border-2 border-[#444488] p-4 bg-[#12122a] hover:bg-[#1e1e3e] transition-colors">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg">🏆</span>
+                      <span className="text-lg">&#127942;</span>
                       <span className="text-[10px] text-white">{a.name}</span>
                     </div>
                     <p className="text-[8px] text-[#8888bb] mb-2">{a.desc}</p>
@@ -347,11 +336,11 @@ export default function HomepagePixelArt() {
             <section className="pixel-border-gold bg-[#1a1a3d] p-6 mb-8 fade-in chess-pattern" style={{ animationDelay: '0.6s' }}>
               <div className="bg-[#1a1a3ddd] p-6">
                 <h2 className="text-[#ffcc00] text-xs mb-4 text-center">
-                  ★ SPECIAL ABILITY: CHESS MASTERY ★
+                  &#9733; SPECIAL ABILITY: CHESS MASTERY &#9733;
                 </h2>
                 <div className="text-center">
                   <div className="text-2xl sm:text-4xl mb-4 select-none" style={{ filter: 'drop-shadow(0 0 8px #ffcc0066)' }}>
-                    ♚ ♛ ♜ ♝ ♞ ♟
+                    &#9818; &#9819; &#9820; &#9821; &#9822; &#9823;
                   </div>
                   <p className="text-[8px] text-[#ccccee] leading-[2.2] max-w-md mx-auto">
                     STRATEGIC THINKING FORGED IN COUNTLESS CHESS BATTLES.
@@ -364,15 +353,15 @@ export default function HomepagePixelArt() {
 
             {/* Footer - Contact */}
             <footer className="pixel-border bg-[#1a1a3d] p-6 mb-8 text-center fade-in" style={{ animationDelay: '0.7s' }}>
-              <h2 className="text-[#00ff88] text-xs mb-6">▸ CONTACT SCROLL</h2>
+              <h2 className="text-[#00ff88] text-xs mb-6">&#9654; CONTACT SCROLL</h2>
               <div className="flex gap-4 justify-center flex-wrap">
-                <a href="https://github.com" className="pixel-btn" target="_blank" rel="noopener noreferrer">
+                <a href={profile.contact.github} className="pixel-btn" target="_blank" rel="noopener noreferrer">
                   {'</>'}  GITHUB
                 </a>
-                <a href="https://linkedin.com" className="pixel-btn" target="_blank" rel="noopener noreferrer">
+                <a href={profile.contact.linkedin} className="pixel-btn" target="_blank" rel="noopener noreferrer">
                   [in] LINKEDIN
                 </a>
-                <a href="mailto:contact@example.com" className="pixel-btn">
+                <a href={`mailto:${profile.contact.email}`} className="pixel-btn">
                   {'@'} EMAIL
                 </a>
               </div>
@@ -380,7 +369,7 @@ export default function HomepagePixelArt() {
                 GAME OVER? NAH, THIS IS JUST THE BEGINNING.
               </p>
               <p className="text-[8px] text-[#333355] mt-2" style={{ animation: 'blink 1.5s infinite' }}>
-                ▼ INSERT COIN TO CONTINUE ▼
+                &#9660; INSERT COIN TO CONTINUE &#9660;
               </p>
             </footer>
           </div>

@@ -1,19 +1,24 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { profile, skills, getExperienceSorted, getFeaturedProjects } from '@/lib/data';
+import type { Skill } from '@/lib/data';
+
+const sortedExp = getExperienceSorted();
+const featured = getFeaturedProjects();
 
 const ASCII_NAME = `
- ███████  ██████  ███████ ████████ ██     ██  █████  ██████  ███████
- ██      ██    ██ ██         ██    ██     ██ ██   ██ ██   ██ ██
- ███████ ██    ██ █████      ██    ██  █  ██ ███████ ██████  █████
-      ██ ██    ██ ██         ██    ██ ███ ██ ██   ██ ██   ██ ██
- ███████  ██████  ██         ██     ███ ███  ██   ██ ██   ██ ███████
+ █████  ███    ██ ██████  ██████  ███████  █████
+██   ██ ████   ██ ██   ██ ██   ██ ██      ██   ██
+███████ ██ ██  ██ ██   ██ ██████  █████   ███████
+██   ██ ██  ██ ██ ██   ██ ██   ██ ██      ██   ██
+██   ██ ██   ████ ██████  ██   ██ ███████ ██   ██
 
- ███████ ███    ██  ██████  ██ ███    ██ ███████ ███████ ██████
- ██      ████   ██ ██       ██ ████   ██ ██      ██      ██   ██
- █████   ██ ██  ██ ██   ███ ██ ██ ██  ██ █████   █████   ██████
- ██      ██  ██ ██ ██    ██ ██ ██  ██ ██ ██      ██      ██   ██
- ███████ ██   ████  ██████  ██ ██   ████ ███████ ███████ ██   ██
+ ██████  █████  ██████   ██████  ███    ██ ███    ██  █████
+██      ██   ██ ██   ██ ██    ██ ████   ██ ████   ██ ██   ██
+██      ███████ ██   ██ ██    ██ ██ ██  ██ ██ ██  ██ ███████
+██      ██   ██ ██   ██ ██    ██ ██  ██ ██ ██  ██ ██ ██   ██
+ ██████ ██   ██ ██████   ██████  ██   ████ ██   ████ ██   ██
 `;
 
 const BOOT_LINES = [
@@ -24,30 +29,37 @@ const BOOT_LINES = [
   { text: '[  OK  ] Mounted Developer Filesystem', delay: 800 },
   { text: '[  OK  ] Started Portfolio Service', delay: 1000 },
   { text: '', delay: 1200 },
-  { text: 'portfolio login: engineer', delay: 1400 },
-  { text: 'Last login: Today from 127.0.0.1', delay: 1600 },
+  { text: `portfolio login: ${profile.firstName.toLowerCase()}`, delay: 1400 },
+  { text: `Last login: Today from ${profile.contact.location}`, delay: 1600 },
   { text: '', delay: 1800 },
 ];
 
-const SKILLS_JSON = {
-  frontend: { tools: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS'], proficiency: 'expert' },
-  backend: { tools: ['Node.js', 'Python', 'GraphQL', 'REST APIs'], proficiency: 'expert' },
-  infrastructure: { tools: ['AWS', 'Docker', 'CI/CD', 'Linux'], proficiency: 'advanced' },
-  databases: { tools: ['PostgreSQL', 'MongoDB', 'Redis'], proficiency: 'advanced' },
-};
+const SKILLS_JSON: Record<string, { tools: string[]; proficiency: string }> = {};
+const skillEntries = Object.entries(skills).slice(0, 4);
+for (const [key, group] of skillEntries) {
+  SKILLS_JSON[key] = {
+    tools: group.skills.slice(0, 4).map((s: Skill) => s.name),
+    proficiency: group.skills[0]?.proficiency || 'advanced',
+  };
+}
+const skillKeys = Object.keys(SKILLS_JSON);
+const lastSkillKey = skillKeys[skillKeys.length - 1];
 
-const GIT_LOG = [
-  { hash: 'a3f29c1', date: '2020-present', msg: 'feat: Senior Software Engineer @ Company', branch: 'main' },
-  { hash: 'b7d14e8', date: '2018-2020', msg: 'feat: Software Developer @ Previous Co', branch: 'career' },
-];
+const GIT_LOG = sortedExp.slice(0, 4).map((exp, i) => ({
+  hash: Math.random().toString(16).slice(2, 9),
+  date: `${exp.startDate.split('-')[0]}-${exp.endDate === 'present' ? 'present' : exp.endDate.split('-')[0]}`,
+  msg: `feat: ${exp.role} @ ${exp.company}`,
+  branch: i === 0 ? 'main' : 'career',
+}));
 
-const PROJECTS_LS = [
-  { name: 'full-stack-platform/', size: '2.4M', desc: 'React + Node.js + MongoDB', perms: 'drwxr-xr-x' },
-  { name: 'open-source-tool/', size: '1.8M', desc: 'TypeScript + Next.js + PostgreSQL', perms: 'drwxr-xr-x' },
-  { name: 'chess-puzzle-app/', size: '890K', desc: 'Next.js + Chess.js + Lichess API', perms: 'drwxr-xr-x' },
-];
+const PROJECTS_LS = featured.slice(0, 3).map(p => ({
+  name: p.id + '/',
+  size: `${(Math.random() * 3 + 0.5).toFixed(1)}M`,
+  desc: p.technologies.slice(0, 3).join(' + '),
+  perms: 'drwxr-xr-x',
+}));
 
-const CHESS_ASCII = `  
+const CHESS_ASCII = `
   +----+----+----+----+----+----+----+---+
 8 | ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜ |
   +----+----+----+----+----+----+----+---+
@@ -238,7 +250,7 @@ export default function HomepageTerminal() {
             <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
             <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
             <div className="w-3 h-3 rounded-full bg-[#28c840]" />
-            <span className="ml-4 text-[#555] text-xs">portfolio@engineer:~</span>
+            <span className="ml-4 text-[#555] text-xs">portfolio@{profile.lastName.toLowerCase()}:~</span>
           </div>
 
           {/* Boot Sequence */}
@@ -264,21 +276,21 @@ export default function HomepageTerminal() {
                 <pre className="text-[7px] sm:text-[9px] md:text-[11px] leading-[1.15] bright overflow-x-auto">
                   {ASCII_NAME}
                 </pre>
-                <p className="comment mt-2">{'// full-stack developer & chess enthusiast'}</p>
+                <p className="comment mt-2">{'// software engineer & chess enthusiast'}</p>
               </div>
 
               {/* whoami */}
               <div className="terminal-section section-fade" style={{ animationDelay: '0.1s' }}>
                 <p className="prompt mb-2">whoami</p>
                 <p className="mb-2">
-                  A passionate software engineer specializing in modern web technologies.
+                  {profile.shortBio}
                 </p>
                 <p className="mb-2">
                   I approach every problem like a <span className="warn">chess position</span> &mdash;
                   analyzing deeply, calculating variations, and finding the most elegant path forward.
                 </p>
                 <p className="dim">
-                  From scalable architectures to pixel-perfect UIs, I build things that work.
+                  From AI-augmented workflows to scalable architectures, I build things that work.
                 </p>
               </div>
 
@@ -301,7 +313,7 @@ export default function HomepageTerminal() {
                         <span className="dim">: </span>
                         <span className="string">&quot;{data.proficiency}&quot;</span>
                       </div>
-                      <span className="dim pl-0">{'}'}{category !== 'databases' ? ',' : ''}</span>
+                      <span className="dim pl-0">{'}'}{category !== lastSkillKey ? ',' : ''}</span>
                     </div>
                   ))}
                   <p>{'}'}</p>
@@ -325,7 +337,7 @@ export default function HomepageTerminal() {
               {/* Projects */}
               <div className="terminal-section section-fade" style={{ animationDelay: '0.4s' }}>
                 <p className="prompt mb-2">ls -la ~/projects/</p>
-                <p className="dim mb-1">total 3</p>
+                <p className="dim mb-1">total {PROJECTS_LS.length}</p>
                 {PROJECTS_LS.map((proj) => (
                   <div key={proj.name} className="mb-1">
                     <span className="dim hidden sm:inline">{proj.perms}  </span>
@@ -353,13 +365,13 @@ export default function HomepageTerminal() {
               <div className="section-fade" style={{ animationDelay: '0.6s' }}>
                 <p className="prompt mb-2">cat contact.txt</p>
                 <p className="mb-1">
-                  GitHub &nbsp;&nbsp;&nbsp;: <a href="https://github.com" className="terminal-link" target="_blank" rel="noopener noreferrer">github.com/engineer</a>
+                  GitHub &nbsp;&nbsp;&nbsp;: <a href={profile.contact.github} className="terminal-link" target="_blank" rel="noopener noreferrer">github.com/AndreaCadonna</a>
                 </p>
                 <p className="mb-1">
-                  LinkedIn &nbsp;: <a href="https://linkedin.com" className="terminal-link" target="_blank" rel="noopener noreferrer">linkedin.com/in/engineer</a>
+                  LinkedIn &nbsp;: <a href={profile.contact.linkedin} className="terminal-link" target="_blank" rel="noopener noreferrer">linkedin.com/in/andrea-cadonna</a>
                 </p>
                 <p className="mb-4">
-                  Email &nbsp;&nbsp;&nbsp;&nbsp;: <a href="mailto:contact@example.com" className="terminal-link">contact@example.com</a>
+                  Email &nbsp;&nbsp;&nbsp;&nbsp;: <a href={`mailto:${profile.contact.email}`} className="terminal-link">{profile.contact.email}</a>
                 </p>
               </div>
 
