@@ -182,10 +182,10 @@ export default function HomepageBrutalism() {
         />
 
         {/* Top Bar */}
-        <div className="border-b-4 border-black flex justify-between items-center px-6 py-3">
-          <span className="label-tag">PORTFOLIO_2024.HTML</span>
+        <div className="border-b-4 border-black flex justify-between items-center px-4 sm:px-6 py-3">
+          <span className="label-tag hidden sm:inline">PORTFOLIO_2024.HTML</span>
           <span className="font-bold text-sm font-mono">{time}</span>
-          <span className="label-tag">SCROLL DOWN OR DON&apos;T</span>
+          <span className="label-tag hidden sm:inline">SCROLL DOWN OR DON&apos;T</span>
         </div>
 
         {/* Hero */}
@@ -194,11 +194,11 @@ export default function HomepageBrutalism() {
             SINCE 2018
           </div>
           <p className="label-tag mb-4">&lt;h1&gt;</p>
-          <h1 className="brutal-heading text-[clamp(48px,12vw,180px)] text-black">
+          <h1 className="brutal-heading text-[clamp(36px,12vw,180px)] text-black">
             SOFT
             <span className="pink-accent">WARE</span>
           </h1>
-          <h1 className="brutal-heading text-[clamp(48px,12vw,180px)] text-black -mt-2 md:-mt-6">
+          <h1 className="brutal-heading text-[clamp(36px,12vw,180px)] text-black -mt-2 md:-mt-6">
             ENGI
             <span className="yellow-bg text-black">NEER</span>
           </h1>
@@ -225,7 +225,7 @@ export default function HomepageBrutalism() {
 
         {/* Marquee */}
         <div className="border-y-4 border-black py-3 overflow-hidden yellow-bg">
-          <div className="marquee-track font-bold text-xl tracking-widest">
+          <div className="marquee-track font-bold text-sm sm:text-xl tracking-wider sm:tracking-widest">
             {TECH_MARQUEE.repeat(4)}
           </div>
         </div>
@@ -233,7 +233,7 @@ export default function HomepageBrutalism() {
         {/* Skills Grid */}
         <section className="px-6 md:px-12 py-16">
           <p className="label-tag mb-2">&lt;section id=&quot;skills&quot;&gt;</p>
-          <h2 className="brutal-heading text-5xl md:text-7xl mb-12">
+          <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
             WHAT I <span className="pink-accent">DO</span>
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -253,7 +253,7 @@ export default function HomepageBrutalism() {
         {/* Experience */}
         <section className="px-6 md:px-12 py-16 bg-black text-white">
           <p className="label-tag text-gray-500 mb-2">&lt;experience&gt;</p>
-          <h2 className="brutal-heading text-5xl md:text-7xl mb-12">
+          <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
             WHERE I&apos;VE <span className="text-[#D4FF00]">BEEN</span>
           </h2>
           <div className="space-y-8">
@@ -262,7 +262,7 @@ export default function HomepageBrutalism() {
                 <span className="absolute -top-4 right-4 bg-[#FF0066] text-white px-3 py-1 text-xs font-bold">
                   {exp.period}
                 </span>
-                <h3 className="brutal-heading text-2xl md:text-4xl text-[#D4FF00] mb-1">
+                <h3 className="brutal-heading text-lg sm:text-2xl md:text-4xl text-[#D4FF00] mb-1">
                   {exp.role}
                 </h3>
                 <p className="text-gray-400 text-sm mb-4">@ {exp.company}</p>
@@ -281,15 +281,15 @@ export default function HomepageBrutalism() {
 
         {/* Projects */}
         <section className="px-6 md:px-12 py-16">
-          <h2 className="brutal-heading text-5xl md:text-7xl mb-12">
+          <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
             THINGS I <span className="blue-accent">MADE</span>
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="brutal-card p-8 bg-white relative overflow-hidden">
+            <div className="brutal-card p-5 sm:p-8 bg-white relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 yellow-bg"
                 style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }} />
               <span className="label-tag">PROJECT_01</span>
-              <h3 className="brutal-heading text-3xl mt-2 mb-4">FULL-STACK PLATFORM</h3>
+              <h3 className="brutal-heading text-xl sm:text-3xl mt-2 mb-4">FULL-STACK PLATFORM</h3>
               <p className="text-sm mb-4 leading-relaxed">
                 A production-grade web application built with React, Node.js, and MongoDB.
                 Handles real users, real data, real problems.
@@ -302,11 +302,11 @@ export default function HomepageBrutalism() {
                 ))}
               </div>
             </div>
-            <div className="brutal-card p-8 bg-black text-white relative overflow-hidden">
+            <div className="brutal-card p-5 sm:p-8 bg-black text-white relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-[#FF0066]"
                 style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }} />
               <span className="label-tag text-gray-500">PROJECT_02</span>
-              <h3 className="brutal-heading text-3xl mt-2 mb-4">OPEN SOURCE TOOL</h3>
+              <h3 className="brutal-heading text-xl sm:text-3xl mt-2 mb-4">OPEN SOURCE TOOL</h3>
               <p className="text-sm mb-4 leading-relaxed text-gray-300">
                 TypeScript-powered developer tool with Next.js frontend
                 and PostgreSQL backend. Community-driven. Battle-tested.
@@ -331,7 +331,7 @@ export default function HomepageBrutalism() {
             }}
           />
           <div className="relative">
-            <h2 className="brutal-heading text-5xl md:text-8xl mb-4">
+            <h2 className="brutal-heading text-3xl sm:text-5xl md:text-8xl mb-4">
               I PLAY <span className="pink-accent">CHESS</span>.
             </h2>
             <p className="text-xl font-bold mb-4">DEAL WITH IT.</p>
@@ -343,7 +343,7 @@ export default function HomepageBrutalism() {
                 Strategy is strategy, whether it&apos;s code or chess.
               </span>
             </p>
-            <div className="mt-6 text-6xl select-none" style={{ letterSpacing: '8px' }}>
+            <div className="mt-6 text-2xl sm:text-4xl md:text-6xl select-none tracking-wide sm:tracking-[8px]">
               ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
             </div>
           </div>
@@ -352,7 +352,7 @@ export default function HomepageBrutalism() {
         {/* Contact */}
         <footer className="px-6 md:px-12 py-16">
           <p className="label-tag mb-2">&lt;footer&gt;</p>
-          <h2 className="brutal-heading text-5xl md:text-7xl mb-8">
+          <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8">
             LET&apos;S <span className="text-[#0000FF]">TALK</span>
           </h2>
           <div className="flex gap-4 flex-wrap">

@@ -181,11 +181,19 @@ export default function HomepageY2K() {
           font-family: 'VT323', monospace;
           background: #000;
           border: 2px inset #444;
-          padding: 4px 12px;
+          padding: 4px 8px;
           color: #0f0;
-          font-size: 20px;
-          letter-spacing: 3px;
+          font-size: 16px;
+          letter-spacing: 2px;
           display: inline-block;
+        }
+
+        @media (min-width: 640px) {
+          .counter-box {
+            font-size: 20px;
+            letter-spacing: 3px;
+            padding: 4px 12px;
+          }
         }
 
         .guestbook-entry {
@@ -268,7 +276,7 @@ export default function HomepageY2K() {
           <hr className="y2k-hr" />
 
           {/* Main content table */}
-          <table className="y2k-table w-full mb-4" cellPadding={0} cellSpacing={0}>
+          <table className="y2k-table w-full mb-4" cellPadding={0} cellSpacing={0} style={{ tableLayout: 'fixed' }}>
             <tbody>
               {/* Nav sidebar + content */}
               <tr>

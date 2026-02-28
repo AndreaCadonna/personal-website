@@ -267,14 +267,14 @@ export default function HomepageVaporwave() {
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 py-12">
           {/* Header */}
-          <div className="flex justify-between items-center mb-20">
-            <span className="aesthetic-text neon-pink">PORTFOLIO.EXE</span>
-            <span className="aesthetic-text neon-cyan">2 0 2 4</span>
+          <div className="flex justify-between items-center mb-12 sm:mb-20">
+            <span className="aesthetic-text neon-pink text-[10px] sm:text-xs">PORTFOLIO.EXE</span>
+            <span className="aesthetic-text neon-cyan text-[10px] sm:text-xs">2 0 2 4</span>
           </div>
 
           {/* Sun + Hero */}
           <section className="text-center mb-24">
-            <div className="vapor-sun mb-12" />
+            <div className="vapor-sun mb-12 !w-[140px] !h-[140px] sm:!w-[200px] sm:!h-[200px]" />
             <h1
               className="display-font text-4xl md:text-6xl lg:text-7xl neon-pink glitch-text mb-6"
               data-text="SOFTWARE"
@@ -287,8 +287,8 @@ export default function HomepageVaporwave() {
             >
               ENGINEER
             </h1>
-            <p className="aesthetic-text text-[#8866aa] tracking-[0.8em]">
-              F U L L &nbsp; S T A C K &nbsp; D E V E L O P E R
+            <p className="aesthetic-text text-[#8866aa] tracking-[0.2em] sm:tracking-[0.8em] text-[10px] sm:text-xs">
+              FULL-STACK DEVELOPER
             </p>
             <p className="mt-4 text-sm text-[#6644aa]">
               ソフトウェアエンジニア &mdash; チェス愛好家

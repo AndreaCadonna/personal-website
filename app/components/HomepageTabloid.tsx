@@ -215,9 +215,9 @@ export default function HomepageTabloid() {
 
           {/* Main Headline */}
           <section className="mb-6">
-            <h2 className="headline-font text-3xl md:text-5xl lg:text-6xl leading-[1.05] mb-3 text-center">
+            <h2 className="headline-font text-xl sm:text-3xl md:text-5xl lg:text-6xl leading-[1.05] mb-3 text-center">
               LOCAL SOFTWARE ENGINEER CAUGHT
-              <br />
+              {' '}
               <span className="text-[#cc0000]">BUILDING THINGS THAT ACTUALLY WORK</span>
             </h2>
             <p className="text-center text-sm italic text-[#666] mb-4">
@@ -254,7 +254,7 @@ export default function HomepageTabloid() {
             <div className="space-y-6">
               {EXPERIENCE.map((exp) => (
                 <article key={exp.headline}>
-                  <h4 className="headline-font text-lg md:text-2xl leading-tight mb-1">
+                  <h4 className="headline-font text-sm sm:text-lg md:text-2xl leading-tight mb-1">
                     {exp.headline}
                   </h4>
                   <p className="text-xs italic text-[#888] mb-2">{exp.sub}</p>

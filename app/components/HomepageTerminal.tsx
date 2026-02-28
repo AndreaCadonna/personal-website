@@ -316,7 +316,8 @@ export default function HomepageTerminal() {
                     <span className="warn">{commit.hash}</span>
                     <span className="dim"> ({commit.branch}) </span>
                     <span className="key-blue">[{commit.date}]</span>
-                    <span> {commit.msg}</span>
+                    <br className="sm:hidden" />
+                    <span className="sm:ml-0"> {commit.msg}</span>
                   </div>
                 ))}
               </div>
@@ -326,11 +327,12 @@ export default function HomepageTerminal() {
                 <p className="prompt mb-2">ls -la ~/projects/</p>
                 <p className="dim mb-1">total 3</p>
                 {PROJECTS_LS.map((proj) => (
-                  <div key={proj.name} className="flex gap-4 mb-1 flex-wrap">
-                    <span className="dim w-24 shrink-0">{proj.perms}</span>
-                    <span className="number w-12 shrink-0 text-right">{proj.size}</span>
+                  <div key={proj.name} className="mb-1">
+                    <span className="dim hidden sm:inline">{proj.perms}  </span>
+                    <span className="number">{proj.size}  </span>
                     <span className="key-blue">{proj.name}</span>
-                    <span className="comment shrink-0">{`// ${proj.desc}`}</span>
+                    <br className="sm:hidden" />
+                    <span className="comment sm:ml-2">{`// ${proj.desc}`}</span>
                   </div>
                 ))}
               </div>
@@ -338,7 +340,7 @@ export default function HomepageTerminal() {
               {/* Chess */}
               <div className="terminal-section section-fade" style={{ animationDelay: '0.5s' }}>
                 <p className="prompt mb-2">./chess --status</p>
-                <pre className="text-sm leading-[1.3] mb-4 warn overflow-x-auto">{CHESS_ASCII}</pre>
+                <pre className="text-[8px] leading-[1.2] sm:text-xs sm:leading-[1.3] mb-4 warn overflow-x-auto">{CHESS_ASCII}</pre>
                 <p>
                   <span className="key-blue">STATUS:</span> Daily puzzles on Lichess.
                   <br />
