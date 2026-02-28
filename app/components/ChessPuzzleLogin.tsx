@@ -53,6 +53,10 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
   const [boardOrientation, setBoardOrientation] = useState<'white' | 'black'>('white');
   const [puzzleInfo, setPuzzleInfo] = useState<{ rating: number; themes: string[] } | null>(null);
   const [pendingPromotion, setPendingPromotion] = useState<{ from: string; to: string } | null>(null);
+  const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null);
+  const [wrongMoveSquare, setWrongMoveSquare] = useState<string | null>(null);
+  const [hintSquare, setHintSquare] = useState<string | null>(null);
+  const [boardLocked, setBoardLocked] = useState(false);
 
   /**
    * Fetch a puzzle from Lichess API on mount
@@ -73,34 +77,50 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
         // Load the PGN and replay up to initialPly for the puzzle starting position
         const game = new Chess();
         game.loadPgn(data.game.pgn);
-        const history = game.history();
+        const history = game.history({ verbose: true });
         const startFen = game.getHeaders()['FEN'] || undefined;
 
         const puzzleGame = new Chess(startFen);
         const initialPly = data.puzzle.initialPly;
         for (let i = 0; i < initialPly && i < history.length; i++) {
-          puzzleGame.move(history[i]);
+          puzzleGame.move(history[i].san);
         }
 
         const solution = data.puzzle.solution;
 
         if (solution.length > 0) {
+          const setupMoveData = history[initialPly];
+
+          // Show position BEFORE setup move so we can animate it
           chessGameRef.current = puzzleGame;
           setChessPosition(puzzleGame.fen());
           setPuzzleSolution(solution);
 
-          // Determine board orientation based on whose turn it is
-          const playerColor = puzzleGame.turn();
+          // Determine player color (it's the turn AFTER the setup move)
+          // At initialPly the opponent is about to move, so the player is the other color
+          const opponentColor = puzzleGame.turn();
+          const playerColor = opponentColor === 'w' ? 'b' : 'w';
           setBoardOrientation(playerColor === 'w' ? 'white' : 'black');
 
-          // Set puzzle info
-          setPuzzleInfo({
-            rating: data.puzzle.rating,
-            themes: data.puzzle.themes,
-          });
+          setSolutionIndex(0);
+          setPuzzleInfo({ rating: data.puzzle.rating, themes: data.puzzle.themes });
 
-          const turn = playerColor === 'w' ? 'White' : 'Black';
-          setStatus(`${turn} to move - Find the best move!`);
+          // Animate the opponent's setup move after a short delay
+          if (setupMoveData) {
+            setBoardLocked(true);
+            setStatus('...');
+            setTimeout(() => {
+              puzzleGame.move(setupMoveData.san);
+              setChessPosition(puzzleGame.fen());
+              setLastMove({ from: setupMoveData.from, to: setupMoveData.to });
+              setBoardLocked(false);
+              const turn = playerColor === 'w' ? 'White' : 'Black';
+              setStatus(`${turn} to move - Find the best move!`);
+            }, 500);
+          } else {
+            const turn = playerColor === 'w' ? 'White' : 'Black';
+            setStatus(`${turn} to move - Find the best move!`);
+          }
         }
 
         setIsLoading(false);
@@ -150,10 +170,13 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     // Check if it matches the expected move
     if (playedUci !== expected && `${move.from}${move.to}` !== expected) {
       setChessPosition(game.fen());
+      setWrongMoveSquare(move.to);
+      setHintSquare(null);
       setTimeout(() => {
         game.undo();
-        setStatus('❌ Not quite! Try again.');
+        setStatus('Not quite! Try again.');
         setChessPosition(prevFen);
+        setWrongMoveSquare(null);
       }, 500);
       return false;
     }
@@ -161,14 +184,20 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     // Correct user move
     let newIndex = solutionIndex + 1;
     setChessPosition(game.fen());
-    setStatus('✅ Excellent move!');
+    setLastMove({ from, to });
+    setHintSquare(null);
+    setStatus('Excellent move!');
 
     // Opponent's reply (next move in the solution line)
     if (newIndex < puzzleSolution.length) {
       const replyUci = puzzleSolution[newIndex];
+      const replyArgs = uciToMoveArgs(replyUci);
+      setBoardLocked(true);
       setTimeout(() => {
-        game.move(uciToMoveArgs(replyUci));
+        game.move(replyArgs);
         setChessPosition(game.fen());
+        setLastMove({ from: replyArgs.from, to: replyArgs.to });
+        setBoardLocked(false);
       }, 500);
       newIndex += 1;
     }
@@ -230,7 +259,23 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
   /**
    * Click-to-move handler
    */
+  function handleHint() {
+    const expected = puzzleSolution[solutionIndex];
+    if (!expected) return;
+    setHintSquare(expected.slice(0, 2));
+  }
+
   function onSquareClick({ square, piece }: { square: string; piece?: string }) {
+    if (boardLocked) return;
+    setHintSquare(null);
+
+    // Click same square again to deselect
+    if (moveFrom === square) {
+      setMoveFrom('');
+      setOptionSquares({});
+      return;
+    }
+
     if (!moveFrom && piece) {
       const hasMoveOptions = getMoveOptions(square);
       if (hasMoveOptions) {
@@ -273,6 +318,8 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     sourceSquare: string;
     targetSquare: string | null;
   }) {
+    if (boardLocked) return false;
+    setHintSquare(null);
     if (!targetSquare) return false;
 
     if (isPromotionMove(sourceSquare, targetSquare)) {
@@ -291,13 +338,30 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     return true;
   }
 
+  const mergedSquareStyles: Record<string, React.CSSProperties> = {};
+
+  if (lastMove) {
+    mergedSquareStyles[lastMove.from] = { background: 'rgba(255, 255, 0, 0.4)' };
+    mergedSquareStyles[lastMove.to] = { background: 'rgba(255, 255, 0, 0.4)' };
+  }
+  if (hintSquare) {
+    mergedSquareStyles[hintSquare] = { background: 'rgba(0, 150, 255, 0.6)' };
+  }
+  for (const [sq, style] of Object.entries(optionSquares)) {
+    mergedSquareStyles[sq] = { ...mergedSquareStyles[sq], ...style };
+  }
+  if (wrongMoveSquare) {
+    mergedSquareStyles[wrongMoveSquare] = { background: 'rgba(255, 0, 0, 0.6)' };
+  }
+
   const chessboardOptions = {
     onPieceDrop,
     onSquareClick,
     position: chessPosition,
-    squareStyles: optionSquares,
+    squareStyles: mergedSquareStyles,
     id: 'puzzle-board',
     boardOrientation,
+    animationDurationInMs: 200,
   };
 
   if (isLoading) {
@@ -376,6 +440,13 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
         <p className="text-sm text-slate-400 mt-2">
           Click or drag pieces to make your move
         </p>
+        <button
+          onClick={handleHint}
+          disabled={solutionIndex >= puzzleSolution.length}
+          className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white text-sm rounded-lg transition-colors"
+        >
+          Hint
+        </button>
       </div>
 
       <div className="text-xs text-slate-500 text-center">
