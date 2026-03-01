@@ -32,12 +32,14 @@ const PROMOTION_PIECES = [
   { piece: 'n', white: '\u2658', black: '\u265E', label: 'Knight' },
 ] as const;
 
-/**
- * ChessPuzzleLogin Component
- *
- * Fetches a chess puzzle from Lichess API and requires the user to solve it
- * before granting access to the website.
- */
+const LOADING_FRAMES = [
+  'Connecting to Lichess API.....',
+  'Fetching daily puzzle.........',
+  'Parsing PGN data.............',
+  'Computing initial position...',
+  'Rendering board..............',
+];
+
 export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginProps) {
   const chessGameRef = useRef(new Chess());
   const chessGame = chessGameRef.current;
@@ -57,10 +59,17 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
   const [wrongMoveSquare, setWrongMoveSquare] = useState<string | null>(null);
   const [hintSquare, setHintSquare] = useState<string | null>(null);
   const [boardLocked, setBoardLocked] = useState(false);
+  const [loadingLine, setLoadingLine] = useState(0);
 
-  /**
-   * Fetch a puzzle from Lichess API on mount
-   */
+  // Loading animation
+  useEffect(() => {
+    if (!isLoading) return;
+    const interval = setInterval(() => {
+      setLoadingLine(prev => (prev + 1) % LOADING_FRAMES.length);
+    }, 600);
+    return () => clearInterval(interval);
+  }, [isLoading]);
+
   useEffect(() => {
     async function fetchPuzzle() {
       try {
@@ -74,7 +83,6 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
 
         const data: LichessPuzzle = await response.json();
 
-        // Load the PGN and replay up to initialPly for the puzzle starting position
         const game = new Chess();
         game.loadPgn(data.game.pgn);
         const history = game.history({ verbose: true });
@@ -91,13 +99,10 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
         if (solution.length > 0) {
           const setupMoveData = history[initialPly];
 
-          // Show position BEFORE setup move so we can animate it
           chessGameRef.current = puzzleGame;
           setChessPosition(puzzleGame.fen());
           setPuzzleSolution(solution);
 
-          // Determine player color (it's the turn AFTER the setup move)
-          // At initialPly the opponent is about to move, so the player is the other color
           const opponentColor = puzzleGame.turn();
           const playerColor = opponentColor === 'w' ? 'b' : 'w';
           setBoardOrientation(playerColor === 'w' ? 'white' : 'black');
@@ -105,7 +110,6 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
           setSolutionIndex(0);
           setPuzzleInfo({ rating: data.puzzle.rating, themes: data.puzzle.themes });
 
-          // Animate the opponent's setup move after a short delay
           if (setupMoveData) {
             setBoardLocked(true);
             setStatus('...');
@@ -115,18 +119,18 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
               setLastMove({ from: setupMoveData.from, to: setupMoveData.to });
               setBoardLocked(false);
               const turn = playerColor === 'w' ? 'White' : 'Black';
-              setStatus(`${turn} to move - Find the best move!`);
+              setStatus(`${turn} to move — Find the best move`);
             }, 500);
           } else {
             const turn = playerColor === 'w' ? 'White' : 'Black';
-            setStatus(`${turn} to move - Find the best move!`);
+            setStatus(`${turn} to move — Find the best move`);
           }
         }
 
         setIsLoading(false);
       } catch (err) {
         console.error('Error fetching puzzle:', err);
-        setError('Failed to load puzzle. Please refresh to try again.');
+        setError('CONNECTION FAILED: Unable to reach Lichess API');
         setIsLoading(false);
       }
     }
@@ -134,9 +138,6 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     fetchPuzzle();
   }, []);
 
-  /**
-   * Core puzzle logic
-   */
   function isPromotionMove(from: string, to: string): boolean {
     const piece = chessGameRef.current.get(from as Square);
     if (!piece || piece.type !== 'p') return false;
@@ -148,12 +149,8 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     const prevFen = game.fen();
     const expected = puzzleSolution[solutionIndex];
 
-    // Puzzle already finished
-    if (!expected) {
-      return false;
-    }
+    if (!expected) return false;
 
-    // Try to apply the move according to chess.js rules
     let move;
     try {
       move = game.move({
@@ -162,33 +159,30 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
         promotion,
       });
     } catch {
-      return false; // illegal move according to chess.js
+      return false;
     }
 
     const playedUci = `${move.from}${move.to}${move.promotion || ''}`;
 
-    // Check if it matches the expected move
     if (playedUci !== expected && `${move.from}${move.to}` !== expected) {
       setChessPosition(game.fen());
       setWrongMoveSquare(move.to);
       setHintSquare(null);
       setTimeout(() => {
         game.undo();
-        setStatus('Not quite! Try again.');
+        setStatus('ERROR: Invalid move. Try again.');
         setChessPosition(prevFen);
         setWrongMoveSquare(null);
       }, 500);
       return false;
     }
 
-    // Correct user move
     let newIndex = solutionIndex + 1;
     setChessPosition(game.fen());
     setLastMove({ from, to });
     setHintSquare(null);
-    setStatus('Excellent move!');
+    setStatus('[OK] Correct move');
 
-    // Opponent's reply (next move in the solution line)
     if (newIndex < puzzleSolution.length) {
       const replyUci = puzzleSolution[newIndex];
       const replyArgs = uciToMoveArgs(replyUci);
@@ -202,26 +196,21 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
       newIndex += 1;
     }
 
-    // Update solution index
     setSolutionIndex(newIndex);
 
-    // Check if puzzle is solved
     if (newIndex >= puzzleSolution.length) {
-      setStatus('🎉 Puzzle solved! Granting access...');
+      setStatus('ACCESS GRANTED — Puzzle solved. Redirecting...');
       setTimeout(() => {
         onPuzzleSolved();
       }, 1500);
     } else {
       const turn = game.turn() === 'w' ? 'White' : 'Black';
-      setStatus(`✅ Correct! Now ${turn} to move.`);
+      setStatus(`[OK] Correct. ${turn} to move.`);
     }
 
     return true;
   }
 
-  /**
-   * Helper to compute highlight styles for valid moves from a given square
-   */
   function getMoveOptions(square: string) {
     const moves = chessGame.moves({
       square: square as Square,
@@ -242,23 +231,20 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
 
       newSquares[move.to] = {
         background: isCapture
-          ? 'radial-gradient(circle, rgba(0,0,0,.1) 85%, transparent 85%)'
-          : 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
+          ? 'radial-gradient(circle, rgba(0,255,65,.15) 85%, transparent 85%)'
+          : 'radial-gradient(circle, rgba(0,255,65,.15) 25%, transparent 25%)',
         borderRadius: '50%',
       };
     }
 
     newSquares[square] = {
-      background: 'rgba(255, 255, 0, 0.4)',
+      background: 'rgba(0, 255, 65, 0.25)',
     };
 
     setOptionSquares(newSquares);
     return true;
   }
 
-  /**
-   * Click-to-move handler
-   */
   function handleHint() {
     const expected = puzzleSolution[solutionIndex];
     if (!expected) return;
@@ -269,7 +255,6 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     if (boardLocked) return;
     setHintSquare(null);
 
-    // Click same square again to deselect
     if (moveFrom === square) {
       setMoveFrom('');
       setOptionSquares({});
@@ -308,9 +293,6 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     setOptionSquares({});
   }
 
-  /**
-   * Drag-and-drop handler
-   */
   function onPieceDrop({
     sourceSquare,
     targetSquare,
@@ -329,9 +311,7 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
 
     const success = handleUserMove(sourceSquare, targetSquare);
 
-    if (!success) {
-      return false;
-    }
+    if (!success) return false;
 
     setMoveFrom('');
     setOptionSquares({});
@@ -341,17 +321,17 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
   const mergedSquareStyles: Record<string, React.CSSProperties> = {};
 
   if (lastMove) {
-    mergedSquareStyles[lastMove.from] = { background: 'rgba(255, 255, 0, 0.4)' };
-    mergedSquareStyles[lastMove.to] = { background: 'rgba(255, 255, 0, 0.4)' };
+    mergedSquareStyles[lastMove.from] = { background: 'rgba(0, 255, 65, 0.2)' };
+    mergedSquareStyles[lastMove.to] = { background: 'rgba(0, 255, 65, 0.2)' };
   }
   if (hintSquare) {
-    mergedSquareStyles[hintSquare] = { background: 'rgba(0, 150, 255, 0.6)' };
+    mergedSquareStyles[hintSquare] = { background: 'rgba(0, 170, 255, 0.45)' };
   }
   for (const [sq, style] of Object.entries(optionSquares)) {
     mergedSquareStyles[sq] = { ...mergedSquareStyles[sq], ...style };
   }
   if (wrongMoveSquare) {
-    mergedSquareStyles[wrongMoveSquare] = { background: 'rgba(255, 0, 0, 0.6)' };
+    mergedSquareStyles[wrongMoveSquare] = { background: 'rgba(255, 60, 60, 0.5)' };
   }
 
   const chessboardOptions = {
@@ -362,96 +342,323 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
     id: 'puzzle-board',
     boardOrientation,
     animationDurationInMs: 200,
+    customDarkSquareStyle: { backgroundColor: '#1a2a1a' },
+    customLightSquareStyle: { backgroundColor: '#0f1a0f' },
+    customBoardStyle: {
+      borderRadius: '0px',
+      border: '1px solid #00ff4133',
+      boxShadow: '0 0 20px #00ff4111',
+    },
   };
+
+  const terminalStyles = (
+    <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap');
+
+      .puzzle-terminal {
+        font-family: 'Fira Code', 'Courier New', monospace;
+        background: #0a0a0a;
+        color: #00ff41;
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .puzzle-terminal::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0,255,65,0.02) 2px,
+          rgba(0,255,65,0.02) 4px
+        );
+        pointer-events: none;
+        z-index: 100;
+      }
+
+      .puzzle-terminal::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+        pointer-events: none;
+        z-index: 99;
+      }
+
+      .p-phosphor { text-shadow: 0 0 5px #00ff4166, 0 0 10px #00ff4122; }
+      .p-dim { color: #444; }
+      .p-blue { color: #00aaff; }
+      .p-yellow { color: #ffd93d; }
+      .p-red { color: #ff6b6b; }
+      .p-ok { color: #28c840; }
+
+      @keyframes pBlink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+      }
+
+      .p-cursor {
+        display: inline-block;
+        width: 8px;
+        height: 15px;
+        background: #00ff41;
+        animation: pBlink 1s step-end infinite;
+        vertical-align: middle;
+        margin-left: 2px;
+      }
+
+      .p-matrix-col {
+        position: absolute;
+        top: -100%;
+        font-size: 12px;
+        color: #00ff4110;
+        writing-mode: vertical-rl;
+        animation: pMatrixFall linear infinite;
+        white-space: nowrap;
+      }
+
+      @keyframes pMatrixFall {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(calc(100vh + 100%)); }
+      }
+
+      @keyframes pPulse {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+      }
+
+      .p-loading-pulse {
+        animation: pPulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes pFadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .p-fade-in {
+        animation: pFadeIn 0.4s ease-out both;
+      }
+
+      .p-hint-btn {
+        font-family: 'Fira Code', monospace;
+        font-size: 12px;
+        color: #00aaff;
+        background: transparent;
+        border: 1px solid #00aaff33;
+        padding: 6px 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .p-hint-btn:hover:not(:disabled) {
+        border-color: #00aaff;
+        box-shadow: 0 0 10px #00aaff22;
+        color: #ffd93d;
+      }
+
+      .p-hint-btn:disabled {
+        color: #333;
+        border-color: #1a1a1a;
+        cursor: not-allowed;
+      }
+
+      .p-promo-btn {
+        font-family: 'Fira Code', monospace;
+        width: 56px;
+        height: 56px;
+        background: #111;
+        border: 1px solid #00ff4133;
+        color: #00ff41;
+        font-size: 28px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .p-promo-btn:hover {
+        background: #1a2a1a;
+        border-color: #00ff41;
+        box-shadow: 0 0 12px #00ff4122;
+      }
+    `}</style>
+  );
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="text-center">
-          <div className="text-6xl mb-4 animate-pulse">♟️</div>
-          <p className="text-white text-xl">Loading chess puzzle...</p>
-          <p className="text-slate-400 text-sm mt-2">Fetching from Lichess</p>
+      <>
+        {terminalStyles}
+        <div className="puzzle-terminal">
+          <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div
+                key={i}
+                className="p-matrix-col"
+                style={{
+                  left: `${i * 10}%`,
+                  animationDuration: `${12 + Math.random() * 18}s`,
+                  animationDelay: `${Math.random() * -20}s`,
+                }}
+              >
+                {'01'.repeat(80).split('').sort(() => Math.random() - 0.5).join('')}
+              </div>
+            ))}
+          </div>
+          <div className="relative z-10 min-h-screen flex items-center justify-center">
+            <div className="p-phosphor text-center">
+              <pre className="text-[10px] sm:text-xs p-yellow mb-6">{`
+   ♚ ♛ ♜ ♝ ♞ ♟
+  CHESS  PUZZLE
+  AUTH  SYSTEM
+   ♙ ♘ ♗ ♖ ♕ ♔
+`}</pre>
+              <div className="text-left inline-block">
+                {LOADING_FRAMES.slice(0, loadingLine + 1).map((line, i) => (
+                  <div key={i} className={i < loadingLine ? 'p-dim' : 'p-loading-pulse'}>
+                    {i < loadingLine && <span className="p-ok">[OK] </span>}
+                    {i === loadingLine && <span className="p-yellow">[..] </span>}
+                    {line}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 p-dim text-xs">Fetching from lichess.org</div>
+            </div>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">❌</div>
-          <p className="text-white text-xl mb-4">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-          >
-            Refresh Page
-          </button>
+      <>
+        {terminalStyles}
+        <div className="puzzle-terminal">
+          <div className="relative z-10 min-h-screen flex items-center justify-center">
+            <div className="p-phosphor text-center max-w-md">
+              <div className="p-red text-lg mb-4">[ SYSTEM ERROR ]</div>
+              <div className="p-red mb-6">{error}</div>
+              <div className="p-dim mb-6">
+                <div>Possible causes:</div>
+                <div className="ml-4">- Network connectivity issues</div>
+                <div className="ml-4">- Lichess API rate limiting</div>
+                <div className="ml-4">- Service temporarily unavailable</div>
+              </div>
+              <button
+                onClick={() => window.location.reload()}
+                className="p-hint-btn"
+              >
+                $ sudo retry --force
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 p-4">
-      <div className="text-center mb-4">
-        <h1 className="text-4xl font-bold text-white mb-2">Chess Puzzle Challenge</h1>
-        <p className="text-slate-300">Solve this puzzle to unlock access</p>
-        {puzzleInfo && (
-          <div className="flex items-center justify-center gap-4 mt-3 text-sm text-slate-400">
-            <span>Rating: {puzzleInfo.rating}</span>
-            <span>•</span>
-            <span className="capitalize">{puzzleInfo.themes[0] || 'Puzzle'}</span>
-          </div>
-        )}
-      </div>
-
-      <div className="shadow-2xl rounded-xl overflow-hidden max-w-[600px] w-full relative">
-        <Chessboard options={chessboardOptions as any} />
-
-        {pendingPromotion && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
-            <div className="bg-slate-800 rounded-lg p-4 shadow-xl border border-slate-600">
-              <p className="text-white text-sm mb-3 text-center">Promote to:</p>
-              <div className="flex gap-2">
-                {PROMOTION_PIECES.map(({ piece, white, black, label }) => (
-                  <button
-                    key={piece}
-                    onClick={() => {
-                      const { from, to } = pendingPromotion;
-                      setPendingPromotion(null);
-                      handleUserMove(from, to, piece);
-                    }}
-                    className="w-14 h-14 bg-slate-700 hover:bg-slate-600 rounded-lg flex items-center justify-center text-3xl transition-colors"
-                    title={label}
-                  >
-                    {boardOrientation === 'white' ? white : black}
-                  </button>
-                ))}
-              </div>
+    <>
+      {terminalStyles}
+      <div className="puzzle-terminal">
+        {/* Matrix rain */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-20">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div
+              key={i}
+              className="p-matrix-col"
+              style={{
+                left: `${i * 10}%`,
+                animationDuration: `${12 + Math.random() * 18}s`,
+                animationDelay: `${Math.random() * -20}s`,
+              }}
+            >
+              {'01'.repeat(80).split('').sort(() => Math.random() - 0.5).join('')}
             </div>
+          ))}
+        </div>
+
+        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center gap-4 p-4">
+          {/* Header */}
+          <div className="p-phosphor text-center p-fade-in">
+            <div className="text-xs p-dim mb-1">$ ./chess-auth --puzzle daily</div>
+            <div className="text-lg sm:text-xl p-yellow mb-1">
+              PUZZLE AUTHENTICATION
+            </div>
+            {puzzleInfo && (
+              <div className="text-xs p-dim">
+                <span className="p-blue">Rating:</span> {puzzleInfo.rating}
+                <span className="mx-2">|</span>
+                <span className="p-blue">Theme:</span>{' '}
+                <span className="capitalize">{puzzleInfo.themes[0] || 'tactical'}</span>
+              </div>
+            )}
           </div>
-        )}
-      </div>
 
-      <div className="text-center">
-        <p className="text-lg font-semibold">{status}</p>
-        <p className="text-sm text-slate-400 mt-2">
-          Click or drag pieces to make your move
-        </p>
-        <button
-          onClick={handleHint}
-          disabled={solutionIndex >= puzzleSolution.length}
-          className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white text-sm rounded-lg transition-colors"
-        >
-          Hint
-        </button>
-      </div>
+          {/* Board */}
+          <div className="p-fade-in max-w-[min(90vw,500px)] w-full relative" style={{ animationDelay: '0.1s' }}>
+            <Chessboard options={chessboardOptions as any} />
 
-      <div className="text-xs text-slate-500 text-center">
-        Puzzle provided by Lichess.org
+            {/* Promotion overlay */}
+            {pendingPromotion && (
+              <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-10">
+                <div className="border border-[#00ff4133] bg-[#0a0a0a] p-4">
+                  <p className="p-blue text-xs mb-3 text-center">SELECT PROMOTION:</p>
+                  <div className="flex gap-2">
+                    {PROMOTION_PIECES.map(({ piece, white, black, label }) => (
+                      <button
+                        key={piece}
+                        onClick={() => {
+                          const { from, to } = pendingPromotion;
+                          setPendingPromotion(null);
+                          handleUserMove(from, to, piece);
+                        }}
+                        className="p-promo-btn"
+                        title={label}
+                      >
+                        {boardOrientation === 'white' ? white : black}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Status */}
+          <div className="p-phosphor text-center p-fade-in" style={{ animationDelay: '0.2s' }}>
+            <div className={`text-sm font-medium mb-1 ${
+              status.includes('ERROR') ? 'p-red' :
+              status.includes('ACCESS GRANTED') ? 'p-ok' :
+              status.includes('[OK]') ? 'p-ok' :
+              'p-yellow'
+            }`}>
+              {status}
+            </div>
+            <div className="text-xs p-dim mb-3">
+              Click or drag pieces to make your move
+            </div>
+            <button
+              onClick={handleHint}
+              disabled={solutionIndex >= puzzleSolution.length}
+              className="p-hint-btn"
+            >
+              --hint
+            </button>
+          </div>
+
+          <div className="text-[10px] p-dim text-center">
+            Puzzle source: lichess.org/api/puzzle/daily
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -4,21 +4,13 @@ import { useState } from 'react';
 import HomepagePixelArt from '../components/HomepagePixelArt';
 import HomepageBrutalism from '../components/HomepageBrutalism';
 import HomepageTerminal from '../components/HomepageTerminal';
-import HomepageVaporwave from '../components/HomepageVaporwave';
-import HomepageTabloid from '../components/HomepageTabloid';
-import HomepageCrimeBoard from '../components/HomepageCrimeBoard';
 import HomepageY2K from '../components/HomepageY2K';
-import HomepageNoir from '../components/HomepageNoir';
 
 const VARIATIONS = [
+  { id: 'terminal', label: 'Terminal', emoji: '💻', component: HomepageTerminal },
   { id: 'pixel', label: 'Pixel Art', emoji: '🎮', component: HomepagePixelArt },
   { id: 'brutal', label: 'Brutalism', emoji: '🔨', component: HomepageBrutalism },
-  { id: 'terminal', label: 'Terminal', emoji: '💻', component: HomepageTerminal },
-  { id: 'vapor', label: 'Vaporwave', emoji: '🌴', component: HomepageVaporwave },
-  { id: 'tabloid', label: 'Tabloid', emoji: '📰', component: HomepageTabloid },
-  { id: 'crime', label: 'Crime Board', emoji: '🔍', component: HomepageCrimeBoard },
   { id: 'y2k', label: 'Y2K', emoji: '🌐', component: HomepageY2K },
-  { id: 'noir', label: 'Noir', emoji: '🎬', component: HomepageNoir },
 ] as const;
 
 export default function PreviewPage() {
