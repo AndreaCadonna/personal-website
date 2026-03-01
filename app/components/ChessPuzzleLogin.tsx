@@ -390,7 +390,7 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
         z-index: 99;
       }
 
-      .p-phosphor { text-shadow: 0 0 5px #00ff4166, 0 0 10px #00ff4122; }
+      .p-phosphor { text-shadow: 0 0 3px #00ff4144, 0 0 6px #00ff4111; }
       .p-dim { color: #444; }
       .p-blue { color: #00aaff; }
       .p-yellow { color: #ffd93d; }

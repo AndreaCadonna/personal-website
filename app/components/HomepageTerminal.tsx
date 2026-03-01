@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { profile, skills, getExperienceSorted, getFeaturedProjects } from '@/lib/data';
-import type { Skill } from '@/lib/data';
-
-const sortedExp = getExperienceSorted();
-const featured = getFeaturedProjects();
+import { useMemo } from 'react';
+import { profile } from '@/lib/data';
+import { useTerminal, BOOT_LINES } from './terminal/useTerminal';
+import { renderCommand } from './terminal/renderers';
+import TerminalInput from './terminal/TerminalInput';
 
 const ASCII_NAME = `
  █████  ███    ██ ██████  ██████  ███████  █████
@@ -21,89 +20,35 @@ const ASCII_NAME = `
  ██████ ██   ██ ██████   ██████  ██   ████ ██   ████ ██   ██
 `;
 
-const BOOT_LINES = [
-  { text: 'BIOS v3.14 - Portfolio System', delay: 0 },
-  { text: 'Checking memory... 16384 MB OK', delay: 200 },
-  { text: 'Loading kernel modules...', delay: 400 },
-  { text: '[  OK  ] Started Network Manager', delay: 600 },
-  { text: '[  OK  ] Mounted Developer Filesystem', delay: 800 },
-  { text: '[  OK  ] Started Portfolio Service', delay: 1000 },
-  { text: '', delay: 1200 },
-  { text: `portfolio login: ${profile.firstName.toLowerCase()}`, delay: 1400 },
-  { text: `Last login: Today from ${profile.contact.location}`, delay: 1600 },
-  { text: '', delay: 1800 },
-];
-
-const SKILLS_JSON: Record<string, { tools: string[]; proficiency: string }> = {};
-const skillEntries = Object.entries(skills).slice(0, 4);
-for (const [key, group] of skillEntries) {
-  SKILLS_JSON[key] = {
-    tools: group.skills.slice(0, 4).map((s: Skill) => s.name),
-    proficiency: group.skills[0]?.proficiency || 'advanced',
-  };
-}
-const skillKeys = Object.keys(SKILLS_JSON);
-const lastSkillKey = skillKeys[skillKeys.length - 1];
-
-const GIT_LOG = sortedExp.slice(0, 4).map((exp, i) => ({
-  hash: Math.random().toString(16).slice(2, 9),
-  date: `${exp.startDate.split('-')[0]}-${exp.endDate === 'present' ? 'present' : exp.endDate.split('-')[0]}`,
-  msg: `feat: ${exp.role} @ ${exp.company}`,
-  branch: i === 0 ? 'main' : 'career',
+// Stable matrix rain data (computed once, avoids hydration mismatch)
+const MATRIX_COLS = Array.from({ length: 15 }, (_, i) => ({
+  left: `${i * 7}%`,
+  duration: `${12 + i * 1.3}s`,
+  delay: `${-(i * 1.7)}s`,
+  chars: '01'.repeat(80),
 }));
-
-const PROJECTS_LS = featured.slice(0, 3).map(p => ({
-  name: p.id + '/',
-  size: `${(Math.random() * 3 + 0.5).toFixed(1)}M`,
-  desc: p.technologies.slice(0, 3).join(' + '),
-  perms: 'drwxr-xr-x',
-}));
-
-const CHESS_ASCII = `
-  +----+----+----+----+----+----+----+---+
-8 | ♜ | ♞ | ♝ | ♛ | ♚ | ♝ | ♞ | ♜ |
-  +----+----+----+----+----+----+----+---+
-7 | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ | ♟ |
-  +----+----+----+----+----+----+----+---+
-6 |    |    |    |    |    |    |    |   |
-  +----+----+----+----+----+----+----+---+
-5 |    |    |    |    |    |    |    |   |
-  +----+----+----+----+----+----+----+---+
-4 |    |    |    |    |    |    |    |   |
-  +----+----+----+----+----+----+----+---+
-3 |    |    |    |    |    |    |    |   |
-  +----+----+----+----+----+----+----+---+
-2 | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ | ♙ |
-  +----+----+----+----+----+----+----+---+
-1 | ♖ | ♘ | ♗ | ♕ | ♔ | ♗ | ♘ | ♖ |
-  +----+----+----+----+----+----+----+---+
-    a    b    c    d    e    f    g    h`;
 
 export default function HomepageTerminal() {
-  const [bootComplete, setBootComplete] = useState(false);
-  const [visibleLines, setVisibleLines] = useState(0);
-  const [showPrompt, setShowPrompt] = useState(false);
-  const termRef = useRef<HTMLDivElement>(null);
+  const terminal = useTerminal();
 
-  useEffect(() => {
-    BOOT_LINES.forEach((line, i) => {
-      setTimeout(() => {
-        setVisibleLines(i + 1);
-        if (i === BOOT_LINES.length - 1) {
-          setTimeout(() => {
-            setBootComplete(true);
-            setTimeout(() => setShowPrompt(true), 500);
-          }, 400);
-        }
-      }, line.delay);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (termRef.current) {
-      termRef.current.scrollTop = termRef.current.scrollHeight;
-    }
-  }, [visibleLines, bootComplete]);
+  // Memoize to avoid rebuilding matrix rain on every render
+  const matrixRain = useMemo(() => (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
+      {MATRIX_COLS.map((col, i) => (
+        <div
+          key={i}
+          className="matrix-col"
+          style={{
+            left: col.left,
+            animationDuration: col.duration,
+            animationDelay: col.delay,
+          }}
+        >
+          {col.chars}
+        </div>
+      ))}
+    </div>
+  ), []);
 
   return (
     <>
@@ -145,7 +90,7 @@ export default function HomepageTerminal() {
           z-index: 99;
         }
 
-        .phosphor { text-shadow: 0 0 5px #00ff4166, 0 0 10px #00ff4122; }
+        .phosphor { text-shadow: 0 0 3px #00ff4144, 0 0 6px #00ff4111; }
 
         .prompt::before {
           content: '$ ';
@@ -166,11 +111,6 @@ export default function HomepageTerminal() {
         @keyframes blink {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
-        }
-
-        @keyframes typeIn {
-          from { width: 0; }
-          to { width: 100%; }
         }
 
         .cursor {
@@ -223,167 +163,107 @@ export default function HomepageTerminal() {
           color: #ffd93d;
           text-shadow: 0 0 8px #ffd93d44;
         }
+
+        /* Terminal scrollbar — Webkit */
+        .terminal-scroll::-webkit-scrollbar {
+          width: 6px;
+        }
+        .terminal-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .terminal-scroll::-webkit-scrollbar-thumb {
+          background: #00ff4125;
+          border-radius: 3px;
+        }
+        .terminal-scroll::-webkit-scrollbar-thumb:hover {
+          background: #00ff4150;
+          box-shadow: 0 0 6px #00ff4133;
+        }
+
+        /* Terminal scrollbar — Firefox */
+        .terminal-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: #00ff4125 transparent;
+        }
       `}</style>
 
-      <div className="terminal-page">
+      <div className="terminal-page" onClick={() => { /* clicking body focuses input via TerminalInput */ }}>
         {/* Matrix rain background */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
-          {Array.from({ length: 15 }).map((_, i) => (
-            <div
-              key={i}
-              className="matrix-col"
-              style={{
-                left: `${i * 7}%`,
-                animationDuration: `${10 + Math.random() * 15}s`,
-                animationDelay: `${Math.random() * -20}s`,
-              }}
-            >
-              {'01'.repeat(80).split('').sort(() => Math.random() - 0.5).join('')}
-            </div>
-          ))}
-        </div>
+        {matrixRain}
 
-        {/* Terminal Window */}
-        <div className="relative z-10 max-w-4xl mx-auto p-4 md:p-8" ref={termRef}>
-          {/* Title bar */}
-          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[#222]">
+        {/* Terminal Window — fixed viewport height, scrolls internally */}
+        <div className="relative z-10 max-w-4xl mx-auto p-4 md:p-8 flex flex-col" style={{ height: '100vh' }}>
+          {/* Title bar (stays at top) */}
+          <div className="flex items-center gap-2 pb-3 border-b border-[#222] shrink-0">
             <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
             <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
             <div className="w-3 h-3 rounded-full bg-[#28c840]" />
             <span className="ml-4 text-[#555] text-xs">portfolio@{profile.lastName.toLowerCase()}:~</span>
           </div>
 
-          {/* Boot Sequence */}
-          <div className="mb-6 phosphor">
-            {BOOT_LINES.slice(0, visibleLines).map((line, i) => (
-              <div key={i} className={line.text === '' ? 'h-4' : ''}>
-                {line.text.startsWith('[') ? (
-                  <span>
-                    <span className="text-[#28c840]">{line.text.substring(0, 8)}</span>
-                    <span>{line.text.substring(8)}</span>
-                  </span>
-                ) : (
-                  <span className="dim">{line.text}</span>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {bootComplete && (
-            <div className="phosphor">
-              {/* ASCII Header */}
-              <div className="terminal-section section-fade" style={{ animationDelay: '0s' }}>
-                <pre className="text-[7px] sm:text-[9px] md:text-[11px] leading-[1.15] bright overflow-x-auto">
-                  {ASCII_NAME}
-                </pre>
-                <p className="comment mt-2">{'// software engineer & chess enthusiast'}</p>
-              </div>
-
-              {/* whoami */}
-              <div className="terminal-section section-fade" style={{ animationDelay: '0.1s' }}>
-                <p className="prompt mb-2">whoami</p>
-                <p className="mb-2">
-                  {profile.shortBio}
-                </p>
-                <p className="mb-2">
-                  I approach every problem like a <span className="warn">chess position</span> &mdash;
-                  analyzing deeply, calculating variations, and finding the most elegant path forward.
-                </p>
-                <p className="dim">
-                  From AI-augmented workflows to scalable architectures, I build things that work.
-                </p>
-              </div>
-
-              {/* Skills */}
-              <div className="terminal-section section-fade" style={{ animationDelay: '0.2s' }}>
-                <p className="prompt mb-2">cat skills.json</p>
-                <div className="pl-0">
-                  <p>{'{'}</p>
-                  {Object.entries(SKILLS_JSON).map(([category, data]) => (
-                    <div key={category} className="pl-4 mb-1">
-                      <span className="key-blue">&quot;{category}&quot;</span>
-                      <span className="dim">: {'{'}</span>
-                      <div className="pl-4">
-                        <span className="key-purple">&quot;tools&quot;</span>
-                        <span className="dim">: [</span>
-                        <span className="string">{data.tools.map(t => `"${t}"`).join(', ')}</span>
-                        <span className="dim">],</span>
-                        <br />
-                        <span className="key-purple">&quot;proficiency&quot;</span>
-                        <span className="dim">: </span>
-                        <span className="string">&quot;{data.proficiency}&quot;</span>
-                      </div>
-                      <span className="dim pl-0">{'}'}{category !== lastSkillKey ? ',' : ''}</span>
-                    </div>
-                  ))}
-                  <p>{'}'}</p>
+          {/* Scrollable content area */}
+          <div className="terminal-scroll flex-1 overflow-y-auto min-h-0 pt-4 pb-4" ref={terminal.scrollRef}>
+            {/* Boot Sequence */}
+            <div className="mb-6 phosphor">
+              {BOOT_LINES.slice(0, terminal.visibleBootLines).map((line, i) => (
+                <div key={i} className={line.text === '' ? 'h-4' : ''}>
+                  {line.text.startsWith('[') ? (
+                    <span>
+                      <span className="text-[#28c840]">{line.text.substring(0, 8)}</span>
+                      <span>{line.text.substring(8)}</span>
+                    </span>
+                  ) : (
+                    <span className="dim">{line.text}</span>
+                  )}
                 </div>
-              </div>
-
-              {/* Experience */}
-              <div className="terminal-section section-fade" style={{ animationDelay: '0.3s' }}>
-                <p className="prompt mb-2">git log --oneline --career</p>
-                {GIT_LOG.map((commit) => (
-                  <div key={commit.hash} className="mb-2">
-                    <span className="warn">{commit.hash}</span>
-                    <span className="dim"> ({commit.branch}) </span>
-                    <span className="key-blue">[{commit.date}]</span>
-                    <br className="sm:hidden" />
-                    <span className="sm:ml-0"> {commit.msg}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Projects */}
-              <div className="terminal-section section-fade" style={{ animationDelay: '0.4s' }}>
-                <p className="prompt mb-2">ls -la ~/projects/</p>
-                <p className="dim mb-1">total {PROJECTS_LS.length}</p>
-                {PROJECTS_LS.map((proj) => (
-                  <div key={proj.name} className="mb-1">
-                    <span className="dim hidden sm:inline">{proj.perms}  </span>
-                    <span className="number">{proj.size}  </span>
-                    <span className="key-blue">{proj.name}</span>
-                    <br className="sm:hidden" />
-                    <span className="comment sm:ml-2">{`// ${proj.desc}`}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Chess */}
-              <div className="terminal-section section-fade" style={{ animationDelay: '0.5s' }}>
-                <p className="prompt mb-2">./chess --status</p>
-                <pre className="text-[8px] leading-[1.2] sm:text-xs sm:leading-[1.3] mb-4 warn overflow-x-auto">{CHESS_ASCII}</pre>
-                <p>
-                  <span className="key-blue">STATUS:</span> Daily puzzles on Lichess.
-                  <br />
-                  <span className="key-blue">PHILOSOPHY:</span>{' '}
-                  <span className="string">&quot;Every pawn sacrifice teaches patience, every fork teaches opportunism.&quot;</span>
-                </p>
-              </div>
-
-              {/* Contact */}
-              <div className="section-fade" style={{ animationDelay: '0.6s' }}>
-                <p className="prompt mb-2">cat contact.txt</p>
-                <p className="mb-1">
-                  GitHub &nbsp;&nbsp;&nbsp;: <a href={profile.contact.github} className="terminal-link" target="_blank" rel="noopener noreferrer">github.com/AndreaCadonna</a>
-                </p>
-                <p className="mb-1">
-                  LinkedIn &nbsp;: <a href={profile.contact.linkedin} className="terminal-link" target="_blank" rel="noopener noreferrer">linkedin.com/in/andrea-cadonna</a>
-                </p>
-                <p className="mb-4">
-                  Email &nbsp;&nbsp;&nbsp;&nbsp;: <a href={`mailto:${profile.contact.email}`} className="terminal-link">{profile.contact.email}</a>
-                </p>
-              </div>
-
-              {/* Final prompt */}
-              {showPrompt && (
-                <div className="section-fade mt-8">
-                  <span className="prompt" />
-                  <span className="cursor" />
-                </div>
-              )}
+              ))}
             </div>
-          )}
+
+            {terminal.phase === 'interactive' && (
+              <div className="phosphor">
+                {/* ASCII Header */}
+                <div className="terminal-section section-fade mb-6">
+                  <pre className="text-[7px] sm:text-[9px] md:text-[11px] leading-[1.15] bright overflow-x-auto">
+                    {ASCII_NAME}
+                  </pre>
+                  <p className="comment mt-2">{'// software engineer & chess enthusiast'}</p>
+                </div>
+
+                {/* Command output history */}
+                {terminal.lines.map((line) => {
+                  if (line.type === 'input') {
+                    return (
+                      <div key={line.id} className="mt-4">
+                        <span className="prompt">{line.content}</span>
+                      </div>
+                    );
+                  }
+                  if (line.type === 'output' && line.commandKey) {
+                    return (
+                      <div key={line.id} className="mb-2">
+                        {renderCommand(line.commandKey, line.args || '', line.raw || '', terminal.commandHistory)}
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
+
+                {/* Interactive input */}
+                <div className="mt-4">
+                  <TerminalInput
+                    currentInput={terminal.currentInput}
+                    setCurrentInput={terminal.setCurrentInput}
+                    onExecute={terminal.executeCommand}
+                    onHistoryUp={terminal.handleHistoryUp}
+                    onHistoryDown={terminal.handleHistoryDown}
+                    onTab={terminal.handleTab}
+                    onCtrlC={terminal.handleCtrlC}
+                    onClearInput={terminal.clearInput}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>

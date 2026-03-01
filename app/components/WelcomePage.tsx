@@ -75,8 +75,8 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
           z-index: 99;
         }
 
-        .w-phosphor { text-shadow: 0 0 5px #00ff4166, 0 0 10px #00ff4122; }
-
+        .w-phosphor { text-shadow: 0 0 3px #00ff4144, 0 0 6px #00ff4111; }
+        
         .w-matrix-col {
           position: absolute;
           top: -100%;

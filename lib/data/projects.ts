@@ -192,24 +192,7 @@ export const projects: Project[] = [
       },
     ],
     categories: ["full-stack", "devops", "web"],
-  },
-  {
-    id: "keypi-net",
-    name: "Keypi.net",
-    tagline: "Angular migration and performance improvements",
-    description:
-      "Contributed to a data-centric application platform by upgrading the codebase from Angular v7 to v13, resolving compatibility issues, updating dependencies, and improving application performance.",
-    status: "completed",
-    startDate: "2022-01",
-    technologies: ["Angular (v7 → v13)", "TypeScript"],
-    highlights: [
-      "Upgraded codebase from Angular v7 to v13",
-      "Resolved compatibility issues and updated dependencies",
-      "Improved application performance and maintainability",
-    ],
-    links: [],
-    categories: ["frontend"],
-  },
+  },  
   {
     id: "personal-website",
     name: "Personal Website",
@@ -263,6 +246,166 @@ export const projects: Project[] = [
     ],
     categories: ["backend"],
   },
+  {
+    id: "certificate-authority-service",
+    name: "Certificate Authority Service",
+    tagline: "Command-line X.509 certificate lifecycle management in Go",
+    description:
+      "A command-line Certificate Authority that manages X.509 digital certificates through their full lifecycle. Built in Go with zero external dependencies, leveraging only the standard library for all cryptographic operations.",
+    status: "open-source",
+    startDate: "2025-01",
+    technologies: [
+      "Go 1.21+",
+      "X.509",
+      "ECDSA P-256",
+      "RSA 2048",
+      "AES-256-GCM",
+    ],
+    highlights: [
+      "Built complete CA lifecycle: initialization, CSR signing, revocation, CRL generation, and verification",
+      "Implemented with zero external dependencies using only Go standard library cryptography",
+      "Designed spec-driven development workflow with research notes, functional specs, and architecture decision records",
+      "Applied validate-before-mutate patterns and atomic file operations for data integrity",
+    ],
+    links: [
+      {
+        label: "GitHub",
+        url: "https://github.com/AndreaCadonna/Certificate_Authority_Service",
+        type: "github",
+      },
+    ],
+    categories: ["backend", "devops"],
+  },
+  {
+    id: "simple-append-only-event-store",
+    name: "Simple Append-Only Event Store",
+    tagline: "Event sourcing implementation in Go with bank account domain",
+    description:
+      "An educational implementation of event sourcing principles written in Go. Demonstrates how to build a system where state is reconstructed from immutable events rather than direct state updates, using a bank account scenario.",
+    status: "open-source",
+    startDate: "2025-01",
+    technologies: ["Go"],
+    highlights: [
+      "Implemented append-only event log with in-memory indexing for efficient stream lookups",
+      "Built event replay mechanism to rebuild current state from immutable event history",
+      "Demonstrated stream-per-aggregate architectural pattern with clear command/event separation",
+      "Zero external dependencies, built entirely with Go standard library",
+    ],
+    links: [
+      {
+        label: "GitHub",
+        url: "https://github.com/AndreaCadonna/simple-append-only-event-store",
+        type: "github",
+      },
+    ],
+    categories: ["backend"],
+  },
+  {
+    id: "rate-limiter",
+    name: "Rate Limiter with Per-User Quotas",
+    tagline: "Token bucket rate limiting experiment in Python",
+    description:
+      "A software experiment demonstrating token bucket rate limiting with independent, configurable per-user quota tracking. Proves that per-user rate limiting using lazy refill works correctly without background threads.",
+    status: "open-source",
+    startDate: "2025-01",
+    technologies: ["Python 3.9+"],
+    highlights: [
+      "Implemented token bucket algorithm with lazy on-demand refill, no background threads needed",
+      "Achieved per-user isolation where one user's quota exhaustion has zero impact on others",
+      "Validated all 5 behavioral scenarios from formal specification with automated testing",
+      "Zero external dependencies, built entirely with Python standard library",
+    ],
+    links: [
+      {
+        label: "GitHub",
+        url: "https://github.com/AndreaCadonna/rate_limiter_with_per-user_quotas",
+        type: "github",
+      },
+    ],
+    categories: ["backend"],
+  },
+  {
+    id: "serverless-function-runtime",
+    name: "Serverless Function Runtime",
+    tagline: "Local serverless runtime mapping files to HTTP endpoints",
+    description:
+      "A local, single-process Node.js runtime that automatically discovers function files in an api/ directory and exposes them as HTTP endpoints. Handles request routing and dispatching based on HTTP methods while maintaining Web-standard APIs.",
+    status: "open-source",
+    startDate: "2025-01",
+    technologies: ["JavaScript", "Node.js 20+"],
+    highlights: [
+      "Built file-based route discovery mapping api/ directory files to HTTP endpoints automatically",
+      "Implemented method-based dispatch routing requests via handler exports named after HTTP verbs",
+      "Used Web-standard Request/Response contracts with fixed invocation timeout (3000ms)",
+      "Includes end-to-end validation test suite",
+    ],
+    links: [
+      {
+        label: "GitHub",
+        url: "https://github.com/AndreaCadonna/serverless_function_runtime",
+        type: "github",
+      },
+    ],
+    categories: ["backend"],
+  },
+  {
+    id: "secret-management-vault",
+    name: "Secret Management Vault",
+    tagline: "Two-layer envelope encryption credential store in Python",
+    description:
+      "A local Python tool implementing two-layer envelope encryption for credential storage. Each secret gets its own Data Encryption Key (AES-256-GCM), with all keys protected by a Root Key derived from a master password using PBKDF2.",
+    status: "open-source",
+    startDate: "2025-01",
+    technologies: [
+      "Python 3.10+",
+      "AES-256-GCM",
+      "PBKDF2-HMAC-SHA256",
+      "cryptography (v42.0+)",
+    ],
+    highlights: [
+      "Implemented envelope encryption with unique Data Encryption Keys per secret and PBKDF2 key derivation (600,000 iterations)",
+      "Built path-based access control with glob wildcards and identity-driven policy system",
+      "Designed seal/unseal lifecycle keeping Root Key in memory only when active",
+      "Includes append-only audit log, secret versioning, and 11 CLI subcommands",
+    ],
+    links: [
+      {
+        label: "GitHub",
+        url: "https://github.com/AndreaCadonna/secret_management_vault",
+        type: "github",
+      },
+    ],
+    categories: ["backend", "devops"],
+  },
+  {
+    id: "property-rental-website-template",
+    name: "Property Rental Website Template",
+    tagline: "Configurable Astro template for vacation rental properties",
+    description:
+      "A customizable website template for vacation rental properties, built with Astro and React. Features configuration-driven setup through YAML/TypeScript files, five built-in theme presets, and static site generation for optimal performance.",
+    status: "open-source",
+    startDate: "2025-01",
+    technologies: [
+      "Astro 4.15",
+      "TypeScript",
+      "Tailwind CSS",
+      "React 18",
+    ],
+    highlights: [
+      "Built configuration-driven architecture customizable through YAML/TypeScript config files without coding",
+      "Created five built-in theme presets: luxury, modern, rustic, coastal, and minimal",
+      "Implemented SEO optimization with Open Graph, meta tags, sitemap, and structured data",
+      "Designed mobile-first responsive layouts with WebP image support and lazy loading",
+    ],
+    links: [
+      {
+        label: "GitHub",
+        url: "https://github.com/AndreaCadonna/property-rental-website-template",
+        type: "github",
+      },
+    ],
+    categories: ["frontend", "web"],
+  },  
 ];
 
 /** Get projects sorted by start date (most recent first) */
