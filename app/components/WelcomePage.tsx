@@ -175,19 +175,26 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
       <div className="welcome-terminal">
         {/* Matrix rain */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div
-              key={i}
-              className="w-matrix-col"
-              style={{
-                left: `${i * 8.5}%`,
-                animationDuration: `${12 + Math.random() * 18}s`,
-                animationDelay: `${Math.random() * -20}s`,
-              }}
-            >
-              {'01'.repeat(80).split('').sort(() => Math.random() - 0.5).join('')}
-            </div>
-          ))}
+          {Array.from({ length: 12 }).map((_, i) => {
+            // Use deterministic values based on index to avoid hydration mismatch
+            const duration = 12 + ((i * 7 + 3) % 18);
+            const delay = -((i * 13 + 5) % 20);
+            // Deterministic pseudo-random binary string seeded by column index
+            const bits = Array.from({ length: 160 }, (_, j) => ((i * 31 + j * 17 + 7) * 2654435761 >>> 31) & 1).join('');
+            return (
+              <div
+                key={i}
+                className="w-matrix-col"
+                style={{
+                  left: `${i * 8.5}%`,
+                  animationDuration: `${duration}s`,
+                  animationDelay: `${delay}s`,
+                }}
+              >
+                {bits}
+              </div>
+            );
+          })}
         </div>
 
         {/* Content */}

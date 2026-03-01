@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef, useCallback, useState } from 'react';
 import { profile } from '@/lib/data';
 import { useTerminal, BOOT_LINES } from './terminal/useTerminal';
 import { renderCommand } from './terminal/renderers';
@@ -32,6 +32,22 @@ const MATRIX_COLS = Array.from({ length: 15 }, (_, i) => ({
 
 export default function HomepageTerminal() {
   const terminal = useTerminal();
+  const asciiRef = useRef<HTMLPreElement>(null);
+  const asciiWrapperRef = useRef<HTMLDivElement>(null);
+  const [asciiScale, setAsciiScale] = useState(1);
+
+  const updateAsciiScale = useCallback(() => {
+    const pre = asciiRef.current;
+    const wrapper = asciiWrapperRef.current;
+    if (!pre || !wrapper) return;
+    setAsciiScale(Math.min(1, wrapper.clientWidth / pre.scrollWidth));
+  }, []);
+
+  useEffect(() => {
+    updateAsciiScale();
+    window.addEventListener('resize', updateAsciiScale);
+    return () => window.removeEventListener('resize', updateAsciiScale);
+  }, [updateAsciiScale, terminal.phase]);
 
   // Memoize to avoid rebuilding matrix rain on every render
   const matrixRain = useMemo(() => (
@@ -225,9 +241,20 @@ export default function HomepageTerminal() {
               <div className="phosphor">
                 {/* ASCII Header */}
                 <div className="terminal-section section-fade mb-6">
-                  <pre className="text-[5px] sm:text-[7px] md:text-[11px] leading-[1.15] bright overflow-x-auto">
-                    {ASCII_NAME_FULL}
-                  </pre>
+                  <div ref={asciiWrapperRef} className="overflow-hidden">
+                    <pre
+                      ref={asciiRef}
+                      className="text-[11px] leading-[1.15] bright whitespace-pre inline-block origin-top-left"
+                      style={{
+                        transform: `scale(${asciiScale})`,
+                        marginBottom: asciiRef.current
+                          ? `${(asciiScale - 1) * asciiRef.current.offsetHeight}px`
+                          : undefined,
+                      }}
+                    >
+                      {ASCII_NAME_FULL}
+                    </pre>
+                  </div>
                   <p className="comment mt-2">{'// software engineer & chess enthusiast'}</p>
                 </div>
 
