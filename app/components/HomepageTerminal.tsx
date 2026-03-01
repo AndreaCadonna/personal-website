@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useRef, useCallback, useState } from 'react';
+import { useMemo } from 'react';
 import { profile } from '@/lib/data';
 import { useTerminal, BOOT_LINES } from './terminal/useTerminal';
 import { renderCommand } from './terminal/renderers';
@@ -32,23 +32,6 @@ const MATRIX_COLS = Array.from({ length: 15 }, (_, i) => ({
 
 export default function HomepageTerminal() {
   const terminal = useTerminal();
-  const asciiRef = useRef<HTMLPreElement>(null);
-  const asciiWrapperRef = useRef<HTMLDivElement>(null);
-  const [asciiScale, setAsciiScale] = useState(1);
-
-  const updateAsciiScale = useCallback(() => {
-    const pre = asciiRef.current;
-    const wrapper = asciiWrapperRef.current;
-    if (!pre || !wrapper) return;
-    setAsciiScale(Math.min(1, wrapper.clientWidth / pre.scrollWidth));
-  }, []);
-
-  useEffect(() => {
-    updateAsciiScale();
-    window.addEventListener('resize', updateAsciiScale);
-    return () => window.removeEventListener('resize', updateAsciiScale);
-  }, [updateAsciiScale, terminal.phase]);
-
   // Memoize to avoid rebuilding matrix rain on every render
   const matrixRain = useMemo(() => (
     <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
@@ -239,22 +222,17 @@ export default function HomepageTerminal() {
 
             {terminal.phase === 'interactive' && (
               <div className="phosphor">
-                {/* ASCII Header */}
+                {/* Name Header */}
                 <div className="terminal-section section-fade mb-6">
-                  <div ref={asciiWrapperRef} className="overflow-hidden">
-                    <pre
-                      ref={asciiRef}
-                      className="text-[11px] leading-[1.15] bright whitespace-pre inline-block origin-top-left"
-                      style={{
-                        transform: `scale(${asciiScale})`,
-                        marginBottom: asciiRef.current
-                          ? `${(asciiScale - 1) * asciiRef.current.offsetHeight}px`
-                          : undefined,
-                      }}
-                    >
-                      {ASCII_NAME_FULL}
-                    </pre>
+                  {/* Mobile: styled text */}
+                  <div className="md:hidden">
+                    <h1 className="text-2xl font-bold bright tracking-wider">{profile.firstName.toUpperCase()}</h1>
+                    <h1 className="text-2xl font-bold bright tracking-wider">{profile.lastName.toUpperCase()}</h1>
                   </div>
+                  {/* Desktop: ASCII art */}
+                  <pre className="hidden md:block text-[11px] leading-[1.15] bright whitespace-pre">
+                    {ASCII_NAME_FULL}
+                  </pre>
                   <p className="comment mt-2">{'// software engineer & chess enthusiast'}</p>
                 </div>
 
