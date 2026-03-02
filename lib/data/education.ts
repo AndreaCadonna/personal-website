@@ -19,66 +19,51 @@ export const languages: Language[] = [
 
 export const interests: Interest[] = [
   {
-    area: "AI-Augmented Development",
+    area: "Agentic Coding Tools",
     description:
-      "Actively tracking evolution of agentic coding tools, patterns, and best practices",
-  },
-  {
-    area: "Engineering Evolution",
-    description:
-      "Adapting to industry shifts from implementation-focused to architecture and orchestration-focused engineering roles",
-  },
-  {
-    area: "AI Coding Tools",
-    description:
-      "Continuous learning of GitHub Copilot IDE/CLI, Claude Code, and emerging development assistants",
+      "Following the evolution of AI coding assistants like GitHub Copilot and Claude Code, and how they change daily development work",
   },
   {
     area: "Development Workflows",
     description:
-      "Studying and practicing prompt engineering, context optimization, and AI output validation techniques",
+      "Exploring how planning, context preparation, and review fit into AI-assisted development",
   },
   {
-    area: "Industry Trends",
+    area: "AI Coding Ecosystem",
     description:
-      "Following the evolving role of software engineers in AI-augmented development environments",
-  },
-  {
-    area: "Responsible AI Usage",
-    description:
-      "Understanding capabilities, limitations, and ethical considerations of AI development tools",
+      "Keeping up with MCP servers, AI agent frameworks, and new tools in the agentic coding space",
   },
   {
     area: "Chess",
     description:
-      "Passionate chess player applying analytical thinking to both game improvement and software engineering",
+      "Enthusiastic chess player who enjoys the analytical and strategic aspects of the game",
   },
 ];
 
 export const softSkills: SoftSkill[] = [
   {
-    name: "Leadership",
+    name: "Task Planning",
     description:
-      "Experience leading technical teams and mentoring developers",
+      "Breaking down work into manageable steps, defining priorities, and structuring development tasks before execution",
+  },
+  {
+    name: "Multitasking",
+    description:
+      "Managing multiple parallel workstreams and switching between tasks effectively, especially in agentic coding workflows",
+  },
+  {
+    name: "Delegation",
+    description:
+      "Distributing work across AI agents and tools, reviewing outputs, and coordinating parallel development efforts",
   },
   {
     name: "Communication",
     description:
-      "Strong client-facing skills and stakeholder management",
-  },
-  {
-    name: "Problem Solving",
-    description:
-      "Proactive approach to identifying and resolving technical challenges",
+      "Comfortable in client interactions, team discussions, and translating requirements into actionable tasks",
   },
   {
     name: "Adaptability",
     description:
-      "Successfully worked in various environments from startups to established companies",
-  },
-  {
-    name: "Business Acumen",
-    description:
-      "Experience in startup environments, project estimation, cost analysis, and AI integration strategy",
+      "Adjusted to different work environments and development paradigms, from traditional coding to AI-assisted workflows",
   },
 ];
