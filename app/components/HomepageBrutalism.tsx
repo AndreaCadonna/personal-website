@@ -16,22 +16,26 @@ const SKILLS_LIST = [
   ...skills.devopsAndPractices.skills.slice(0, 3).map(s => s.name),
 ].slice(0, 16);
 
-const EXPERIENCE = sortedExp.slice(0, 3).map(exp => ({
+const EXPERIENCE = sortedExp.map(exp => ({
   role: exp.role.toUpperCase(),
   company: exp.company.toUpperCase(),
   period: `${exp.startDate.split('-')[0]}\u2014${exp.endDate === 'present' ? 'PRESENT' : exp.endDate.split('-')[0]}`,
-  bullets: exp.achievements.slice(0, 3).map(a => a.description),
+  bullets: exp.achievements.map(a => a.description),
 }));
 
-const PROJECTS = featured.slice(0, 2).map(p => ({
+const INITIAL_PROJECTS_COUNT = 4;
+const ALL_PROJECTS = featured.map(p => ({
   name: p.name,
   tagline: p.tagline,
-  technologies: p.technologies.slice(0, 3),
+  technologies: p.technologies.slice(0, 4),
 }));
 
 export default function HomepageBrutalism() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [time, setTime] = useState('');
+  const [showAllProjects, setShowAllProjects] = useState(false);
+
+  const visibleProjects = showAllProjects ? ALL_PROJECTS : ALL_PROJECTS.slice(0, INITIAL_PROJECTS_COUNT);
 
   useEffect(() => {
     const handleMove = (e: MouseEvent) => {
@@ -280,7 +284,7 @@ export default function HomepageBrutalism() {
             THINGS I <span className="blue-accent">MADE</span>
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {PROJECTS.map((proj, i) => (
+            {visibleProjects.map((proj, i) => (
               <div
                 key={proj.name}
                 className={`brutal-card p-5 sm:p-8 relative overflow-hidden ${i % 2 === 0 ? 'bg-white' : 'bg-black text-white'}`}
@@ -304,6 +308,17 @@ export default function HomepageBrutalism() {
               </div>
             ))}
           </div>
+          {ALL_PROJECTS.length > INITIAL_PROJECTS_COUNT && (
+            <div className="text-center mt-8">
+              <button
+                onClick={() => setShowAllProjects(!showAllProjects)}
+                className="brutal-link"
+                style={{ cursor: 'pointer' }}
+              >
+                {showAllProjects ? 'SHOW LESS ↑' : `LOAD MORE (${ALL_PROJECTS.length - INITIAL_PROJECTS_COUNT} MORE) ↓`}
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Education */}

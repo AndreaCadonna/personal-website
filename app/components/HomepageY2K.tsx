@@ -7,28 +7,27 @@ import type { Skill } from '@/lib/data';
 const sortedExp = getExperienceSorted();
 const featured = getFeaturedProjects();
 
-const proficiencyToStars = (p?: string): number => {
+const proficiencyToLevel = (p?: string): number => {
   switch (p) {
     case 'expert': return 5;
-    case 'advanced': return 5;
-    case 'intermediate': return 4;
-    case 'beginner': return 3;
-    default: return 2;
+    case 'advanced': return 4;
+    case 'intermediate': return 3;
+    case 'beginner': return 2;
+    default: return 1;
   }
 };
 
 const SKILLS = Object.entries(skills).map(([, group]) => {
-  const maxProf = group.skills.reduce((best: string, s: Skill) => {
-    const order = ['beginner', 'intermediate', 'advanced', 'expert'];
-    return order.indexOf(s.proficiency || '') > order.indexOf(best) ? (s.proficiency || '') : best;
-  }, '');
+  const avgLevel = group.skills.reduce((sum: number, s: Skill) => sum + proficiencyToLevel(s.proficiency), 0) / group.skills.length;
   return {
     name: group.label.replace(/ Technologies/g, '').replace(/ & /g, ' & '),
-    stars: proficiencyToStars(maxProf),
+    stars: Math.round(avgLevel),
   };
 });
 
 const MARQUEE_SKILLS = allSkillNames.slice(0, 12).join(' \u2605 ') + ' \u2605 ';
+
+const INITIAL_Y2K_PROJECTS = 4;
 
 const GUESTBOOK = [
   { name: 'xX_CodeMaster_Xx', date: '02/14/2025', msg: 'Cool site!! Love the chess puzzle login :D' },
@@ -41,6 +40,9 @@ export default function HomepageY2K() {
   const [sparkles, setSparkles] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const [currentTime, setCurrentTime] = useState('');
   const [blink, setBlink] = useState(true);
+  const [showAllProjects, setShowAllProjects] = useState(false);
+
+  const visibleProjects = showAllProjects ? featured : featured.slice(0, INITIAL_Y2K_PROJECTS);
 
   useEffect(() => {
     setHits(Math.floor(Math.random() * 90000) + 13370);
@@ -369,7 +371,7 @@ export default function HomepageY2K() {
                       {blink ? '\u25BA' : '\u25BB'} Work Experience
                     </h2>
                     <div className="space-y-4">
-                      {sortedExp.slice(0, 3).map((exp, i) => (
+                      {sortedExp.map((exp, i) => (
                         <div key={exp.id}>
                           <p className="font-bold text-[#ffcc00]">
                             {i === 0 && <span className="blink text-[#ff0000]">[NEW!] </span>}
@@ -379,7 +381,7 @@ export default function HomepageY2K() {
                             {exp.startDate.split('-')[0]} - {exp.endDate === 'present' ? 'Present' : exp.endDate.split('-')[0]}
                           </p>
                           <ul className="text-sm text-[#ccccff] mt-1 list-disc list-inside">
-                            {exp.achievements.slice(0, 3).map((a, j) => (
+                            {exp.achievements.map((a, j) => (
                               <li key={j}>{a.description}{a.metric ? ` (${a.metric})` : ''}</li>
                             ))}
                           </ul>
@@ -396,16 +398,26 @@ export default function HomepageY2K() {
                       {blink ? '\u25BA' : '\u25BB'} Cool Projects!!
                     </h2>
                     <div className="space-y-3">
-                      {featured.slice(0, 3).map((project, i) => (
+                      {visibleProjects.map((project, i) => (
                         <div key={project.id} className="border-2 ridge border-[#6666aa] p-3" style={{ background: 'rgba(0,0,60,0.5)' }}>
                           <p className="font-bold text-[#ff88ff]">
                             <span className="badge">{i === 0 ? 'HOT!' : 'NEW!'}</span> {project.name}
                           </p>
-                          <p className="text-xs text-[#8888cc] mb-1">{project.technologies.slice(0, 3).join(' + ')}</p>
+                          <p className="text-xs text-[#8888cc] mb-1">{project.technologies.slice(0, 4).join(' + ')}</p>
                           <p className="text-sm text-[#ccccff]">{project.tagline}</p>
                         </div>
                       ))}
                     </div>
+                    {featured.length > INITIAL_Y2K_PROJECTS && (
+                      <div className="text-center mt-4">
+                        <button
+                          onClick={() => setShowAllProjects(!showAllProjects)}
+                          className="y2k-button"
+                        >
+                          {showAllProjects ? '[-] Show Less' : `[+] Load More!! (${featured.length - INITIAL_Y2K_PROJECTS} more)`}
+                        </button>
+                      </div>
+                    )}
                   </section>
 
                   <hr className="y2k-hr" />
