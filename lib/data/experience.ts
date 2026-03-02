@@ -11,14 +11,13 @@ export const experience: ExperienceEntry[] = [
     startDate: "2025-12",
     endDate: "present",
     summary:
-      "Frontend engineer responsible for geospatial visualization libraries and 3D mapping integration, working in AI-augmented development environment utilizing latest agentic coding tools and practices.",
+      "Frontend engineer contributing to geospatial visualization libraries and 3D mapping integration, using AI coding tools to support daily development work.",
     responsibilities: [
-      "Managing and developing frontend libraries for georeferenced imagery visualization and integration",
+      "Contributing to frontend libraries for georeferenced imagery visualization and integration",
       "Working on libraries enabling 3D model rendering and manipulation within map-based interfaces",
-      "Implementing geospatial data visualization solutions for complex mapping applications",
-      "Adopted AI coding tools (GitHub Copilot IDE/CLI, Claude Code) in production environment, validating their effectiveness for complex library development",
-      "Established systematic workflows for AI-assisted development: planning → context engineering → AI-generated implementation → review → refinement",
-      "Managed multiple concurrent development tasks using AI orchestration, maintaining consistent code quality across parallel workstreams",
+      "Implementing geospatial data visualization features for mapping applications",
+      "Using AI coding tools (GitHub Copilot IDE/CLI, Claude Code) in daily development workflow",
+      "Applying planning-first approach to development tasks: planning context, reviewing AI-generated code, and iterating on results",
     ],
     technologies: [
       "TypeScript",
@@ -30,11 +29,7 @@ export const experience: ExperienceEntry[] = [
     achievements: [
       {
         description:
-          "Validated AI coding tools for complex geospatial library development in production",
-      },
-      {
-        description:
-          "Established systematic AI-assisted development workflows for the team",
+          "Adopted AI coding tools for geospatial library development in production environment",
       },
     ],
   },
@@ -50,22 +45,17 @@ export const experience: ExperienceEntry[] = [
     startDate: "2023-05",
     endDate: "2025-05",
     summary:
-      "Lead developer responsible for the entire software development lifecycle and quality control, from architecture to deployment, while participating in strategic business decisions and client-facing activities.",
+      "Developer working across the software development lifecycle in a small startup, building web applications and AI-powered automation tools for content creation services.",
     responsibilities: [
-      "Led planning and architecture of multiple platforms for internal use and client services",
-      "Developed web applications using Angular for core products and React/Next.js/Astro for client-facing sites",
-      "Developed AI agent frameworks for automated content creation workflows",
-      "Developed and deployed RAG systems for enhanced information retrieval and content generation",
-      "Implemented MCP servers for efficient AI model communication and orchestration",
-      "Created AI-powered automation tools that streamlined marketing content production processes",
-      "Integrated multiple AI APIs (OpenAI, Anthropic) with custom prompt engineering strategies",
-      "Developed workflow orchestration systems for consistent AI outputs across different content types",
-      "Implemented vector databases and embedding models for semantic search capabilities",
-      "Developed performance monitoring and cost optimization strategies for AI API usage",
-      "Participated in early-stage client calls, co-designed solutions, estimated project costs and timelines",
-      "Managed sprint-based development, defined deliverables and milestones in collaboration with stakeholders",
-      "Oversaw CI/CD pipelines, multi-environment deployment, and version control workflows",
-      "Engaged in company strategy meetings, provided technical insights into service offerings and AI integration opportunities",
+      "Built web applications using Angular for internal products and React/Next.js/Astro for client-facing sites",
+      "Developed AI agent systems for automated content creation workflows",
+      "Built and deployed RAG systems for information retrieval and content generation",
+      "Implemented MCP servers for AI model communication and orchestration",
+      "Integrated AI APIs (OpenAI, Anthropic) with prompt engineering for content automation",
+      "Worked with vector databases and embedding models for semantic search features",
+      "Participated in client calls and contributed to project scoping and timeline estimation",
+      "Contributed to sprint planning and milestone definition with stakeholders",
+      "Maintained CI/CD pipelines and multi-environment deployment workflows",
     ],
     technologies: [
       "Angular",
@@ -88,20 +78,12 @@ export const experience: ExperienceEntry[] = [
     achievements: [
       {
         description:
-          "Successfully integrated AI-powered automation resulting in significant reduction in manual content creation time",
-        metric: "40%+ reduction",
+          "Contributed to AI-powered automation that helped reduce manual content creation time",
+        metric: "~40% reduction",
       },
       {
         description:
-          "Introduced modular architecture patterns that improved development speed across multiple projects",
-      },
-      {
-        description:
-          "Developed scalable AI-driven platforms supporting multiple client projects with consistent quality outputs",
-      },
-      {
-        description:
-          "Developed cost-effective AI integration strategies that improved service margins while enhancing client deliverables",
+          "Built AI-driven tools supporting multiple client projects for content production",
       },
     ],
   },
@@ -116,15 +98,15 @@ export const experience: ExperienceEntry[] = [
     startDate: "2022-11",
     endDate: "2023-05",
     summary:
-      "Independently maintained and expanded an integrated business management platform for construction industry operations, integrating CRM, project management, billing, and workflow automation.",
+      "Maintained and expanded an existing business management platform for a construction company, working independently as the sole developer on the project.",
     responsibilities: [
-      "Independently maintained and expanded integrated business management platform serving all company departments",
-      "Conducted weekly meetings with CEO and staff to define requirements, prioritize features, and translate business needs into technical specifications",
-      "Developed integrated modules for client management, construction site tracking, material management, and automated billing processes",
-      "Restructured Firebase Realtime Database JSON architecture, optimizing search queries and data load times",
-      "Implemented end-to-end workflow automation connecting CRM, project management, and financial operations, eliminating paper-based processes",
-      "Developed and optimized REST APIs supporting real-time data synchronization across integrated business modules",
-      "Managed CI/CD pipelines ensuring consistent deployments and platform stability",
+      "Maintained and expanded business management platform used across company departments",
+      "Had weekly meetings with CEO and staff to gather requirements and prioritize features",
+      "Developed modules for client management, construction site tracking, and billing",
+      "Restructured Firebase Realtime Database to improve search queries and load times",
+      "Built workflow automation connecting CRM, project management, and billing modules",
+      "Developed REST APIs for data synchronization across platform modules",
+      "Maintained CI/CD pipelines for deployments",
     ],
     technologies: [
       "Angular",
@@ -139,22 +121,15 @@ export const experience: ExperienceEntry[] = [
     achievements: [
       {
         description:
-          "Enhanced platform automation capabilities reducing administrative overhead significantly, enabling a 4-person team to manage operations previously requiring 15+ staff",
-        metric: "70% reduction in admin overhead",
+          "Improved platform automation reducing manual administrative work for the team",
       },
       {
         description:
-          "Delivered database restructuring and workflow improvements resulting in faster data retrieval",
-        metric: "50% faster data retrieval",
+          "Restructured database improving data retrieval performance",
       },
       {
         description:
-          "Maintained 100% on-time feature delivery through direct collaboration with executive team",
-      },
-      {
-        description:
-          "Managed independent development lifecycle with zero critical incidents during 7-month engagement",
-        metric: "99%+ uptime",
+          "Delivered features on schedule through direct collaboration with the company",
       },
     ],
   },
@@ -169,17 +144,16 @@ export const experience: ExperienceEntry[] = [
     startDate: "2021-04",
     endDate: "2022-11",
     summary:
-      "Product developer and external consultant for international SaaS clients. Contributed to a major platform migration for a UK-based client (Commify) within a 10-developer team.",
+      "Fullstack developer working on the company's internal product and as an external consultant for a UK-based SaaS client (Commify) within a 10-developer team.",
     responsibilities: [
-      "Developed and maintained company's first commercial web product (frontend and backend)",
-      "Served as external consultant for UK-based SaaS client (Commify) within 10-developer team",
-      "Contributed to 6-month platform migration from legacy PHP codebase to modern Angular architecture for SMS messaging platform serving thousands of customers",
-      "Assisted in API migration from acquired company platform to client's proprietary system handling high-volume SMS transactions",
-      "Implemented lazy loading for Angular modules, reducing initial bundle size and improving startup time",
-      "Collaborated with cross-functional international teams to ensure seamless transition with zero downtime",
-      "Contributed to API development using Java and Spring Framework for high-traffic messaging platform",
-      "Enhanced UI/UX using Angular, focusing on performance optimization and modern development practices",
-      "Participated in Git-based branching workflows and code review processes with international development team",
+      "Developed and maintained company's internal web product (frontend and backend)",
+      "Worked as part of a 10-developer team on a platform migration for a UK-based SaaS client (Commify)",
+      "Contributed to migrating a legacy PHP codebase to Angular for an SMS messaging platform",
+      "Helped with API migration from an acquired platform to the client's system",
+      "Implemented lazy loading for Angular modules to reduce bundle size",
+      "Contributed to API development using Java and Spring Framework",
+      "Worked on UI improvements using Angular",
+      "Participated in code reviews and Git-based branching workflows with the international team",
     ],
     technologies: [
       "Angular 2+",
@@ -198,17 +172,12 @@ export const experience: ExperienceEntry[] = [
     achievements: [
       {
         description:
-          "Contributed to zero-downtime migration of critical SMS messaging infrastructure serving thousands of active customers",
-        metric: "6-month migration timeline",
+          "Contributed to platform migration for an SMS messaging service as part of a distributed team",
+        metric: "6-month migration",
       },
       {
         description:
-          "Delivered frontend performance improvements through Angular architecture enhancements",
-        metric: "30-40% bundle size reduction, 2-3s faster startup",
-      },
-      {
-        description:
-          "Effectively collaborated in international consulting environment with distributed 10-developer team across multiple time zones",
+          "Helped improve frontend performance through Angular lazy loading and bundle optimization",
       },
     ],
   },

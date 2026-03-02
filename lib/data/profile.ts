@@ -13,7 +13,7 @@ export const profile: Profile = {
     github: "https://github.com/AndreaCadonna",
   },
   summary:
-    "Software Engineer with 5 years of experience evolving from fullstack development to engineering leadership focused on AI-augmented development workflows and system architecture. Expert in leveraging modern AI coding tools (GitHub Copilot, Claude Code, Codex) to accelerate delivery while maintaining code quality through systematic review, prompt engineering, and DevOps practices. Proven track record of adapting to rapidly changing development paradigms, from traditional coding to orchestrating AI-powered development processes.",
+    "Software Engineer with 5 years of experience in fullstack development, with the last 2 years focused on AI-augmented development workflows and agentic coding systems. Comfortable working with modern AI coding tools (GitHub Copilot, Claude Code) to support development, with growing familiarity in planning, coordinating tasks, and reviewing AI-generated outputs. More experienced with frameworks and patterns than raw language expertise, and continuously learning.",
   shortBio:
-    "Software Engineer based in Trento, Italy. 5 years of experience spanning fullstack development, AI integration, and engineering leadership. Passionate about AI-augmented development workflows and building scalable web applications.",
+    "Software Engineer based in Trento, Italy. 5 years of experience in fullstack development and AI-augmented workflows. Focused on agentic coding practices, task planning, and building web applications with modern frameworks.",
 };
