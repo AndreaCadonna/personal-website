@@ -25,17 +25,34 @@ const EXPERIENCE = sortedExp.map(exp => ({
 
 const INITIAL_PROJECTS_COUNT = 4;
 const ALL_PROJECTS = featured.map(p => ({
+  id: p.id,
   name: p.name,
   tagline: p.tagline,
-  technologies: p.technologies.slice(0, 4),
+  description: p.description,
+  technologies: p.technologies.slice(0, 6),
+  highlights: p.highlights.slice(0, 3),
+  status: p.status,
+  startDate: p.startDate.split('-')[0],
+  endDate: p.endDate === 'present' ? 'PRESENT' : p.endDate?.split('-')[0] || '',
+  githubUrl: p.links.find(l => l.type === 'github')?.url || '',
 }));
 
 export default function HomepageBrutalism() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [time, setTime] = useState('');
   const [showAllProjects, setShowAllProjects] = useState(false);
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
 
   const visibleProjects = showAllProjects ? ALL_PROJECTS : ALL_PROJECTS.slice(0, INITIAL_PROJECTS_COUNT);
+
+  const toggleProject = (id: string) => {
+    setExpandedProjects(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   useEffect(() => {
     const handleMove = (e: MouseEvent) => {
@@ -284,29 +301,84 @@ export default function HomepageBrutalism() {
             THINGS I <span className="blue-accent">MADE</span>
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {visibleProjects.map((proj, i) => (
-              <div
-                key={proj.name}
-                className={`brutal-card p-5 sm:p-8 relative overflow-hidden ${i % 2 === 0 ? 'bg-white' : 'bg-black text-white'}`}
-              >
+            {visibleProjects.map((proj, i) => {
+              const isExpanded = expandedProjects.has(proj.id);
+              const isDark = i % 2 !== 0;
+              return (
                 <div
-                  className={`absolute top-0 right-0 w-24 h-24 ${i % 2 === 0 ? 'yellow-bg' : 'bg-[#FF0066]'}`}
-                  style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }}
-                />
-                <span className={`label-tag ${i % 2 !== 0 ? 'text-gray-500' : ''}`}>PROJECT_{String(i + 1).padStart(2, '0')}</span>
-                <h3 className="brutal-heading text-xl sm:text-3xl mt-2 mb-2">{proj.name.toUpperCase()}</h3>
-                <p className={`text-sm mb-4 leading-relaxed ${i % 2 !== 0 ? 'text-gray-300' : ''}`}>
-                  {proj.tagline}
-                </p>
-                <div className="flex gap-2 flex-wrap">
-                  {proj.technologies.map(t => (
-                    <span key={t} className={`border-2 ${i % 2 === 0 ? 'border-black' : 'border-white'} px-2 py-1 text-[10px] font-bold uppercase`}>
-                      {t}
-                    </span>
-                  ))}
+                  key={proj.id}
+                  className={`brutal-card relative overflow-hidden flex flex-col ${isDark ? 'bg-black text-white' : 'bg-white'}`}
+                >
+                  <div className="p-5 sm:p-8 flex-1">
+                    <div
+                      className={`absolute top-0 right-0 w-24 h-24 ${isDark ? 'bg-[#FF0066]' : 'yellow-bg'}`}
+                      style={{ clipPath: 'polygon(100% 0, 0 0, 100% 100%)' }}
+                    />
+                    <div className="flex items-center gap-3 mb-2 flex-wrap">
+                      <span className={`label-tag ${isDark ? 'text-gray-500' : ''}`}>PROJECT_{String(i + 1).padStart(2, '0')}</span>
+                      <span className={`text-[9px] font-bold uppercase px-2 py-0.5 ${
+                        proj.status === 'production' ? 'bg-[#00CC66] text-black' :
+                        proj.status === 'in-progress' ? 'yellow-bg text-black' :
+                        isDark ? 'bg-white text-black' : 'bg-black text-white'
+                      }`}>
+                        {proj.status === 'production' ? 'LIVE' : proj.status === 'in-progress' ? 'WIP' : 'OSS'}
+                      </span>
+                      <span className={`label-tag ${isDark ? 'text-gray-500' : ''}`}>
+                        {proj.startDate}{proj.endDate ? `\u2014${proj.endDate}` : ''}
+                      </span>
+                    </div>
+                    <h3 className="brutal-heading text-xl sm:text-3xl mt-2 mb-2">{proj.name.toUpperCase()}</h3>
+                    <p className={`text-sm mb-4 leading-relaxed ${isDark ? 'text-gray-300' : ''}`}>
+                      {proj.tagline}
+                    </p>
+                    <div className="flex gap-2 flex-wrap mb-4">
+                      {proj.technologies.map(t => (
+                        <span key={t} className={`border-2 ${isDark ? 'border-white' : 'border-black'} px-2 py-1 text-[10px] font-bold uppercase`}>
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+
+                    {isExpanded && (
+                      <div className={`border-t-4 ${isDark ? 'border-gray-700' : 'border-black'} pt-4 mt-2`}>
+                        <p className={`text-sm leading-relaxed mb-4 ${isDark ? 'text-gray-300' : ''}`}>
+                          {proj.description}
+                        </p>
+                        {proj.highlights.length > 0 && (
+                          <ul className="space-y-2">
+                            {proj.highlights.map((h, j) => (
+                              <li key={j} className={`text-sm flex gap-2 ${isDark ? 'text-gray-300' : ''}`}>
+                                <span className="pink-accent shrink-0">{'//'}</span>
+                                {h}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={`border-t-4 ${isDark ? 'border-gray-700' : 'border-black'} px-5 sm:px-8 py-3 flex items-center justify-between gap-3`}>
+                    <button
+                      onClick={() => toggleProject(proj.id)}
+                      className={`text-xs font-bold uppercase cursor-pointer bg-transparent border-none p-0 font-[inherit] ${isDark ? 'text-[#D4FF00] hover:text-white' : 'pink-accent hover:text-black'} transition-colors`}
+                    >
+                      {isExpanded ? '[\u2013] LESS' : '[+] MORE'}
+                    </button>
+                    {proj.githubUrl && (
+                      <a
+                        href={proj.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`text-xs font-bold uppercase no-underline ${isDark ? 'text-white hover:text-[#D4FF00]' : 'text-black hover:pink-accent'} transition-colors`}
+                      >
+                        GITHUB &#8599;
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           {ALL_PROJECTS.length > INITIAL_PROJECTS_COUNT && (
             <div className="text-center mt-8">
@@ -315,7 +387,7 @@ export default function HomepageBrutalism() {
                 className="brutal-link"
                 style={{ cursor: 'pointer' }}
               >
-                {showAllProjects ? 'SHOW LESS ↑' : `LOAD MORE (${ALL_PROJECTS.length - INITIAL_PROJECTS_COUNT} MORE) ↓`}
+                {showAllProjects ? 'SHOW LESS \u2191' : `LOAD MORE (${ALL_PROJECTS.length - INITIAL_PROJECTS_COUNT} MORE) \u2193`}
               </button>
             </div>
           )}

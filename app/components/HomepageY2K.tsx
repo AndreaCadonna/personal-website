@@ -41,8 +41,18 @@ export default function HomepageY2K() {
   const [currentTime, setCurrentTime] = useState('');
   const [blink, setBlink] = useState(true);
   const [showAllProjects, setShowAllProjects] = useState(false);
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
 
   const visibleProjects = showAllProjects ? featured : featured.slice(0, INITIAL_Y2K_PROJECTS);
+
+  const toggleProject = (id: string) => {
+    setExpandedProjects(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   useEffect(() => {
     setHits(Math.floor(Math.random() * 90000) + 13370);
@@ -398,15 +408,66 @@ export default function HomepageY2K() {
                       {blink ? '\u25BA' : '\u25BB'} Cool Projects!!
                     </h2>
                     <div className="space-y-3">
-                      {visibleProjects.map((project, i) => (
-                        <div key={project.id} className="border-2 ridge border-[#6666aa] p-3" style={{ background: 'rgba(0,0,60,0.5)' }}>
-                          <p className="font-bold text-[#ff88ff]">
-                            <span className="badge">{i === 0 ? 'HOT!' : 'NEW!'}</span> {project.name}
-                          </p>
-                          <p className="text-xs text-[#8888cc] mb-1">{project.technologies.slice(0, 4).join(' + ')}</p>
-                          <p className="text-sm text-[#ccccff]">{project.tagline}</p>
-                        </div>
-                      ))}
+                      {visibleProjects.map((project, i) => {
+                        const isExpanded = expandedProjects.has(project.id);
+                        const githubUrl = project.links.find(l => l.type === 'github')?.url;
+                        return (
+                          <div key={project.id} className="border-2 ridge border-[#6666aa]" style={{ background: 'rgba(0,0,60,0.5)' }}>
+                            <div className="p-3">
+                              <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
+                                <p className="font-bold text-[#ff88ff]">
+                                  <span className="badge">{
+                                    project.status === 'production' ? 'LIVE!' :
+                                    project.status === 'in-progress' ? 'WIP!' :
+                                    i === 0 ? 'HOT!' : 'NEW!'
+                                  }</span> {project.name}
+                                </p>
+                                <span className="text-[10px] text-[#6666aa]">
+                                  {project.startDate.split('-')[0]}{project.endDate === 'present' ? '-Now' : project.endDate ? `-${project.endDate.split('-')[0]}` : ''}
+                                </span>
+                              </div>
+                              <p className="text-xs text-[#8888cc] mb-1">{project.technologies.slice(0, 5).join(' + ')}</p>
+                              <p className="text-sm text-[#ccccff]">{project.tagline}</p>
+
+                              {isExpanded && (
+                                <div className="mt-3 border-t border-dashed border-[#6666aa] pt-3">
+                                  <p className="text-sm text-[#ccccff] leading-relaxed mb-2">{project.description}</p>
+                                  {project.highlights.length > 0 && (
+                                    <>
+                                      <p className="text-xs text-[#ff88ff] font-bold mb-1">~*~ Highlights ~*~</p>
+                                      <ul className="text-xs text-[#aaaadd] list-disc list-inside space-y-1">
+                                        {project.highlights.slice(0, 3).map((h, j) => (
+                                          <li key={j}>{h}</li>
+                                        ))}
+                                      </ul>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="border-t border-[#6666aa] px-3 py-2 flex items-center justify-between gap-2">
+                              <button
+                                onClick={() => toggleProject(project.id)}
+                                className="neon-link text-xs cursor-pointer bg-transparent border-none p-0 font-[inherit]"
+                              >
+                                {isExpanded ? '[-] Less info' : '[+] Read more!!'}
+                              </button>
+                              {githubUrl && (
+                                <a
+                                  href={githubUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs font-bold no-underline"
+                                  style={{ color: '#ff88ff' }}
+                                >
+                                  [GitHub] &#128279;
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                     {featured.length > INITIAL_Y2K_PROJECTS && (
                       <div className="text-center mt-4">

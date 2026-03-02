@@ -47,8 +47,16 @@ const QUESTS = sortedExp.map((exp, i) => ({
 
 const INITIAL_PROJECTS = 4;
 const ALL_ACHIEVEMENTS = featured.map(p => ({
+  id: p.id,
   name: p.name,
-  desc: p.technologies.slice(0, 3).join(' + '),
+  tagline: p.tagline,
+  description: p.description,
+  technologies: p.technologies.slice(0, 5),
+  highlights: p.highlights.slice(0, 3),
+  status: p.status,
+  startDate: p.startDate.split('-')[0],
+  endDate: p.endDate === 'present' ? 'NOW' : p.endDate?.split('-')[0] || '',
+  githubUrl: p.links.find(l => l.type === 'github')?.url || '',
   rarity: p.status === 'production' ? 'LEGENDARY' as const : p.status === 'in-progress' ? 'EPIC' as const : 'RARE' as const,
 }));
 
@@ -57,8 +65,18 @@ export default function HomepagePixelArt() {
   const [showContent, setShowContent] = useState(false);
   const [animatedSkills, setAnimatedSkills] = useState<number[]>(SKILLS.map(() => 0));
   const [showAllProjects, setShowAllProjects] = useState(false);
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
 
   const visibleAchievements = showAllProjects ? ALL_ACHIEVEMENTS : ALL_ACHIEVEMENTS.slice(0, INITIAL_PROJECTS);
+
+  const toggleProject = (id: string) => {
+    setExpandedProjects(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   useEffect(() => {
     const t1 = setTimeout(() => setBooted(true), 1200);
@@ -342,18 +360,79 @@ export default function HomepagePixelArt() {
             <section className="pixel-border bg-[#1a1a3d] p-6 mb-8 fade-in" style={{ animationDelay: '0.5s' }}>
               <h2 className="text-[#00ff88] text-xs mb-6">&#9654; ACHIEVEMENTS UNLOCKED</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {visibleAchievements.map((a) => (
-                  <div key={a.name} className="border-2 border-[#444488] p-4 bg-[#12122a] hover:bg-[#1e1e3e] transition-colors">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg">&#127942;</span>
-                      <span className="text-[10px] text-white">{a.name}</span>
+                {visibleAchievements.map((a) => {
+                  const isExpanded = expandedProjects.has(a.id);
+                  return (
+                    <div key={a.id} className="border-2 border-[#444488] bg-[#12122a] hover:bg-[#1e1e3e] transition-colors flex flex-col">
+                      <div className="p-4 flex-1">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-lg shrink-0">&#127942;</span>
+                            <span className="text-[10px] text-white truncate">{a.name}</span>
+                          </div>
+                          <span className={`text-[8px] shrink-0 ${a.rarity === 'LEGENDARY' ? 'rarity-legendary' : a.rarity === 'EPIC' ? 'rarity-epic' : 'rarity-rare'}`}>
+                            [{a.rarity}]
+                          </span>
+                        </div>
+                        <p className="text-[8px] text-[#aaaacc] mb-2 leading-[1.8]">{a.tagline}</p>
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
+                          <span className="text-[7px] px-2 py-0.5 bg-[#2a2a5a] border border-[#444488] text-[#8888bb]">
+                            {a.startDate}{a.endDate ? ` - ${a.endDate}` : ''}
+                          </span>
+                          <span className={`text-[7px] px-2 py-0.5 border ${
+                            a.status === 'production' ? 'bg-[#1a3a1a] border-[#00ff88] text-[#00ff88]' :
+                            a.status === 'in-progress' ? 'bg-[#3a3a1a] border-[#ffcc00] text-[#ffcc00]' :
+                            'bg-[#1a1a3a] border-[#0088ff] text-[#0088ff]'
+                          }`}>
+                            {a.status === 'production' ? 'DEPLOYED' : a.status === 'in-progress' ? 'IN DEV' : 'OPEN SRC'}
+                          </span>
+                        </div>
+                        <div className="flex gap-1 flex-wrap mb-2">
+                          {a.technologies.map(t => (
+                            <span key={t} className="text-[7px] px-1.5 py-0.5 bg-[#2a2a5a] text-[#8888bb] border border-[#333366]">
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+
+                        {isExpanded && (
+                          <div className="mt-3 border-t border-[#333366] pt-3">
+                            <p className="text-[8px] text-[#aaaacc] leading-[2] mb-3">{a.description}</p>
+                            {a.highlights.length > 0 && (
+                              <>
+                                <p className="text-[8px] text-[#ffcc00] mb-1">KEY LOOT:</p>
+                                {a.highlights.map((h, j) => (
+                                  <p key={j} className="text-[7px] text-[#8888bb] pl-3 leading-[2]">
+                                    {'>'} {h}
+                                  </p>
+                                ))}
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="border-t border-[#333366] px-4 py-2 flex items-center justify-between gap-2">
+                        <button
+                          onClick={() => toggleProject(a.id)}
+                          className="text-[8px] text-[#00ff88] hover:text-[#88ffcc] transition-colors cursor-pointer bg-transparent border-none p-0 font-[inherit]"
+                        >
+                          {isExpanded ? '[-] COLLAPSE' : '[+] INSPECT'}
+                        </button>
+                        {a.githubUrl && (
+                          <a
+                            href={a.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[8px] text-[#aa44ff] hover:text-[#cc88ff] transition-colors no-underline"
+                          >
+                            {'</>'} GITHUB
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-[8px] text-[#8888bb] mb-2">{a.desc}</p>
-                    <span className={`text-[8px] ${a.rarity === 'LEGENDARY' ? 'rarity-legendary' : a.rarity === 'EPIC' ? 'rarity-epic' : 'rarity-rare'}`}>
-                      [{a.rarity}]
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
               {ALL_ACHIEVEMENTS.length > INITIAL_PROJECTS && (
                 <div className="text-center mt-6">
