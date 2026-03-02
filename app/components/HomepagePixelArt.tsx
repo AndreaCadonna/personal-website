@@ -37,24 +37,28 @@ const SKILLS = Object.entries(skills).map(([key, group]) => {
   };
 });
 
-const QUESTS = sortedExp.slice(0, 3).map((exp, i) => ({
+const QUESTS = sortedExp.map((exp, i) => ({
   title: exp.role.toUpperCase(),
   guild: exp.company,
   period: `${exp.startDate.split('-')[0]} - ${exp.endDate === 'present' ? 'NOW' : exp.endDate.split('-')[0]}`,
-  xp: `+${(9500 - i * 2500)}  XP`,
-  tasks: exp.achievements.slice(0, 3).map(a => a.description),
+  xp: `+${Math.max(2000, 9500 - i * 1500)}  XP`,
+  tasks: exp.achievements.map(a => a.description),
 }));
 
-const ACHIEVEMENTS = featured.slice(0, 4).map(p => ({
+const INITIAL_PROJECTS = 4;
+const ALL_ACHIEVEMENTS = featured.map(p => ({
   name: p.name,
   desc: p.technologies.slice(0, 3).join(' + '),
-  rarity: p.status === 'production' ? 'LEGENDARY' as const : 'EPIC' as const,
+  rarity: p.status === 'production' ? 'LEGENDARY' as const : p.status === 'in-progress' ? 'EPIC' as const : 'RARE' as const,
 }));
 
 export default function HomepagePixelArt() {
   const [booted, setBooted] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [animatedSkills, setAnimatedSkills] = useState<number[]>(SKILLS.map(() => 0));
+  const [showAllProjects, setShowAllProjects] = useState(false);
+
+  const visibleAchievements = showAllProjects ? ALL_ACHIEVEMENTS : ALL_ACHIEVEMENTS.slice(0, INITIAL_PROJECTS);
 
   useEffect(() => {
     const t1 = setTimeout(() => setBooted(true), 1200);
@@ -173,6 +177,7 @@ export default function HomepagePixelArt() {
 
         .rarity-legendary { color: #ff8800; text-shadow: 0 0 8px #ff880066; }
         .rarity-epic { color: #aa44ff; text-shadow: 0 0 8px #aa44ff66; }
+        .rarity-rare { color: #0088ff; text-shadow: 0 0 8px #0088ff66; }
 
         .chess-pattern {
           background-image:
@@ -337,19 +342,29 @@ export default function HomepagePixelArt() {
             <section className="pixel-border bg-[#1a1a3d] p-6 mb-8 fade-in" style={{ animationDelay: '0.5s' }}>
               <h2 className="text-[#00ff88] text-xs mb-6">&#9654; ACHIEVEMENTS UNLOCKED</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {ACHIEVEMENTS.map((a) => (
+                {visibleAchievements.map((a) => (
                   <div key={a.name} className="border-2 border-[#444488] p-4 bg-[#12122a] hover:bg-[#1e1e3e] transition-colors">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-lg">&#127942;</span>
                       <span className="text-[10px] text-white">{a.name}</span>
                     </div>
                     <p className="text-[8px] text-[#8888bb] mb-2">{a.desc}</p>
-                    <span className={`text-[8px] ${a.rarity === 'LEGENDARY' ? 'rarity-legendary' : 'rarity-epic'}`}>
+                    <span className={`text-[8px] ${a.rarity === 'LEGENDARY' ? 'rarity-legendary' : a.rarity === 'EPIC' ? 'rarity-epic' : 'rarity-rare'}`}>
                       [{a.rarity}]
                     </span>
                   </div>
                 ))}
               </div>
+              {ALL_ACHIEVEMENTS.length > INITIAL_PROJECTS && (
+                <div className="text-center mt-6">
+                  <button
+                    onClick={() => setShowAllProjects(!showAllProjects)}
+                    className="pixel-btn"
+                  >
+                    {showAllProjects ? '▲ SHOW LESS' : `▼ LOAD MORE (${ALL_ACHIEVEMENTS.length - INITIAL_PROJECTS} MORE)`}
+                  </button>
+                </div>
+              )}
             </section>
 
             {/* Education - Training */}
