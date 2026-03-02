@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { profile, skills, getExperienceSorted, getFeaturedProjects, allSkillNames } from '@/lib/data';
+import { profile, skills, getExperienceSorted, getFeaturedProjects, allSkillNames, education, languages, interests, softSkills } from '@/lib/data';
 
 const sortedExp = getExperienceSorted();
 const featured = getFeaturedProjects();
@@ -301,6 +301,83 @@ export default function HomepageBrutalism() {
                     </span>
                   ))}
                 </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Education */}
+        <section className="px-6 md:px-12 py-16 bg-black text-white">
+          <p className="label-tag text-gray-500 mb-2">&lt;education&gt;</p>
+          <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
+            WHERE I <span className="text-[#D4FF00]">STUDIED</span>
+          </h2>
+          {education.map((edu) => (
+            <div key={edu.institution} className="border-4 border-white p-6 md:p-8 relative mb-6">
+              <span className="absolute -top-4 right-4 bg-[#0000FF] text-white px-3 py-1 text-xs font-bold">
+                {edu.startYear}&mdash;{edu.endYear}
+              </span>
+              <h3 className="brutal-heading text-lg sm:text-2xl md:text-4xl text-[#D4FF00] mb-1">
+                {edu.degree.toUpperCase()} IN {edu.field.toUpperCase()}
+              </h3>
+              <p className="text-gray-400 text-sm mb-2">@ {edu.institution.toUpperCase()}</p>
+              <p className="text-gray-400 text-sm mb-4">{edu.location}</p>
+              {edu.thesis && (
+                <p className="text-sm">
+                  <span className="text-[#FF0066] shrink-0">{'//'}</span> Thesis: &quot;{edu.thesis}&quot;
+                </p>
+              )}
+            </div>
+          ))}
+          <div className="mt-8">
+            <p className="label-tag text-gray-500 mb-4">LANGUAGES</p>
+            <div className="flex gap-4 flex-wrap">
+              {languages.map((lang) => (
+                <div key={lang.code} className="border-4 border-white p-4">
+                  <span className="brutal-heading text-xl sm:text-2xl text-[#D4FF00]">{lang.name.toUpperCase()}</span>
+                  <p className="text-gray-400 text-xs mt-1">{lang.level}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Interests */}
+        <section className="px-6 md:px-12 py-16">
+          <p className="label-tag mb-2">&lt;interests&gt;</p>
+          <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
+            WHAT I <span className="pink-accent">EXPLORE</span>
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {interests.map((interest, i) => (
+              <div
+                key={i}
+                className={`brutal-card p-5 sm:p-8 ${i % 2 === 0 ? 'bg-white' : 'bg-[#D4FF00]'}`}
+              >
+                <span className="label-tag">{String(i + 1).padStart(2, '0')}</span>
+                <h3 className="brutal-heading text-xl sm:text-2xl mt-2 mb-2">{interest.area.toUpperCase()}</h3>
+                <p className="text-sm leading-relaxed">{interest.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Soft Skills */}
+        <section className="px-6 md:px-12 py-16 bg-black text-white">
+          <p className="label-tag text-gray-500 mb-2">&lt;soft-skills&gt;</p>
+          <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
+            HOW I <span className="text-[#D4FF00]">WORK</span>
+          </h2>
+          <div className="space-y-6">
+            {softSkills.map((skill, i) => (
+              <div key={i} className="border-4 border-white p-6 md:p-8 relative">
+                <span className="absolute -top-4 left-4 bg-[#FF0066] text-white px-3 py-1 text-xs font-bold">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3 className="brutal-heading text-lg sm:text-2xl md:text-3xl text-[#D4FF00] mb-2">
+                  {skill.name.toUpperCase()}
+                </h3>
+                <p className="text-sm leading-relaxed text-gray-300">{skill.description}</p>
               </div>
             ))}
           </div>

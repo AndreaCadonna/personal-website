@@ -1,21 +1,41 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { profile, skills, getExperienceSorted, getFeaturedProjects } from '@/lib/data';
+import { profile, skills, getExperienceSorted, getFeaturedProjects, education, languages, interests, softSkills } from '@/lib/data';
+import type { Skill } from '@/lib/data';
 
 const sortedExp = getExperienceSorted();
 const featured = getFeaturedProjects();
 
-const SKILLS = [
-  { name: 'ANGULAR/REACT', level: 95, color: '#DD0031' },
-  { name: 'TYPESCRIPT', level: 95, color: '#3178C6' },
-  { name: 'NEXT.JS/ASTRO', level: 88, color: '#ffffff' },
-  { name: 'NODE.JS', level: 88, color: '#68A063' },
-  { name: 'PYTHON/JAVA', level: 85, color: '#FFD43B' },
-  { name: 'AI/RAG/MCP', level: 88, color: '#c084fc' },
-  { name: 'FIREBASE', level: 90, color: '#FF9900' },
-  { name: 'DOCKER/CI-CD', level: 82, color: '#2496ED' },
-];
+const proficiencyToLevel = (p?: string): number => {
+  switch (p) {
+    case 'expert': return 98;
+    case 'advanced': return 88;
+    case 'intermediate': return 72;
+    case 'beginner': return 50;
+    default: return 40;
+  }
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  frontend: '#DD0031',
+  backend: '#68A063',
+  databaseAndCloud: '#FF9900',
+  aiAndAutomation: '#c084fc',
+  devopsAndPractices: '#2496ED',
+  aiAugmentedDev: '#00ffcc',
+};
+
+const SKILLS = Object.entries(skills).map(([key, group]) => {
+  const avgLevel = Math.round(
+    group.skills.reduce((sum: number, s: Skill) => sum + proficiencyToLevel(s.proficiency), 0) / group.skills.length
+  );
+  return {
+    name: group.label.toUpperCase().replace(/ & /g, '/').replace(/ TECHNOLOGIES/g, '').replace(/ TOOLS/g, ''),
+    level: avgLevel,
+    color: CATEGORY_COLORS[key] || '#ffffff',
+  };
+});
 
 const QUESTS = sortedExp.slice(0, 3).map((exp, i) => ({
   title: exp.role.toUpperCase(),
@@ -332,8 +352,71 @@ export default function HomepagePixelArt() {
               </div>
             </section>
 
+            {/* Education - Training */}
+            <section className="pixel-border bg-[#1a1a3d] p-6 mb-8 fade-in" style={{ animationDelay: '0.55s' }}>
+              <h2 className="text-[#00ff88] text-xs mb-6">&#9654; TRAINING ACADEMY</h2>
+              {education.map((edu) => (
+                <div key={edu.institution} className="border-2 border-[#444488] p-4 bg-[#12122a] mb-4">
+                  <span className="text-[#ffcc00] text-[10px]">[!] {edu.degree.toUpperCase()} IN {edu.field.toUpperCase()}</span>
+                  <p className="text-[8px] text-[#8888bb] mt-1">
+                    GUILD: {edu.institution.toUpperCase()} | {edu.startYear}-{edu.endYear}
+                  </p>
+                  <p className="text-[8px] text-[#8888bb]">REGION: {edu.location.toUpperCase()}</p>
+                  {edu.thesis && (
+                    <p className="text-[8px] text-[#aaaacc] mt-2 pl-4">
+                      {'>'} FINAL BOSS: &quot;{edu.thesis.toUpperCase()}&quot;
+                    </p>
+                  )}
+                </div>
+              ))}
+              <div className="mt-4">
+                <span className="text-[#ffcc00] text-[8px]">LANGUAGES UNLOCKED:</span>
+                <div className="flex gap-3 mt-2 flex-wrap">
+                  {languages.map((lang) => (
+                    <span key={lang.code} className="text-[8px] px-3 py-1 bg-[#2a2a5a] border-2 border-[#444488] text-[#aaaadd]">
+                      [{lang.code.toUpperCase()}] {lang.name.toUpperCase()} - {lang.level.toUpperCase()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Interests - Skill Tree */}
+            <section className="pixel-border bg-[#1a1a3d] p-6 mb-8 fade-in" style={{ animationDelay: '0.6s' }}>
+              <h2 className="text-[#00ff88] text-xs mb-6">&#9654; SKILL TREE BRANCHES</h2>
+              <div className="space-y-4">
+                {interests.map((interest, i) => (
+                  <div key={i} className="border-2 border-[#444488] p-3 bg-[#12122a]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[#ffcc00] text-[10px]">&#9733;</span>
+                      <span className="text-[#ffcc00] text-[10px]">{interest.area.toUpperCase()}</span>
+                    </div>
+                    <p className="text-[8px] text-[#aaaacc] pl-4">
+                      {'>'} {interest.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Soft Skills - Character Traits */}
+            <section className="pixel-border bg-[#1a1a3d] p-6 mb-8 fade-in" style={{ animationDelay: '0.65s' }}>
+              <h2 className="text-[#00ff88] text-xs mb-6">&#9654; CHARACTER TRAITS</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {softSkills.map((skill, i) => (
+                  <div key={i} className="border-2 border-[#444488] p-3 bg-[#12122a]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[#c084fc] text-[10px]">&#9830; BUFF:</span>
+                      <span className="text-[10px] text-white">{skill.name.toUpperCase()}</span>
+                    </div>
+                    <p className="text-[8px] text-[#aaaacc] pl-4">{skill.description}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             {/* Special Ability - Chess */}
-            <section className="pixel-border-gold bg-[#1a1a3d] p-6 mb-8 fade-in chess-pattern" style={{ animationDelay: '0.6s' }}>
+            <section className="pixel-border-gold bg-[#1a1a3d] p-6 mb-8 fade-in chess-pattern" style={{ animationDelay: '0.7s' }}>
               <div className="bg-[#1a1a3ddd] p-6">
                 <h2 className="text-[#ffcc00] text-xs mb-4 text-center">
                   &#9733; SPECIAL ABILITY: CHESS MASTERY &#9733;
@@ -352,7 +435,7 @@ export default function HomepagePixelArt() {
             </section>
 
             {/* Footer - Contact */}
-            <footer className="pixel-border bg-[#1a1a3d] p-6 mb-8 text-center fade-in" style={{ animationDelay: '0.7s' }}>
+            <footer className="pixel-border bg-[#1a1a3d] p-6 mb-8 text-center fade-in" style={{ animationDelay: '0.8s' }}>
               <h2 className="text-[#00ff88] text-xs mb-6">&#9654; CONTACT SCROLL</h2>
               <div className="flex gap-4 justify-center flex-wrap">
                 <a href={profile.contact.github} className="pixel-btn" target="_blank" rel="noopener noreferrer">

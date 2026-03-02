@@ -1,21 +1,32 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { profile, getExperienceSorted, getFeaturedProjects, allSkillNames } from '@/lib/data';
+import { profile, skills, getExperienceSorted, getFeaturedProjects, allSkillNames, education, languages, interests, softSkills } from '@/lib/data';
+import type { Skill } from '@/lib/data';
 
 const sortedExp = getExperienceSorted();
 const featured = getFeaturedProjects();
 
-const SKILLS = [
-  { name: 'Angular & React', stars: 5 },
-  { name: 'TypeScript', stars: 5 },
-  { name: 'Next.js & Astro', stars: 5 },
-  { name: 'Node.js', stars: 5 },
-  { name: 'Python & Java', stars: 4 },
-  { name: 'AI/RAG/MCP', stars: 5 },
-  { name: 'Firebase & Supabase', stars: 5 },
-  { name: 'Docker & CI/CD', stars: 4 },
-];
+const proficiencyToStars = (p?: string): number => {
+  switch (p) {
+    case 'expert': return 5;
+    case 'advanced': return 5;
+    case 'intermediate': return 4;
+    case 'beginner': return 3;
+    default: return 2;
+  }
+};
+
+const SKILLS = Object.entries(skills).map(([, group]) => {
+  const maxProf = group.skills.reduce((best: string, s: Skill) => {
+    const order = ['beginner', 'intermediate', 'advanced', 'expert'];
+    return order.indexOf(s.proficiency || '') > order.indexOf(best) ? (s.proficiency || '') : best;
+  }, '');
+  return {
+    name: group.label.replace(/ Technologies/g, '').replace(/ & /g, ' & '),
+    stars: proficiencyToStars(maxProf),
+  };
+});
 
 const MARQUEE_SKILLS = allSkillNames.slice(0, 12).join(' \u2605 ') + ' \u2605 ';
 
@@ -293,6 +304,9 @@ export default function HomepageY2K() {
                     <li><a href="#skills" className="neon-link">{'>>'}My Skills</a></li>
                     <li><a href="#work" className="neon-link">{'>>'}Experience</a></li>
                     <li><a href="#projects" className="neon-link">{'>>'}Cool Projects</a></li>
+                    <li><a href="#education" className="neon-link">{'>>'}Education</a></li>
+                    <li><a href="#interests" className="neon-link">{'>>'}Interests</a></li>
+                    <li><a href="#traits" className="neon-link">{'>>'}Soft Skills</a></li>
                     <li><a href="#chess" className="neon-link">{'>>'}Chess!!</a></li>
                     <li><a href="#guestbook" className="neon-link">{'>>'}Guestbook</a></li>
                     <li><a href="#links" className="neon-link">{'>>'}Cool Links</a></li>
@@ -392,6 +406,83 @@ export default function HomepageY2K() {
                         </div>
                       ))}
                     </div>
+                  </section>
+
+                  <hr className="y2k-hr" />
+
+                  {/* Education */}
+                  <section id="education" className="mb-6">
+                    <h2 className="text-xl font-bold text-[#00ffff] mb-3">
+                      {blink ? '\u25BA' : '\u25BB'} My Education!!
+                    </h2>
+                    {education.map((edu) => (
+                      <div key={edu.institution} className="border-2 ridge border-[#6666aa] p-3 mb-3" style={{ background: 'rgba(0,0,60,0.5)' }}>
+                        <p className="font-bold text-[#ffcc00]">
+                          {edu.degree} in {edu.field}
+                        </p>
+                        <p className="text-xs text-[#8888cc]">
+                          {edu.institution} | {edu.startYear} - {edu.endYear}
+                        </p>
+                        <p className="text-xs text-[#8888cc]">{edu.location}</p>
+                        {edu.thesis && (
+                          <p className="text-sm text-[#ccccff] mt-1">
+                            Thesis: &quot;{edu.thesis}&quot; &#128218;
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                    <div className="mt-3">
+                      <p className="text-sm text-[#ff88ff] font-bold mb-2">~*~ Languages I Speak ~*~</p>
+                      <div className="flex gap-3 flex-wrap">
+                        {languages.map((lang) => (
+                          <span key={lang.code} className="badge">
+                            [{lang.code.toUpperCase()}] {lang.name} - {lang.level}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </section>
+
+                  <hr className="y2k-hr" />
+
+                  {/* Interests */}
+                  <section id="interests" className="mb-6">
+                    <h2 className="text-xl font-bold text-[#00ffff] mb-3">
+                      {blink ? '\u25BA' : '\u25BB'} Things I&apos;m Into!!
+                    </h2>
+                    <div className="space-y-2">
+                      {interests.map((interest, i) => (
+                        <div key={i} className="guestbook-entry">
+                          <p className="font-bold text-[#00ff00] text-sm">
+                            &#9733; {interest.area}
+                          </p>
+                          <p className="text-sm text-[#ccccff]">{interest.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+
+                  <hr className="y2k-hr" />
+
+                  {/* Soft Skills */}
+                  <section id="traits" className="mb-6">
+                    <h2 className="text-xl font-bold text-[#00ffff] mb-3">
+                      {blink ? '\u25BA' : '\u25BB'} My Superpowers!! &#128170;
+                    </h2>
+                    <table className="w-full text-sm">
+                      <tbody>
+                        {softSkills.map((skill, i) => (
+                          <tr key={i} className="border-b border-[#333366]">
+                            <td className="py-2 text-[#ffcc00] font-bold align-top" style={{ width: '35%' }}>
+                              {skill.name}
+                            </td>
+                            <td className="py-2 text-[#ccccff]">
+                              {skill.description}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </section>
 
                   <hr className="y2k-hr" />
