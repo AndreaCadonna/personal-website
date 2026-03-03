@@ -32,6 +32,13 @@ const PROMOTION_PIECES = [
   { piece: 'n', white: '\u2658', black: '\u265E', label: 'Knight' },
 ] as const;
 
+// Deterministic matrix rain data to avoid hydration mismatches
+const MATRIX_RAIN_COLS = Array.from({ length: 10 }, (_, i) => ({
+  duration: 12 + ((i * 7 + 3) % 18),
+  delay: -((i * 13 + 5) % 20),
+  bits: Array.from({ length: 160 }, (_, j) => ((i * 31 + j * 17 + 7) * 2654435761 >>> 31) & 1).join(''),
+}));
+
 const LOADING_FRAMES = [
   'Connecting to Lichess API.....',
   'Fetching daily puzzle.........',
@@ -497,17 +504,17 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
         {terminalStyles}
         <div className="puzzle-terminal">
           <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
-            {Array.from({ length: 10 }).map((_, i) => (
+            {MATRIX_RAIN_COLS.map((col, i) => (
               <div
                 key={i}
                 className="p-matrix-col"
                 style={{
                   left: `${i * 10}%`,
-                  animationDuration: `${12 + Math.random() * 18}s`,
-                  animationDelay: `${Math.random() * -20}s`,
+                  animationDuration: `${col.duration}s`,
+                  animationDelay: `${col.delay}s`,
                 }}
               >
-                {'01'.repeat(80).split('').sort(() => Math.random() - 0.5).join('')}
+                {col.bits}
               </div>
             ))}
           </div>
@@ -570,17 +577,17 @@ export default function ChessPuzzleLogin({ onPuzzleSolved }: ChessPuzzleLoginPro
       <div className="puzzle-terminal">
         {/* Matrix rain */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-20">
-          {Array.from({ length: 10 }).map((_, i) => (
+          {MATRIX_RAIN_COLS.map((col, i) => (
             <div
               key={i}
               className="p-matrix-col"
               style={{
                 left: `${i * 10}%`,
-                animationDuration: `${12 + Math.random() * 18}s`,
-                animationDelay: `${Math.random() * -20}s`,
+                animationDuration: `${col.duration}s`,
+                animationDelay: `${col.delay}s`,
               }}
             >
-              {'01'.repeat(80).split('').sort(() => Math.random() - 0.5).join('')}
+              {col.bits}
             </div>
           ))}
         </div>

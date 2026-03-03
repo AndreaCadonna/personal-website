@@ -44,6 +44,9 @@ const BOOT_LINES = [
 
 export { BOOT_LINES };
 
+const MAX_HISTORY = 100;
+const MAX_LINES = 500;
+
 let lineCounter = 0;
 function nextId(): string {
   return `line-${++lineCounter}`;
@@ -100,8 +103,11 @@ export function useTerminal() {
 
     const parsed = parseCommand(trimmed);
 
-    // Add to history
-    setCommandHistory((prev) => [...prev, trimmed]);
+    // Add to history (capped to prevent unbounded growth)
+    setCommandHistory((prev) => {
+      const updated = [...prev, trimmed];
+      return updated.length > MAX_HISTORY ? updated.slice(-MAX_HISTORY) : updated;
+    });
     setHistoryIndex(-1);
     setCurrentInput('');
 
@@ -110,11 +116,14 @@ export function useTerminal() {
       return;
     }
 
-    setLines((prev) => [
-      ...prev,
-      { id: nextId(), type: 'input', content: trimmed, raw: trimmed },
-      { id: nextId(), type: 'output', commandKey: parsed.key, args: parsed.args, raw: parsed.raw },
-    ]);
+    setLines((prev) => {
+      const updated = [
+        ...prev,
+        { id: nextId(), type: 'input' as const, content: trimmed, raw: trimmed },
+        { id: nextId(), type: 'output' as const, commandKey: parsed.key, args: parsed.args, raw: parsed.raw },
+      ];
+      return updated.length > MAX_LINES ? updated.slice(-MAX_LINES) : updated;
+    });
   }, []);
 
   const handleHistoryUp = useCallback(() => {

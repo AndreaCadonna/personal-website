@@ -50,8 +50,7 @@ export async function fetchRandomPuzzle(): Promise<Puzzle> {
 export async function fetchPuzzleByTheme(theme: PuzzleTheme): Promise<Puzzle> {
   // Lichess API for filtering by theme requires authentication
   // For now, we'll return the daily puzzle
-  // TODO: Implement proper theme filtering with authentication
-  console.warn('Theme filtering not yet implemented, returning daily puzzle');
+  void theme;
   return fetchDailyPuzzle();
 }
 
@@ -86,12 +85,17 @@ export async function fetchPuzzleByRating(
 /**
  * Fetch puzzle by ID
  *
- * @param puzzleId - Lichess puzzle ID
+ * @param puzzleId - Lichess puzzle ID (alphanumeric only)
  * @returns Promise resolving to a Puzzle object
- * @throws Error if the API request fails
+ * @throws Error if the API request fails or puzzleId is invalid
  */
 export async function fetchPuzzleById(puzzleId: string): Promise<Puzzle> {
-  const response = await fetch(`${LICHESS_API_BASE}/puzzle/${puzzleId}`, {
+  // Validate puzzleId to prevent URL injection — Lichess IDs are alphanumeric
+  if (!/^[a-zA-Z0-9]{1,10}$/.test(puzzleId)) {
+    throw new Error('Invalid puzzle ID format');
+  }
+
+  const response = await fetch(`${LICHESS_API_BASE}/puzzle/${encodeURIComponent(puzzleId)}`, {
     headers: {
       'Accept': 'application/json',
     },
