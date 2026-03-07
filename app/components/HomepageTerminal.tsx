@@ -1,8 +1,11 @@
 'use client';
 
 import { useMemo } from 'react';
-import { profile } from '@/lib/data';
-import { useTerminal, BOOT_LINES } from './terminal/useTerminal';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { profile, getLocalizedData } from '@/lib/data';
+import { useTerminal } from './terminal/useTerminal';
+import type { BootLine } from './terminal/useTerminal';
 import { renderCommand } from './terminal/renderers';
 import TerminalInput from './terminal/TerminalInput';
 
@@ -31,7 +34,26 @@ const MATRIX_COLS = Array.from({ length: 15 }, (_, i) => ({
 }));
 
 export default function HomepageTerminal() {
-  const terminal = useTerminal();
+  const t = useTranslations('terminal');
+  const locale = useLocale();
+  const localized = getLocalizedData(locale);
+
+  const bootLines: BootLine[] = useMemo(() => [
+    { text: t('boot.bios'), delay: 0 },
+    { text: t('boot.checkingMemory'), delay: 200 },
+    { text: t('boot.loadingKernel'), delay: 400 },
+    { text: t('boot.networkManager'), delay: 600 },
+    { text: t('boot.devFilesystem'), delay: 800 },
+    { text: t('boot.portfolioService'), delay: 1000 },
+    { text: '', delay: 1200 },
+    { text: t('boot.login', { name: profile.firstName.toLowerCase() }), delay: 1400 },
+    { text: t('boot.lastLogin', { location: profile.contact.location }), delay: 1600 },
+    { text: '', delay: 1800 },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], []);
+
+  const terminal = useTerminal(bootLines);
+
   // Memoize to avoid rebuilding matrix rain on every render
   const matrixRain = useMemo(() => (
     <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
@@ -206,7 +228,7 @@ export default function HomepageTerminal() {
           <div className="terminal-scroll flex-1 overflow-y-auto min-h-0 pt-4 pb-4" ref={terminal.scrollRef}>
             {/* Boot Sequence */}
             <div className="mb-6 phosphor">
-              {BOOT_LINES.slice(0, terminal.visibleBootLines).map((line, i) => (
+              {terminal.bootLines.slice(0, terminal.visibleBootLines).map((line, i) => (
                 <div key={i} className={line.text === '' ? 'h-4' : ''}>
                   {line.text.startsWith('[') ? (
                     <span>
@@ -233,7 +255,7 @@ export default function HomepageTerminal() {
                   <pre className="hidden md:block text-[11px] leading-[1.15] bright whitespace-pre">
                     {ASCII_NAME_FULL}
                   </pre>
-                  <p className="comment mt-2">{'// software engineer & chess enthusiast'}</p>
+                  <p className="comment mt-2">{t('comment')}</p>
                 </div>
 
                 {/* Command output history */}
@@ -248,7 +270,7 @@ export default function HomepageTerminal() {
                   if (line.type === 'output' && line.commandKey) {
                     return (
                       <div key={line.id} className="mb-2">
-                        {renderCommand(line.commandKey, line.args || '', line.raw || '', terminal.commandHistory)}
+                        {renderCommand(line.commandKey, line.args || '', line.raw || '', terminal.commandHistory, t, localized)}
                       </div>
                     );
                   }
