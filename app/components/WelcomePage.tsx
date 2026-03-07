@@ -1,25 +1,28 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface WelcomePageProps {
   onPlayPuzzle: () => void;
   onSkipToWebsite: () => void;
 }
 
-const BOOT_SEQUENCE = [
-  { text: 'BIOS v3.14 — Portfolio System', delay: 0 },
-  { text: 'Checking memory.......... 16384 MB OK', delay: 300 },
-  { text: 'Detecting peripherals.... keyboard OK', delay: 500 },
-  { text: 'Loading kernel modules...', delay: 700 },
-  { text: '[  OK  ] Started Network Manager', delay: 900 },
-  { text: '[  OK  ] Mounted Developer Filesystem', delay: 1050 },
-  { text: '[  OK  ] Started Authentication Service', delay: 1200 },
-  { text: '', delay: 1400 },
-  { text: 'System ready. Choose authentication method:', delay: 1600 },
-];
-
 export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePageProps) {
+  const t = useTranslations('welcome');
+
+  const BOOT_SEQUENCE = [
+    { text: t('bios'), delay: 0 },
+    { text: t('checkingMemory'), delay: 300 },
+    { text: t('detectingPeripherals'), delay: 500 },
+    { text: t('loadingKernel'), delay: 700 },
+    { text: t('networkManager'), delay: 900 },
+    { text: t('devFilesystem'), delay: 1050 },
+    { text: t('authService'), delay: 1200 },
+    { text: '', delay: 1400 },
+    { text: t('systemReady'), delay: 1600 },
+  ];
+
   const [visibleLines, setVisibleLines] = useState(0);
   const [bootDone, setBootDone] = useState(false);
   const [hoveredOption, setHoveredOption] = useState<number | null>(null);
@@ -33,6 +36,7 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
         }
       }, line.delay);
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -76,7 +80,7 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
         }
 
         .w-phosphor { text-shadow: 0 0 3px #00ff4144, 0 0 6px #00ff4111; }
-        
+
         .w-matrix-col {
           position: absolute;
           top: -100%;
@@ -176,10 +180,8 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
         {/* Matrix rain */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-30">
           {Array.from({ length: 12 }).map((_, i) => {
-            // Use deterministic values based on index to avoid hydration mismatch
             const duration = 12 + ((i * 7 + 3) % 18);
             const delay = -((i * 13 + 5) % 20);
-            // Deterministic pseudo-random binary string seeded by column index
             const bits = Array.from({ length: 160 }, (_, j) => ((i * 31 + j * 17 + 7) * 2654435761 >>> 31) & 1).join('');
             return (
               <div
@@ -221,7 +223,7 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
                           <span className="w-ok">{line.text.substring(0, 8)}</span>
                           <span className="w-dim">{line.text.substring(8)}</span>
                         </span>
-                      ) : line.text.startsWith('System ready') ? (
+                      ) : line.text === t('systemReady') ? (
                         <span className="w-yellow">{line.text}</span>
                       ) : (
                         <span className="w-dim">{line.text}</span>
@@ -235,7 +237,7 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
                   <div className="w-fade-in">
                     <div className="w-ascii-border mb-5">
 {`┌──────────────────────────────────────────────┐
-│  SELECT AUTHENTICATION METHOD                │
+│  ${t('selectAuth').padEnd(44)}│
 └──────────────────────────────────────────────┘`}
                     </div>
 
@@ -249,9 +251,9 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
                         <div className="relative z-10 flex items-center justify-between">
                           <div>
                             <span className="w-blue">[1]</span>
-                            <span className="ml-3">Chess Puzzle Authentication</span>
+                            <span className="ml-3">{t('chessPuzzle')}</span>
                             <div className="text-xs w-dim mt-1 ml-7">
-                              Solve Lichess daily puzzle to verify identity
+                              {t('chessPuzzleDesc')}
                             </div>
                           </div>
                           <span className="w-option-arrow text-lg">
@@ -269,9 +271,9 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
                         <div className="relative z-10 flex items-center justify-between">
                           <div>
                             <span className="w-blue">[2]</span>
-                            <span className="ml-3">Guest Access</span>
+                            <span className="ml-3">{t('guestAccess')}</span>
                             <div className="text-xs w-dim mt-1 ml-7">
-                              Skip authentication, proceed to portfolio
+                              {t('guestAccessDesc')}
                             </div>
                           </div>
                           <span className="w-option-arrow text-lg">
@@ -283,7 +285,7 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
 
                     <div className="flex items-center">
                       <span className="w-blue font-bold">$ </span>
-                      <span className="w-dim">select option</span>
+                      <span className="w-dim">{t('selectOption')}</span>
                       <span className="w-cursor" />
                     </div>
                   </div>
@@ -293,7 +295,7 @@ export default function WelcomePage({ onPlayPuzzle, onSkipToWebsite }: WelcomePa
 
             {/* Footer */}
             <div className="mt-4 text-center text-[11px] w-dim">
-              Both paths lead to the same destination
+              {t('footer')}
             </div>
           </div>
         </div>

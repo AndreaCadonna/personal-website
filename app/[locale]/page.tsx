@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import WelcomePage from './components/WelcomePage';
-import ChessPuzzleLogin from './components/ChessPuzzleLogin';
-import HomepageTerminal from './components/HomepageTerminal';
-import HomepagePixelArt from './components/HomepagePixelArt';
-import HomepageBrutalism from './components/HomepageBrutalism';
-import HomepageY2K from './components/HomepageY2K';
+import { useTranslations } from 'next-intl';
+import WelcomePage from '../components/WelcomePage';
+import ChessPuzzleLogin from '../components/ChessPuzzleLogin';
+import HomepageTerminal from '../components/HomepageTerminal';
+import HomepagePixelArt from '../components/HomepagePixelArt';
+import HomepageBrutalism from '../components/HomepageBrutalism';
+import HomepageY2K from '../components/HomepageY2K';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 type PageState = 'welcome' | 'puzzle' | 'portfolio';
 type ThemeId = 'terminal' | 'pixel' | 'brutal' | 'y2k';
@@ -19,6 +21,7 @@ const THEMES = [
 ] as const;
 
 export default function Home() {
+  const tTheme = useTranslations('theme');
   const [currentPage, setCurrentPage] = useState<PageState>('welcome');
   const [activeTheme, setActiveTheme] = useState<ThemeId>('terminal');
 
@@ -28,15 +31,23 @@ export default function Home() {
 
   if (currentPage === 'welcome') {
     return (
-      <WelcomePage
-        onPlayPuzzle={handlePlayPuzzle}
-        onSkipToWebsite={handleSkipToWebsite}
-      />
+      <>
+        <LanguageSwitcher />
+        <WelcomePage
+          onPlayPuzzle={handlePlayPuzzle}
+          onSkipToWebsite={handleSkipToWebsite}
+        />
+      </>
     );
   }
 
   if (currentPage === 'puzzle') {
-    return <ChessPuzzleLogin onPuzzleSolved={handlePuzzleSolved} />;
+    return (
+      <>
+        <LanguageSwitcher />
+        <ChessPuzzleLogin onPuzzleSolved={handlePuzzleSolved} />
+      </>
+    );
   }
 
   const ActiveTheme = THEMES.find(t => t.id === activeTheme)!.component;
@@ -47,7 +58,10 @@ export default function Home() {
         themes={THEMES}
         activeTheme={activeTheme}
         onThemeChange={setActiveTheme}
+        label={tTheme('label')}
+        selectLabel={tTheme('selectTheme')}
       />
+      <LanguageSwitcher />
       <ActiveTheme />
     </div>
   );
@@ -57,10 +71,14 @@ function ThemeSwitcher({
   themes,
   activeTheme,
   onThemeChange,
+  label,
+  selectLabel,
 }: {
   themes: readonly { id: ThemeId; label: string; component: React.ComponentType }[];
   activeTheme: ThemeId;
   onThemeChange: (id: ThemeId) => void;
+  label: string;
+  selectLabel: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -175,7 +193,7 @@ function ThemeSwitcher({
         title="Switch theme"
       >
         <span style={{ color: '#00aaff' }}>&gt;</span>
-        theme
+        {label}
         <span style={{ color: '#555' }}>
           [{themes.find(t => t.id === activeTheme)?.label}]
         </span>
@@ -194,7 +212,7 @@ function ThemeSwitcher({
           />
           <div className="theme-switcher-panel">
             <div className="theme-switcher-header">
-              $ select-theme
+              {selectLabel}
             </div>
             {themes.map((theme) => (
               <button

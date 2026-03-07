@@ -1,7 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { profile, skills, getExperienceSorted, getFeaturedProjects, allSkillNames, education, languages, interests, softSkills } from '@/lib/data';
+import { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { getLocalizedData } from '@/lib/data';
+import { profile, skills, getExperienceSorted, getFeaturedProjects, allSkillNames, education } from '@/lib/data';
 import type { Skill } from '@/lib/data';
 
 const sortedExp = getExperienceSorted();
@@ -36,6 +39,11 @@ const GUESTBOOK = [
 ];
 
 export default function HomepageY2K() {
+  const t = useTranslations('y2k');
+  const tc = useTranslations('common');
+  const locale = useLocale();
+  const localized = useMemo(() => getLocalizedData(locale), [locale]);
+
   const [hits, setHits] = useState(0);
   const [sparkles, setSparkles] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const [currentTime, setCurrentTime] = useState('');
@@ -273,17 +281,17 @@ export default function HomepageY2K() {
           {/* Under construction banner */}
           <div className="under-construction mb-4">
             <div className="under-construction-inner">
-              &#128679; THIS SITE IS UNDER CONSTRUCTION &#128679; CHECK BACK SOON FOR UPDATES!! &#128679;
+              &#128679; {t('underConstruction')} &#128679; {t('checkBack')} &#128679;
             </div>
           </div>
 
           {/* Title */}
           <div className="text-center mb-4">
             <h1 className="y2k-title">
-              ~*~ {profile.fullName}&apos;s Homepage!! ~*~
+              ~*~ {t('homepageTitle', { name: profile.fullName })} ~*~
             </h1>
             <p className="text-lg rainbow-text font-bold mt-2">
-              &#9733; {profile.title} &amp; Chess Enthusiast &#9733;
+              &#9733; {t('titleSuffix')} &#9733;
             </p>
           </div>
 
@@ -298,8 +306,8 @@ export default function HomepageY2K() {
 
           {/* Visitor counter + time */}
           <div className="text-center mb-4 text-sm">
-            <p>You are visitor number: <span className="counter-box">{hits.toString().padStart(7, '0')}</span></p>
-            <p className="text-xs text-[#8888cc] mt-2">Current time: {currentTime}</p>
+            <p>{t('visitorNumber')} <span className="counter-box">{hits.toString().padStart(7, '0')}</span></p>
+            <p className="text-xs text-[#8888cc] mt-2">{t('currentTime')} {currentTime}</p>
           </div>
 
           <hr className="y2k-hr" />
@@ -310,28 +318,28 @@ export default function HomepageY2K() {
               {/* Nav sidebar + content */}
               <tr>
                 <td className="y2k-cell w-40 align-top hidden md:table-cell" style={{ background: '#000044' }}>
-                  <p className="text-xs text-[#00ff00] mb-3 font-bold">~ NAVIGATION ~</p>
+                  <p className="text-xs text-[#00ff00] mb-3 font-bold">~ {t('navigation')} ~</p>
                   <ul className="space-y-2 text-sm">
-                    <li><a href="#about" className="neon-link">{'>>'}About Me</a></li>
-                    <li><a href="#skills" className="neon-link">{'>>'}My Skills</a></li>
-                    <li><a href="#work" className="neon-link">{'>>'}Experience</a></li>
-                    <li><a href="#projects" className="neon-link">{'>>'}Cool Projects</a></li>
-                    <li><a href="#education" className="neon-link">{'>>'}Education</a></li>
-                    <li><a href="#interests" className="neon-link">{'>>'}Interests</a></li>
-                    <li><a href="#traits" className="neon-link">{'>>'}Soft Skills</a></li>
-                    <li><a href="#chess" className="neon-link">{'>>'}Chess!!</a></li>
-                    <li><a href="#guestbook" className="neon-link">{'>>'}Guestbook</a></li>
-                    <li><a href="#links" className="neon-link">{'>>'}Cool Links</a></li>
+                    <li><a href="#about" className="neon-link">{'>>'}{t('aboutMe')}</a></li>
+                    <li><a href="#skills" className="neon-link">{'>>'}{t('mySkills')}</a></li>
+                    <li><a href="#work" className="neon-link">{'>>'}{t('workExperience')}</a></li>
+                    <li><a href="#projects" className="neon-link">{'>>'}{t('coolProjects')}</a></li>
+                    <li><a href="#education" className="neon-link">{'>>'}{t('myEducation')}</a></li>
+                    <li><a href="#interests" className="neon-link">{'>>'}{t('thingsImInto')}</a></li>
+                    <li><a href="#traits" className="neon-link">{'>>'}{t('mySoftSkills')}</a></li>
+                    <li><a href="#chess" className="neon-link">{'>>'}{t('chessCorner')}</a></li>
+                    <li><a href="#guestbook" className="neon-link">{'>>'}{t('guestbook')}</a></li>
+                    <li><a href="#links" className="neon-link">{'>>'}{t('coolLinks')}</a></li>
                   </ul>
                   <hr className="y2k-hr my-3" />
                   <p className="text-[10px] text-[#6666aa]">
-                    Best viewed in<br />
+                    {t('bestViewed')}<br />
                     1024x768<br />
                     Netscape Navigator 4.0+
                   </p>
                   <hr className="y2k-hr my-3" />
                   <div className="text-center">
-                    <div className="badge">MADE WITH<br />&#9829; AND HTML</div>
+                    <div className="badge">{t('madeWith')}<br />&#9829; {t('andHtml')}</div>
                   </div>
                 </td>
 
@@ -339,16 +347,13 @@ export default function HomepageY2K() {
                   {/* About */}
                   <section id="about" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-2">
-                      {blink ? '\u25BA' : '\u25BB'} About Me!!
+                      {blink ? '\u25BA' : '\u25BB'} {t('aboutMe')}!!
                     </h2>
                     <p className="text-sm leading-relaxed text-[#ccccff]">
-                      Hey there!! Welcome to my corner of the internet!! I&apos;m {profile.fullName},
-                      a {profile.title.toLowerCase()} from {profile.contact.location} who LOVES building web apps,
-                      integrating AI tools, and playing chess!! I believe in clean code, good architecture,
-                      and always thinking three moves ahead (just like in chess LOL) ^_^
+                      {t('aboutText', { name: profile.fullName, title: localized.profile.title.toLowerCase(), location: profile.contact.location })}
                     </p>
                     <p className="text-xs text-[#ff88ff] mt-2">
-                      {'>>'} Currently: Available for new opportunities!! Email me!! {'<<'}
+                      {'>>'} {t('currentlyAvailable')} {'<<'}
                     </p>
                   </section>
 
@@ -357,7 +362,7 @@ export default function HomepageY2K() {
                   {/* Skills */}
                   <section id="skills" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '\u25BA' : '\u25BB'} My Skillz!!
+                      {blink ? '\u25BA' : '\u25BB'} {t('mySkills')}!!
                     </h2>
                     <table className="w-full text-sm">
                       <tbody>
@@ -378,25 +383,28 @@ export default function HomepageY2K() {
                   {/* Experience */}
                   <section id="work" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '\u25BA' : '\u25BB'} Work Experience
+                      {blink ? '\u25BA' : '\u25BB'} {t('workExperience')}
                     </h2>
                     <div className="space-y-4">
-                      {sortedExp.map((exp, i) => (
-                        <div key={exp.id}>
-                          <p className="font-bold text-[#ffcc00]">
-                            {i === 0 && <span className="blink text-[#ff0000]">[NEW!] </span>}
-                            {exp.role} @ {exp.company}
-                          </p>
-                          <p className="text-xs text-[#8888cc]">
-                            {exp.startDate.split('-')[0]} - {exp.endDate === 'present' ? 'Present' : exp.endDate.split('-')[0]}
-                          </p>
-                          <ul className="text-sm text-[#ccccff] mt-1 list-disc list-inside">
-                            {exp.achievements.map((a, j) => (
-                              <li key={j}>{a.description}{a.metric ? ` (${a.metric})` : ''}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
+                      {sortedExp.map((exp, i) => {
+                        const localExp = localized.experience.find(e => e.id === exp.id);
+                        return (
+                          <div key={exp.id}>
+                            <p className="font-bold text-[#ffcc00]">
+                              {i === 0 && <span className="blink text-[#ff0000]">[NEW!] </span>}
+                              {localExp?.role ?? exp.role} @ {exp.company}
+                            </p>
+                            <p className="text-xs text-[#8888cc]">
+                              {exp.startDate.split('-')[0]} - {exp.endDate === 'present' ? tc('present') : exp.endDate.split('-')[0]}
+                            </p>
+                            <ul className="text-sm text-[#ccccff] mt-1 list-disc list-inside">
+                              {(localExp?.achievements ?? exp.achievements).map((a, j) => (
+                                <li key={j}>{a.description}{a.metric ? ` (${a.metric})` : ''}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        );
+                      })}
                     </div>
                   </section>
 
@@ -405,21 +413,22 @@ export default function HomepageY2K() {
                   {/* Projects */}
                   <section id="projects" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '\u25BA' : '\u25BB'} Cool Projects!!
+                      {blink ? '\u25BA' : '\u25BB'} {t('coolProjects')}!!
                     </h2>
                     <div className="space-y-3">
                       {visibleProjects.map((project, i) => {
                         const isExpanded = expandedProjects.has(project.id);
                         const githubUrl = project.links.find(l => l.type === 'github')?.url;
+                        const localProject = localized.projects.find(p => p.id === project.id);
                         return (
                           <div key={project.id} className="border-2 ridge border-[#6666aa]" style={{ background: 'rgba(0,0,60,0.5)' }}>
                             <div className="p-3">
                               <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
                                 <p className="font-bold text-[#ff88ff]">
                                   <span className="badge">{
-                                    project.status === 'production' ? 'LIVE!' :
-                                    project.status === 'in-progress' ? 'WIP!' :
-                                    i === 0 ? 'HOT!' : 'NEW!'
+                                    project.status === 'production' ? `${t('live')}!` :
+                                    project.status === 'in-progress' ? `${t('wip')}!` :
+                                    i === 0 ? `${t('hot')}!` : `${t('new')}!`
                                   }</span> {project.name}
                                 </p>
                                 <span className="text-[10px] text-[#6666aa]">
@@ -427,16 +436,16 @@ export default function HomepageY2K() {
                                 </span>
                               </div>
                               <p className="text-xs text-[#8888cc] mb-1">{project.technologies.slice(0, 5).join(' + ')}</p>
-                              <p className="text-sm text-[#ccccff]">{project.tagline}</p>
+                              <p className="text-sm text-[#ccccff]">{localProject?.tagline ?? project.tagline}</p>
 
                               {isExpanded && (
                                 <div className="mt-3 border-t border-dashed border-[#6666aa] pt-3">
-                                  <p className="text-sm text-[#ccccff] leading-relaxed mb-2">{project.description}</p>
-                                  {project.highlights.length > 0 && (
+                                  <p className="text-sm text-[#ccccff] leading-relaxed mb-2">{localProject?.description ?? project.description}</p>
+                                  {(localProject?.highlights ?? project.highlights).length > 0 && (
                                     <>
-                                      <p className="text-xs text-[#ff88ff] font-bold mb-1">~*~ Highlights ~*~</p>
+                                      <p className="text-xs text-[#ff88ff] font-bold mb-1">~*~ {t('highlights')} ~*~</p>
                                       <ul className="text-xs text-[#aaaadd] list-disc list-inside space-y-1">
-                                        {project.highlights.slice(0, 3).map((h, j) => (
+                                        {(localProject?.highlights ?? project.highlights).slice(0, 3).map((h, j) => (
                                           <li key={j}>{h}</li>
                                         ))}
                                       </ul>
@@ -451,7 +460,7 @@ export default function HomepageY2K() {
                                 onClick={() => toggleProject(project.id)}
                                 className="neon-link text-xs cursor-pointer bg-transparent border-none p-0 font-[inherit]"
                               >
-                                {isExpanded ? '[-] Less info' : '[+] Read more!!'}
+                                {isExpanded ? t('lessInfo') : t('readMore')}
                               </button>
                               {githubUrl && (
                                 <a
@@ -475,7 +484,7 @@ export default function HomepageY2K() {
                           onClick={() => setShowAllProjects(!showAllProjects)}
                           className="y2k-button"
                         >
-                          {showAllProjects ? '[-] Show Less' : `[+] Load More!! (${featured.length - INITIAL_Y2K_PROJECTS} more)`}
+                          {showAllProjects ? t('showLess') : t('showMore', { count: featured.length - INITIAL_Y2K_PROJECTS })}
                         </button>
                       </div>
                     )}
@@ -486,28 +495,31 @@ export default function HomepageY2K() {
                   {/* Education */}
                   <section id="education" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '\u25BA' : '\u25BB'} My Education!!
+                      {blink ? '\u25BA' : '\u25BB'} {t('myEducation')}!!
                     </h2>
-                    {education.map((edu) => (
-                      <div key={edu.institution} className="border-2 ridge border-[#6666aa] p-3 mb-3" style={{ background: 'rgba(0,0,60,0.5)' }}>
-                        <p className="font-bold text-[#ffcc00]">
-                          {edu.degree} in {edu.field}
-                        </p>
-                        <p className="text-xs text-[#8888cc]">
-                          {edu.institution} | {edu.startYear} - {edu.endYear}
-                        </p>
-                        <p className="text-xs text-[#8888cc]">{edu.location}</p>
-                        {edu.thesis && (
-                          <p className="text-sm text-[#ccccff] mt-1">
-                            Thesis: &quot;{edu.thesis}&quot; &#128218;
+                    {education.map((edu, idx) => {
+                      const localEdu = localized.education[idx];
+                      return (
+                        <div key={edu.institution} className="border-2 ridge border-[#6666aa] p-3 mb-3" style={{ background: 'rgba(0,0,60,0.5)' }}>
+                          <p className="font-bold text-[#ffcc00]">
+                            {localEdu?.degree ?? edu.degree} in {localEdu?.field ?? edu.field}
                           </p>
-                        )}
-                      </div>
-                    ))}
+                          <p className="text-xs text-[#8888cc]">
+                            {edu.institution} | {edu.startYear} - {edu.endYear}
+                          </p>
+                          <p className="text-xs text-[#8888cc]">{edu.location}</p>
+                          {(localEdu?.thesis ?? edu.thesis) && (
+                            <p className="text-sm text-[#ccccff] mt-1">
+                              Thesis: &quot;{localEdu?.thesis ?? edu.thesis}&quot; &#128218;
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                     <div className="mt-3">
-                      <p className="text-sm text-[#ff88ff] font-bold mb-2">~*~ Languages I Speak ~*~</p>
+                      <p className="text-sm text-[#ff88ff] font-bold mb-2">~*~ {t('languagesISpeak')} ~*~</p>
                       <div className="flex gap-3 flex-wrap">
-                        {languages.map((lang) => (
+                        {localized.languages.map((lang) => (
                           <span key={lang.code} className="badge">
                             [{lang.code.toUpperCase()}] {lang.name} - {lang.level}
                           </span>
@@ -521,10 +533,10 @@ export default function HomepageY2K() {
                   {/* Interests */}
                   <section id="interests" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '\u25BA' : '\u25BB'} Things I&apos;m Into!!
+                      {blink ? '\u25BA' : '\u25BB'} {t('thingsImInto')}!!
                     </h2>
                     <div className="space-y-2">
-                      {interests.map((interest, i) => (
+                      {localized.interests.map((interest, i) => (
                         <div key={i} className="guestbook-entry">
                           <p className="font-bold text-[#00ff00] text-sm">
                             &#9733; {interest.area}
@@ -540,11 +552,11 @@ export default function HomepageY2K() {
                   {/* Soft Skills */}
                   <section id="traits" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '\u25BA' : '\u25BB'} My Superpowers!! &#128170;
+                      {blink ? '\u25BA' : '\u25BB'} {t('mySoftSkills')}!! &#128170;
                     </h2>
                     <table className="w-full text-sm">
                       <tbody>
-                        {softSkills.map((skill, i) => (
+                        {localized.softSkills.map((skill, i) => (
                           <tr key={i} className="border-b border-[#333366]">
                             <td className="py-2 text-[#ffcc00] font-bold align-top" style={{ width: '35%' }}>
                               {skill.name}
@@ -563,17 +575,16 @@ export default function HomepageY2K() {
                   {/* Chess */}
                   <section id="chess" className="mb-6 text-center">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      &#9823; CHESS CORNER &#9823;
+                      &#9823; {t('chessCorner')} &#9823;
                     </h2>
                     <div className="text-3xl mb-3 select-none">
                       &#9820;&#9822;&#9821;&#9819;&#9818;&#9821;&#9822;&#9820;
                     </div>
                     <p className="text-sm text-[#ccccff]">
-                      I play chess EVERY DAY on Lichess!! It makes me a better coder
-                      because strategy is strategy!! Come challenge me!! B-)
+                      {t('chessText')}
                     </p>
                     <p className="text-xs text-[#ff88ff] mt-2 blink">
-                      ** DAILY PUZZLE SOLVER ** RATED PLAYER ** CHESS IS LIFE **
+                      {t('chessBlinking')}
                     </p>
                   </section>
 
@@ -582,7 +593,7 @@ export default function HomepageY2K() {
                   {/* Guestbook */}
                   <section id="guestbook" className="mb-6">
                     <h2 className="text-xl font-bold text-[#00ffff] mb-3">
-                      {blink ? '\u25BA' : '\u25BB'} Guestbook (Sign it!!)
+                      {blink ? '\u25BA' : '\u25BB'} {t('guestbook')} ({t('signIt')})
                     </h2>
                     {GUESTBOOK.map((entry) => (
                       <div key={entry.name} className="guestbook-entry">
@@ -603,7 +614,7 @@ export default function HomepageY2K() {
 
           {/* Links & Contact */}
           <section id="links" className="text-center mb-6">
-            <h2 className="text-lg font-bold text-[#ffcc00] mb-3">~*~ Cool Links &amp; Contact ~*~</h2>
+            <h2 className="text-lg font-bold text-[#ffcc00] mb-3">~*~ {t('coolLinksAndContact')} ~*~</h2>
             <div className="flex gap-3 justify-center flex-wrap">
               <a href={profile.contact.github} className="y2k-button" target="_blank" rel="noopener noreferrer">
                 [GitHub]
@@ -619,19 +630,19 @@ export default function HomepageY2K() {
 
           {/* Webring */}
           <div className="text-center border-2 ridge border-[#6666aa] p-3 mb-4" style={{ background: 'rgba(0,0,60,0.5)' }}>
-            <p className="text-xs text-[#8888cc] mb-2">~ Developer Webring ~</p>
+            <p className="text-xs text-[#8888cc] mb-2">~ {t('devWebring')} ~</p>
             <div className="flex gap-4 justify-center items-center text-sm">
-              <span className="neon-link cursor-pointer">{'<< '}Prev</span>
+              <span className="neon-link cursor-pointer">{'<< '}{t('prev')}</span>
               <span className="text-[#ff88ff]">|</span>
-              <span className="neon-link cursor-pointer">Random</span>
+              <span className="neon-link cursor-pointer">{t('random')}</span>
               <span className="text-[#ff88ff]">|</span>
-              <span className="neon-link cursor-pointer">Next{' >>'}</span>
+              <span className="neon-link cursor-pointer">{t('next')}{' >>'}</span>
             </div>
           </div>
 
           {/* Footer */}
           <footer className="text-center text-[10px] text-[#6666aa] py-4">
-            <p>Made with {'<3'} and lots of HTML &middot; Last updated: TODAY!</p>
+            <p>{t('madeWithLove')} &middot; {t('lastUpdated')}</p>
             <p className="mt-1">This page is best viewed in Netscape Navigator 4.0+ at 1024x768</p>
             <p className="mt-1">&copy; 2025 &middot; {profile.fullName} &middot; You are visitor #{hits}</p>
           </footer>

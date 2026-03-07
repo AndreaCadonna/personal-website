@@ -9,8 +9,11 @@ import {
   getExperienceSorted,
   getProjectsSorted,
 } from '@/lib/data';
-import type { Skill } from '@/lib/data';
+import type { Skill, LocalizedPortfolioData } from '@/lib/data';
 import { COMMANDS, type CommandKey } from './commands';
+
+// Translation function type
+type TFunc = (key: string, values?: Record<string, string | number>) => string;
 
 // --- Helpers ---
 
@@ -47,81 +50,84 @@ function statusBadge(status: string): React.ReactNode {
 
 // --- Renderers ---
 
-export function renderHelp(): React.ReactNode {
+export function renderHelp(t: TFunc): React.ReactNode {
   const visible = COMMANDS.filter((c) => c.visible);
   return (
     <div>
-      <p className="bright mb-2">Available commands:</p>
+      <p className="bright mb-2">{t('availableCommands')}</p>
       <div className="pl-2">
         {visible.map((cmd) => (
           <div key={cmd.key} className="mb-1">
             <span className="key-blue" style={{ display: 'inline-block', minWidth: '20ch' }}>
               {cmd.canonical}
             </span>
-            <span className="dim"> {cmd.description}</span>
+            <span className="dim"> {t(`commandDescriptions.${cmd.key}`)}</span>
           </div>
         ))}
         <div className="mb-1">
           <span className="key-blue" style={{ display: 'inline-block', minWidth: '20ch' }}>
             cat project &lt;id&gt;
           </span>
-          <span className="dim"> Deep-dive into a specific project</span>
+          <span className="dim"> {t('commandDescriptions.projectDetail')}</span>
         </div>
       </div>
-      <p className="dim mt-2">Tip: use Tab for autocomplete, Arrow Up/Down for history</p>
+      <p className="dim mt-2">{t('tabTip')}</p>
     </div>
   );
 }
 
-export function renderWhoami(): React.ReactNode {
+export function renderWhoami(localized: LocalizedPortfolioData): React.ReactNode {
   return (
     <div>
       <p className="bright mb-1">{profile.fullName}</p>
       <p className="mb-1">
-        <span className="key-blue">Title:</span> {profile.title}
+        <span className="key-blue">Title:</span> {localized.profile.title}
       </p>
       <p className="mb-1">
-        <span className="key-blue">Location:</span> {profile.contact.location}
+        <span className="key-blue">Location:</span> {localized.profile.locationLabel}
       </p>
-      <p className="mb-2 mt-2">{profile.shortBio}</p>
-      <p className="dim">{profile.summary}</p>
+      <p className="mb-2 mt-2">{localized.profile.shortBio}</p>
+      <p className="dim">{localized.profile.summary}</p>
     </div>
   );
 }
 
-export function renderSkills(): React.ReactNode {
+export function renderSkills(localized: LocalizedPortfolioData): React.ReactNode {
   const entries = Object.entries(skills);
   const lastKey = entries[entries.length - 1][0];
   return (
     <div>
       <p>{'{'}</p>
-      {entries.map(([key, group]) => (
-        <div key={key} className="pl-4 mb-2">
-          <span className="key-blue">&quot;{group.label}&quot;</span>
-          <span className="dim">: {'{'}</span>
-          <div className="pl-4">
-            <span className="key-purple">&quot;description&quot;</span>
-            <span className="dim">: </span>
-            <span className="string">&quot;{group.description}&quot;</span>
-            <span className="dim">,</span>
-            <br />
-            <span className="key-purple">&quot;skills&quot;</span>
-            <span className="dim">: [</span>
-            {group.skills.map((s: Skill, i: number) => (
-              <div key={s.name} className="pl-4">
-                <span className="string">&quot;{s.name}&quot;</span>
-                <span className="dim"> &mdash; </span>
-                <span style={{ color: proficiencyColor(s.proficiency), fontFamily: 'inherit' }}>
-                  {proficiencyBar(s.proficiency)}
-                </span>
-                {i < group.skills.length - 1 && <span className="dim">,</span>}
-              </div>
-            ))}
-            <span className="dim">]</span>
+      {entries.map(([key, group]) => {
+        const locGroup = localized.skillGroups.find(g => g.key === key);
+        return (
+          <div key={key} className="pl-4 mb-2">
+            <span className="key-blue">&quot;{locGroup?.label || group.label}&quot;</span>
+            <span className="dim">: {'{'}</span>
+            <div className="pl-4">
+              <span className="key-purple">&quot;description&quot;</span>
+              <span className="dim">: </span>
+              <span className="string">&quot;{locGroup?.description || group.description}&quot;</span>
+              <span className="dim">,</span>
+              <br />
+              <span className="key-purple">&quot;skills&quot;</span>
+              <span className="dim">: [</span>
+              {group.skills.map((s: Skill, i: number) => (
+                <div key={s.name} className="pl-4">
+                  <span className="string">&quot;{s.name}&quot;</span>
+                  <span className="dim"> &mdash; </span>
+                  <span style={{ color: proficiencyColor(s.proficiency), fontFamily: 'inherit' }}>
+                    {proficiencyBar(s.proficiency)}
+                  </span>
+                  {i < group.skills.length - 1 && <span className="dim">,</span>}
+                </div>
+              ))}
+              <span className="dim">]</span>
+            </div>
+            <span className="dim">{'}'}{key !== lastKey ? ',' : ''}</span>
           </div>
-          <span className="dim">{'}'}{key !== lastKey ? ',' : ''}</span>
-        </div>
-      ))}
+        );
+      })}
       <p>{'}'}</p>
     </div>
   );
@@ -133,13 +139,12 @@ function gitHash(id: string): string {
   for (let i = 0; i < id.length; i++) {
     h = ((h << 5) + h + id.charCodeAt(i)) >>> 0;
   }
-  // Generate 7 hex chars from the hash
   const a = (h >>> 0).toString(16).padStart(8, '0').slice(0, 4);
   const b = ((h * 2654435761) >>> 0).toString(16).padStart(8, '0').slice(0, 3);
   return a + b;
 }
 
-export function renderExperience(): React.ReactNode {
+export function renderExperience(t: TFunc, localized: LocalizedPortfolioData): React.ReactNode {
   const sorted = getExperienceSorted();
   return (
     <div>
@@ -147,6 +152,7 @@ export function renderExperience(): React.ReactNode {
         const hash = gitHash(exp.id);
         const startYear = exp.startDate.split('-')[0];
         const endYear = exp.endDate === 'present' ? 'present' : exp.endDate.split('-')[0];
+        const loc = localized.experience.find(e => e.id === exp.id);
         return (
           <div key={exp.id} className="mb-4">
             <div>
@@ -156,15 +162,15 @@ export function renderExperience(): React.ReactNode {
             </div>
             <div className="pl-4 mt-1">
               <p className="bright">
-                {exp.role} @ {exp.company}
+                {loc?.role || exp.role} @ {exp.company}
                 <span className="dim"> ({exp.employmentType})</span>
               </p>
               <p className="dim mb-1">{exp.location}{exp.remote ? ' (remote)' : ''}</p>
-              <p className="mb-1">{exp.summary}</p>
-              {exp.achievements.length > 0 && (
+              <p className="mb-1">{loc?.summary || exp.summary}</p>
+              {(loc?.achievements || exp.achievements).length > 0 && (
                 <div className="mt-1">
-                  <span className="key-purple">Achievements:</span>
-                  {exp.achievements.map((a, j) => (
+                  <span className="key-purple">{t('achievements')}</span>
+                  {(loc?.achievements || exp.achievements).map((a, j) => (
                     <div key={j} className="pl-2">
                       <span className="dim">- </span>
                       <span>{a.description}</span>
@@ -185,47 +191,51 @@ export function renderExperience(): React.ReactNode {
   );
 }
 
-export function renderProjects(): React.ReactNode {
+export function renderProjects(t: TFunc, localized: LocalizedPortfolioData): React.ReactNode {
   const sorted = getProjectsSorted();
   return (
     <div>
-      <p className="dim mb-1">total {sorted.length}</p>
-      {sorted.map((p) => (
-        <div key={p.id} className="mb-2">
-          <span className="dim hidden sm:inline">drwxr-xr-x  </span>
-          <span className="key-blue">{p.id}/</span>
-          <span className="ml-2">{statusBadge(p.status)}</span>
-          {p.completionPercent != null && (
-            <span className="number ml-1">{p.completionPercent}%</span>
-          )}
-          <br />
-          <span className="pl-4 dim">{p.tagline}</span>
-          <br />
-          <span className="pl-4 string">{p.technologies.slice(0, 4).join(', ')}</span>
-        </div>
-      ))}
-      <p className="dim mt-2">Use &quot;cat project &lt;id&gt;&quot; for details on a specific project.</p>
+      <p className="dim mb-1">{t('total', { count: sorted.length })}</p>
+      {sorted.map((p) => {
+        const loc = localized.projects.find(lp => lp.id === p.id);
+        return (
+          <div key={p.id} className="mb-2">
+            <span className="dim hidden sm:inline">drwxr-xr-x  </span>
+            <span className="key-blue">{p.id}/</span>
+            <span className="ml-2">{statusBadge(p.status)}</span>
+            {p.completionPercent != null && (
+              <span className="number ml-1">{p.completionPercent}%</span>
+            )}
+            <br />
+            <span className="pl-4 dim">{loc?.tagline || p.tagline}</span>
+            <br />
+            <span className="pl-4 string">{p.technologies.slice(0, 4).join(', ')}</span>
+          </div>
+        );
+      })}
+      <p className="dim mt-2">{t('useProjectCmd')}</p>
     </div>
   );
 }
 
-export function renderProjectDetail(id: string): React.ReactNode {
+export function renderProjectDetail(id: string, t: TFunc, localized: LocalizedPortfolioData): React.ReactNode {
   const sorted = getProjectsSorted();
   const project = sorted.find((p) => p.id.toLowerCase() === id.toLowerCase());
   if (!project) {
     const ids = sorted.map((p) => p.id).join(', ');
     return (
       <div>
-        <p className="keyword">cat: project &apos;{id}&apos;: No such file or directory</p>
-        <p className="dim">Available projects: {ids}</p>
+        <p className="keyword">{t('projectNotFound', { id })}</p>
+        <p className="dim">{t('availableProjects', { ids })}</p>
       </div>
     );
   }
+  const loc = localized.projects.find(lp => lp.id === project.id);
   return (
     <div>
       <p className="bright text-lg">{project.name}</p>
-      <p className="warn mb-2">{project.tagline}</p>
-      <p className="mb-2">{project.description}</p>
+      <p className="warn mb-2">{loc?.tagline || project.tagline}</p>
+      <p className="mb-2">{loc?.description || project.description}</p>
       <div className="mb-2">
         <span className="key-blue">Status: </span>
         {statusBadge(project.status)}
@@ -243,10 +253,10 @@ export function renderProjectDetail(id: string): React.ReactNode {
           <span className="string">{project.technologies.join(', ')}</span>
         </div>
       </div>
-      {project.highlights.length > 0 && (
+      {(loc?.highlights || project.highlights).length > 0 && (
         <div className="mb-2">
           <span className="key-blue">Highlights:</span>
-          {project.highlights.map((h, i) => (
+          {(loc?.highlights || project.highlights).map((h, i) => (
             <div key={i} className="pl-2">
               <span className="dim">- </span><span>{h}</span>
             </div>
@@ -289,19 +299,19 @@ const CHESS_ASCII = `  +----+----+----+----+----+----+----+---+
   +----+----+----+----+----+----+----+---+
     a    b    c    d    e    f    g    h`;
 
-export function renderChess(): React.ReactNode {
+export function renderChess(t: TFunc): React.ReactNode {
   return (
     <div>
       <pre className="text-[8px] leading-[1.2] sm:text-xs sm:leading-[1.3] mb-4 warn overflow-x-auto">
         {CHESS_ASCII}
       </pre>
       <p>
-        <span className="key-blue">STATUS:</span> Daily puzzles on Lichess.
+        <span className="key-blue">STATUS:</span> {t('chess.status')}
       </p>
       <p>
         <span className="key-blue">PHILOSOPHY:</span>{' '}
         <span className="string">
-          &quot;Every pawn sacrifice teaches patience, every fork teaches opportunism.&quot;
+          {t('chess.philosophy')}
         </span>
       </p>
     </div>
@@ -339,72 +349,84 @@ export function renderContact(): React.ReactNode {
   );
 }
 
-export function renderEducation(): React.ReactNode {
+export function renderEducation(localized: LocalizedPortfolioData): React.ReactNode {
   return (
     <div>
-      {education.map((e) => (
-        <div key={e.institution} className="mb-3">
-          <p className="bright">{e.institution}</p>
-          <p>
-            <span className="key-blue">Degree:</span> {e.degree} in {e.field}
-          </p>
-          <p>
-            <span className="key-blue">Period:</span> {e.startYear} &mdash; {e.endYear}
-          </p>
-          <p>
-            <span className="key-blue">Location:</span> {e.location}
-          </p>
-          {e.thesis && (
+      {education.map((e, idx) => {
+        const loc = localized.education[idx];
+        return (
+          <div key={e.institution} className="mb-3">
+            <p className="bright">{e.institution}</p>
             <p>
-              <span className="key-blue">Thesis:</span> <span className="string">&quot;{e.thesis}&quot;</span>
+              <span className="key-blue">Degree:</span> {loc?.degree || e.degree} in {loc?.field || e.field}
             </p>
-          )}
-        </div>
-      ))}
+            <p>
+              <span className="key-blue">Period:</span> {e.startYear} &mdash; {e.endYear}
+            </p>
+            <p>
+              <span className="key-blue">Location:</span> {e.location}
+            </p>
+            {(loc?.thesis || e.thesis) && (
+              <p>
+                <span className="key-blue">Thesis:</span> <span className="string">&quot;{loc?.thesis || e.thesis}&quot;</span>
+              </p>
+            )}
+          </div>
+        );
+      })}
       <div className="mt-2">
         <p className="key-purple mb-1">Languages:</p>
-        {languages.map((l) => (
-          <p key={l.code} className="pl-2">
-            <span className="dim">[{l.code}]</span> <span className="bright">{l.name}</span>{' '}
-            <span className="dim">&mdash; {l.level}</span>
-          </p>
-        ))}
+        {languages.map((l, idx) => {
+          const loc = localized.languages[idx];
+          return (
+            <p key={l.code} className="pl-2">
+              <span className="dim">[{l.code}]</span> <span className="bright">{loc?.name || l.name}</span>{' '}
+              <span className="dim">&mdash; {loc?.level || l.level}</span>
+            </p>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-export function renderInterests(): React.ReactNode {
+export function renderInterests(localized: LocalizedPortfolioData): React.ReactNode {
   return (
     <div>
-      {interests.map((i, idx) => (
-        <div key={idx} className="mb-2">
-          <span className="key-blue">{idx + 1}. {i.area}</span>
-          <br />
-          <span className="pl-4 dim">{i.description}</span>
-        </div>
-      ))}
+      {interests.map((i, idx) => {
+        const loc = localized.interests[idx];
+        return (
+          <div key={idx} className="mb-2">
+            <span className="key-blue">{idx + 1}. {loc?.area || i.area}</span>
+            <br />
+            <span className="pl-4 dim">{loc?.description || i.description}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-export function renderSoftSkills(): React.ReactNode {
+export function renderSoftSkills(localized: LocalizedPortfolioData): React.ReactNode {
   return (
     <div>
-      {softSkills.map((s, idx) => (
-        <div key={idx} className="mb-2">
-          <span className="bright">{s.name}</span>
-          <br />
-          <span className="pl-4 dim">{s.description}</span>
-        </div>
-      ))}
+      {softSkills.map((s, idx) => {
+        const loc = localized.softSkills[idx];
+        return (
+          <div key={idx} className="mb-2">
+            <span className="bright">{loc?.name || s.name}</span>
+            <br />
+            <span className="pl-4 dim">{loc?.description || s.description}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-export function renderHistory(history: string[]): React.ReactNode {
+export function renderHistory(history: string[], t: TFunc): React.ReactNode {
   if (history.length === 0) {
-    return <p className="dim">No commands in history.</p>;
+    return <p className="dim">{t('noHistory')}</p>;
   }
   return (
     <div>
@@ -420,7 +442,7 @@ export function renderHistory(history: string[]): React.ReactNode {
   );
 }
 
-export function renderNeofetch(): React.ReactNode {
+export function renderNeofetch(t: TFunc, localized: LocalizedPortfolioData): React.ReactNode {
   const sorted = getExperienceSorted();
   const allTech = [...new Set(sorted.flatMap((e) => e.technologies))];
   return (
@@ -440,13 +462,13 @@ export function renderNeofetch(): React.ReactNode {
       <div>
         <p><span className="key-blue">andrea</span><span className="dim">@</span><span className="key-blue">portfolio</span></p>
         <p className="dim">-----------------</p>
-        <p><span className="key-blue">OS:</span> Portfolio Linux x86_64</p>
+        <p><span className="key-blue">OS:</span> {t('neofetch.os')}</p>
         <p><span className="key-blue">Host:</span> {profile.fullName}</p>
-        <p><span className="key-blue">Role:</span> {profile.title}</p>
-        <p><span className="key-blue">Location:</span> {profile.contact.location}</p>
-        <p><span className="key-blue">Experience:</span> {sorted.length} positions, {sorted[0]?.endDate === 'present' ? 'currently active' : ''}</p>
+        <p><span className="key-blue">Role:</span> {localized.profile.title}</p>
+        <p><span className="key-blue">Location:</span> {localized.profile.locationLabel}</p>
+        <p><span className="key-blue">Experience:</span> {sorted.length} positions, {sorted[0]?.endDate === 'present' ? t('neofetch.currentlyActive') : ''}</p>
         <p><span className="key-blue">Projects:</span> {getProjectsSorted().length} repositories</p>
-        <p><span className="key-blue">Languages:</span> {languages.map((l) => l.name).join(', ')}</p>
+        <p><span className="key-blue">Languages:</span> {localized.languages.map((l) => l.name).join(', ')}</p>
         <p><span className="key-blue">Skills:</span> {allTech.slice(0, 6).join(', ')}...</p>
         <div className="mt-1 flex gap-1">
           {['#ff5f57', '#febc2e', '#28c840', '#00aaff', '#c084fc', '#ffd93d', '#00ff41', '#ff6b6b'].map((c) => (
@@ -462,19 +484,19 @@ export function renderEcho(text: string): React.ReactNode {
   return <p>{text || ''}</p>;
 }
 
-export function renderSudo(): React.ReactNode {
+export function renderSudo(t: TFunc): React.ReactNode {
   return (
     <p className="keyword">
-      [sudo] password for andrea: Permission denied. Nice try though.
+      {t('sudoDenied')}
     </p>
   );
 }
 
-export function renderUnknown(raw: string): React.ReactNode {
+export function renderUnknown(raw: string, t: TFunc): React.ReactNode {
   return (
     <p>
-      <span className="keyword">bash: {raw}: command not found.</span>{' '}
-      <span className="dim">Type &apos;help&apos; for available commands.</span>
+      <span className="keyword">{t('commandNotFound', { command: raw })}</span>{' '}
+      <span className="dim">{t('typeHelp')}</span>
     </p>
   );
 }
@@ -486,24 +508,26 @@ export function renderCommand(
   args: string,
   raw: string,
   commandHistory: string[],
+  t: TFunc,
+  localized: LocalizedPortfolioData,
 ): React.ReactNode {
   switch (key) {
-    case 'help': return renderHelp();
-    case 'whoami': return renderWhoami();
-    case 'skills': return renderSkills();
-    case 'experience': return renderExperience();
-    case 'projects': return renderProjects();
-    case 'project': return renderProjectDetail(args);
-    case 'chess': return renderChess();
+    case 'help': return renderHelp(t);
+    case 'whoami': return renderWhoami(localized);
+    case 'skills': return renderSkills(localized);
+    case 'experience': return renderExperience(t, localized);
+    case 'projects': return renderProjects(t, localized);
+    case 'project': return renderProjectDetail(args, t, localized);
+    case 'chess': return renderChess(t);
     case 'contact': return renderContact();
-    case 'education': return renderEducation();
-    case 'interests': return renderInterests();
-    case 'softskills': return renderSoftSkills();
-    case 'history': return renderHistory(commandHistory);
-    case 'neofetch': return renderNeofetch();
+    case 'education': return renderEducation(localized);
+    case 'interests': return renderInterests(localized);
+    case 'softskills': return renderSoftSkills(localized);
+    case 'history': return renderHistory(commandHistory, t);
+    case 'neofetch': return renderNeofetch(t, localized);
     case 'echo': return renderEcho(args);
-    case 'sudo': return renderSudo();
-    case 'unknown': return renderUnknown(raw);
+    case 'sudo': return renderSudo(t);
+    case 'unknown': return renderUnknown(raw, t);
     case 'clear': return null;
   }
 }

@@ -79,3 +79,21 @@ export const portfolioData: PortfolioData = {
   interests,
   softSkills,
 };
+
+// --- Localized Data ---
+import type { LocalizedPortfolioData } from './locales/types';
+import { localizedData as localizedEn } from './locales/en';
+import { localizedData as localizedIt } from './locales/it';
+import { localizedData as localizedDe } from './locales/de';
+
+export type { LocalizedPortfolioData } from './locales/types';
+
+const localizedDataMap: Record<string, LocalizedPortfolioData> = {
+  en: localizedEn,
+  it: localizedIt,
+  de: localizedDe,
+};
+
+export function getLocalizedData(locale: string): LocalizedPortfolioData {
+  return localizedDataMap[locale] || localizedEn;
+}

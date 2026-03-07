@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import HomepagePixelArt from '../components/HomepagePixelArt';
-import HomepageBrutalism from '../components/HomepageBrutalism';
-import HomepageTerminal from '../components/HomepageTerminal';
-import HomepageY2K from '../components/HomepageY2K';
+import HomepagePixelArt from '../../components/HomepagePixelArt';
+import HomepageBrutalism from '../../components/HomepageBrutalism';
+import HomepageTerminal from '../../components/HomepageTerminal';
+import HomepageY2K from '../../components/HomepageY2K';
+import LanguageSwitcher from '../../components/LanguageSwitcher';
 
 const VARIATIONS = [
   { id: 'terminal', label: 'Terminal', emoji: '💻', component: HomepageTerminal },
@@ -19,6 +20,7 @@ export default function PreviewPage() {
 
   return (
     <div style={{ minHeight: '100vh' }}>
+      <LanguageSwitcher />
       {/* Floating switcher bar */}
       <div style={{
         position: 'fixed',

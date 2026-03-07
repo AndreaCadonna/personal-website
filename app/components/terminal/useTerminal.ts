@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { parseCommand, getCompletionCandidates } from './commands';
 import type { CommandKey } from './commands';
-import { profile } from '@/lib/data';
 
 // --- Types ---
 
@@ -27,22 +26,12 @@ export interface TerminalState {
   visibleBootLines: number;
 }
 
-// --- Boot data ---
+// --- Boot line type ---
 
-const BOOT_LINES = [
-  { text: 'BIOS v3.14 - Portfolio System', delay: 0 },
-  { text: 'Checking memory... 16384 MB OK', delay: 200 },
-  { text: 'Loading kernel modules...', delay: 400 },
-  { text: '[  OK  ] Started Network Manager', delay: 600 },
-  { text: '[  OK  ] Mounted Developer Filesystem', delay: 800 },
-  { text: '[  OK  ] Started Portfolio Service', delay: 1000 },
-  { text: '', delay: 1200 },
-  { text: `portfolio login: ${profile.firstName.toLowerCase()}`, delay: 1400 },
-  { text: `Last login: Today from ${profile.contact.location}`, delay: 1600 },
-  { text: '', delay: 1800 },
-];
-
-export { BOOT_LINES };
+export interface BootLine {
+  text: string;
+  delay: number;
+}
 
 const MAX_HISTORY = 100;
 const MAX_LINES = 500;
@@ -54,7 +43,7 @@ function nextId(): string {
 
 // --- Hook ---
 
-export function useTerminal() {
+export function useTerminal(bootLines: BootLine[]) {
   const [phase, setPhase] = useState<Phase>('booting');
   const [lines, setLines] = useState<TerminalLine[]>([]);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
@@ -66,10 +55,10 @@ export function useTerminal() {
   // Boot sequence
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = [];
-    BOOT_LINES.forEach((line, i) => {
+    bootLines.forEach((line, i) => {
       const t = setTimeout(() => {
         setVisibleBootLines(i + 1);
-        if (i === BOOT_LINES.length - 1) {
+        if (i === bootLines.length - 1) {
           const t2 = setTimeout(() => {
             setPhase('interactive');
             // Auto-run help after boot
@@ -88,6 +77,7 @@ export function useTerminal() {
       timers.push(t);
     });
     return () => timers.forEach(clearTimeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-scroll
@@ -197,12 +187,12 @@ export function useTerminal() {
     setCurrentInput,
     visibleBootLines,
     scrollRef,
+    bootLines,
     executeCommand,
     handleHistoryUp,
     handleHistoryDown,
     handleTab,
     handleCtrlC,
     clearInput,
-    BOOT_LINES,
   };
 }

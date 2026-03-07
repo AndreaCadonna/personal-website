@@ -1,6 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { getLocalizedData } from '@/lib/data';
 import { profile, skills, getExperienceSorted, getFeaturedProjects, allSkillNames, education, languages, interests, softSkills } from '@/lib/data';
 
 const sortedExp = getExperienceSorted();
@@ -16,32 +19,50 @@ const SKILLS_LIST = [
   ...skills.devopsAndPractices.skills.slice(0, 3).map(s => s.name),
 ].slice(0, 16);
 
-const EXPERIENCE = sortedExp.map(exp => ({
-  role: exp.role.toUpperCase(),
-  company: exp.company.toUpperCase(),
-  period: `${exp.startDate.split('-')[0]}\u2014${exp.endDate === 'present' ? 'PRESENT' : exp.endDate.split('-')[0]}`,
-  bullets: exp.achievements.map(a => a.description),
-}));
-
 const INITIAL_PROJECTS_COUNT = 4;
-const ALL_PROJECTS = featured.map(p => ({
-  id: p.id,
-  name: p.name,
-  tagline: p.tagline,
-  description: p.description,
-  technologies: p.technologies.slice(0, 6),
-  highlights: p.highlights.slice(0, 3),
-  status: p.status,
-  startDate: p.startDate.split('-')[0],
-  endDate: p.endDate === 'present' ? 'PRESENT' : p.endDate?.split('-')[0] || '',
-  githubUrl: p.links.find(l => l.type === 'github')?.url || '',
-}));
+
+/** Split a translated string like "WHAT I {accent}DO{/accent}" into parts */
+function parseAccent(text: string): { before: string; accent: string; after: string } {
+  const parts = text.split(/\{accent\}|\{\/accent\}/);
+  return { before: parts[0] || '', accent: parts[1] || '', after: parts[2] || '' };
+}
 
 export default function HomepageBrutalism() {
+  const t = useTranslations('brutalism');
+  const tc = useTranslations('common');
+  const locale = useLocale();
+  const localized = getLocalizedData(locale);
+
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [time, setTime] = useState('');
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
+
+  const EXPERIENCE = useMemo(() => sortedExp.map(exp => {
+    const loc = localized.experience.find(e => e.id === exp.id);
+    return {
+      role: (loc?.role || exp.role).toUpperCase(),
+      company: exp.company.toUpperCase(),
+      period: `${exp.startDate.split('-')[0]}\u2014${exp.endDate === 'present' ? tc('present').toUpperCase() : exp.endDate.split('-')[0]}`,
+      bullets: loc?.achievements.map(a => a.description) || exp.achievements.map(a => a.description),
+    };
+  }), [localized, tc]);
+
+  const ALL_PROJECTS = useMemo(() => featured.map(p => {
+    const loc = localized.projects.find(pr => pr.id === p.id);
+    return {
+      id: p.id,
+      name: p.name,
+      tagline: loc?.tagline || p.tagline,
+      description: loc?.description || p.description,
+      technologies: p.technologies.slice(0, 6),
+      highlights: loc?.highlights?.slice(0, 3) || p.highlights.slice(0, 3),
+      status: p.status,
+      startDate: p.startDate.split('-')[0],
+      endDate: p.endDate === 'present' ? tc('present').toUpperCase() : p.endDate?.split('-')[0] || '',
+      githubUrl: p.links.find(l => l.type === 'github')?.url || '',
+    };
+  }), [localized, tc]);
 
   const visibleProjects = showAllProjects ? ALL_PROJECTS : ALL_PROJECTS.slice(0, INITIAL_PROJECTS_COUNT);
 
@@ -68,6 +89,22 @@ export default function HomepageBrutalism() {
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Parse section headings with accent markup
+  const whatIDo = parseAccent(t('whatIDo'));
+  const whereIveBeen = parseAccent(t('whereIveBeen'));
+  const thingsIMade = parseAccent(t('thingsIMade'));
+  const whereIStudied = parseAccent(t('whereIStudied'));
+  const whatIExplore = parseAccent(t('whatIExplore'));
+  const howIWork = parseAccent(t('howIWork'));
+  const iPlayChess = parseAccent(t('iPlayChess'));
+  const letsTalk = parseAccent(t('letsTalk'));
+
+  // Localized education, languages, interests, soft skills
+  const localizedEducation = localized.education;
+  const localizedLanguages = localized.languages;
+  const localizedInterests = localized.interests;
+  const localizedSoftSkills = localized.softSkills;
 
   return (
     <>
@@ -202,13 +239,13 @@ export default function HomepageBrutalism() {
         <div className="border-b-4 border-black flex justify-between items-center px-4 sm:px-6 py-3">
           <span className="label-tag hidden sm:inline">PORTFOLIO_{profile.lastName.toUpperCase()}.HTML</span>
           <span className="font-bold text-sm font-mono">{time}</span>
-          <span className="label-tag hidden sm:inline">SCROLL DOWN OR DON&apos;T</span>
+          <span className="label-tag hidden sm:inline">{t('scrollOrDont')}</span>
         </div>
 
         {/* Hero */}
         <section className="px-6 md:px-12 pt-16 pb-8 relative">
           <div className="rotate-tag right-6 top-20 hidden md:block">
-            SINCE 2020
+            {t('since')}
           </div>
           <p className="label-tag mb-4">&lt;h1&gt;</p>
           <h1 className="brutal-heading text-[clamp(36px,10vw,140px)] text-black">
@@ -222,20 +259,20 @@ export default function HomepageBrutalism() {
 
           <div className="mt-8 max-w-xl">
             <p className="text-lg leading-relaxed">
-              {profile.title} based in {profile.contact.location}.
+              {localized.profile.title} based in {localized.profile.locationLabel || profile.contact.location}.
               <br />
-              <span className="strikethrough text-gray-400">Sometimes they even work.</span>
+              <span className="strikethrough text-gray-400">{t('sometimesWork')}</span>
               <br />
-              <span className="yellow-highlight font-bold">They always work.</span>
+              <span className="yellow-highlight font-bold">{t('alwaysWork')}</span>
             </p>
           </div>
 
           {/* Overlapping stat */}
           <div className="absolute top-12 right-6 md:right-24 border-4 border-black p-4 bg-white hidden md:block"
             style={{ transform: 'rotate(3deg)' }}>
-            <p className="label-tag mb-1">STATUS</p>
-            <p className="font-bold text-2xl pink-accent">AVAILABLE</p>
-            <p className="text-xs mt-1">FOR HIRE</p>
+            <p className="label-tag mb-1">{t('status')}</p>
+            <p className="font-bold text-2xl pink-accent">{t('available')}</p>
+            <p className="text-xs mt-1">{t('forHire')}</p>
           </div>
         </section>
 
@@ -250,7 +287,7 @@ export default function HomepageBrutalism() {
         <section className="px-6 md:px-12 py-16">
           <p className="label-tag mb-2">&lt;section id=&quot;skills&quot;&gt;</p>
           <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
-            WHAT I <span className="pink-accent">DO</span>
+            {whatIDo.before}<span className="pink-accent">{whatIDo.accent}</span>{whatIDo.after}
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {SKILLS_LIST.map((skill, i) => (
@@ -270,7 +307,7 @@ export default function HomepageBrutalism() {
         <section className="px-6 md:px-12 py-16 bg-black text-white">
           <p className="label-tag text-gray-500 mb-2">&lt;experience&gt;</p>
           <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
-            WHERE I&apos;VE <span className="text-[#D4FF00]">BEEN</span>
+            {whereIveBeen.before}<span className="text-[#D4FF00]">{whereIveBeen.accent}</span>{whereIveBeen.after}
           </h2>
           <div className="space-y-8">
             {EXPERIENCE.map((exp) => (
@@ -298,7 +335,7 @@ export default function HomepageBrutalism() {
         {/* Projects */}
         <section className="px-6 md:px-12 py-16">
           <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
-            THINGS I <span className="blue-accent">MADE</span>
+            {thingsIMade.before}<span className="blue-accent">{thingsIMade.accent}</span>{thingsIMade.after}
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             {visibleProjects.map((proj, i) => {
@@ -321,7 +358,7 @@ export default function HomepageBrutalism() {
                         proj.status === 'in-progress' ? 'yellow-bg text-black' :
                         isDark ? 'bg-white text-black' : 'bg-black text-white'
                       }`}>
-                        {proj.status === 'production' ? 'LIVE' : proj.status === 'in-progress' ? 'WIP' : 'OSS'}
+                        {proj.status === 'production' ? t('live') : proj.status === 'in-progress' ? t('wip') : t('oss')}
                       </span>
                       <span className={`label-tag ${isDark ? 'text-gray-500' : ''}`}>
                         {proj.startDate}{proj.endDate ? `\u2014${proj.endDate}` : ''}
@@ -332,9 +369,9 @@ export default function HomepageBrutalism() {
                       {proj.tagline}
                     </p>
                     <div className="flex gap-2 flex-wrap mb-4">
-                      {proj.technologies.map(t => (
-                        <span key={t} className={`border-2 ${isDark ? 'border-white' : 'border-black'} px-2 py-1 text-[10px] font-bold uppercase`}>
-                          {t}
+                      {proj.technologies.map(tech => (
+                        <span key={tech} className={`border-2 ${isDark ? 'border-white' : 'border-black'} px-2 py-1 text-[10px] font-bold uppercase`}>
+                          {tech}
                         </span>
                       ))}
                     </div>
@@ -363,7 +400,7 @@ export default function HomepageBrutalism() {
                       onClick={() => toggleProject(proj.id)}
                       className={`text-xs font-bold uppercase cursor-pointer bg-transparent border-none p-0 font-[inherit] ${isDark ? 'text-[#D4FF00] hover:text-white' : 'pink-accent hover:text-black'} transition-colors`}
                     >
-                      {isExpanded ? '[\u2013] LESS' : '[+] MORE'}
+                      {isExpanded ? t('lessBtn') : t('moreBtn')}
                     </button>
                     {proj.githubUrl && (
                       <a
@@ -387,7 +424,7 @@ export default function HomepageBrutalism() {
                 className="brutal-link"
                 style={{ cursor: 'pointer' }}
               >
-                {showAllProjects ? 'SHOW LESS \u2191' : `LOAD MORE (${ALL_PROJECTS.length - INITIAL_PROJECTS_COUNT} MORE) \u2193`}
+                {showAllProjects ? `${t('showLess')} \u2191` : `${t('showMore', { count: ALL_PROJECTS.length - INITIAL_PROJECTS_COUNT })} \u2193`}
               </button>
             </div>
           )}
@@ -397,34 +434,40 @@ export default function HomepageBrutalism() {
         <section className="px-6 md:px-12 py-16 bg-black text-white">
           <p className="label-tag text-gray-500 mb-2">&lt;education&gt;</p>
           <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
-            WHERE I <span className="text-[#D4FF00]">STUDIED</span>
+            {whereIStudied.before}<span className="text-[#D4FF00]">{whereIStudied.accent}</span>{whereIStudied.after}
           </h2>
-          {education.map((edu) => (
-            <div key={edu.institution} className="border-4 border-white p-6 md:p-8 relative mb-6">
-              <span className="absolute -top-4 right-4 bg-[#0000FF] text-white px-3 py-1 text-xs font-bold">
-                {edu.startYear}&mdash;{edu.endYear}
-              </span>
-              <h3 className="brutal-heading text-lg sm:text-2xl md:text-4xl text-[#D4FF00] mb-1">
-                {edu.degree.toUpperCase()} IN {edu.field.toUpperCase()}
-              </h3>
-              <p className="text-gray-400 text-sm mb-2">@ {edu.institution.toUpperCase()}</p>
-              <p className="text-gray-400 text-sm mb-4">{edu.location}</p>
-              {edu.thesis && (
-                <p className="text-sm">
-                  <span className="text-[#FF0066] shrink-0">{'//'}</span> Thesis: &quot;{edu.thesis}&quot;
-                </p>
-              )}
-            </div>
-          ))}
+          {education.map((edu, i) => {
+            const loc = localizedEducation[i];
+            return (
+              <div key={edu.institution} className="border-4 border-white p-6 md:p-8 relative mb-6">
+                <span className="absolute -top-4 right-4 bg-[#0000FF] text-white px-3 py-1 text-xs font-bold">
+                  {edu.startYear}&mdash;{edu.endYear}
+                </span>
+                <h3 className="brutal-heading text-lg sm:text-2xl md:text-4xl text-[#D4FF00] mb-1">
+                  {(loc?.degree || edu.degree).toUpperCase()} IN {(loc?.field || edu.field).toUpperCase()}
+                </h3>
+                <p className="text-gray-400 text-sm mb-2">@ {edu.institution.toUpperCase()}</p>
+                <p className="text-gray-400 text-sm mb-4">{edu.location}</p>
+                {(loc?.thesis || edu.thesis) && (
+                  <p className="text-sm">
+                    <span className="text-[#FF0066] shrink-0">{'//'}</span> Thesis: &quot;{loc?.thesis || edu.thesis}&quot;
+                  </p>
+                )}
+              </div>
+            );
+          })}
           <div className="mt-8">
-            <p className="label-tag text-gray-500 mb-4">LANGUAGES</p>
+            <p className="label-tag text-gray-500 mb-4">{t('languages')}</p>
             <div className="flex gap-4 flex-wrap">
-              {languages.map((lang) => (
-                <div key={lang.code} className="border-4 border-white p-4">
-                  <span className="brutal-heading text-xl sm:text-2xl text-[#D4FF00]">{lang.name.toUpperCase()}</span>
-                  <p className="text-gray-400 text-xs mt-1">{lang.level}</p>
-                </div>
-              ))}
+              {languages.map((lang, i) => {
+                const loc = localizedLanguages[i];
+                return (
+                  <div key={lang.code} className="border-4 border-white p-4">
+                    <span className="brutal-heading text-xl sm:text-2xl text-[#D4FF00]">{(loc?.name || lang.name).toUpperCase()}</span>
+                    <p className="text-gray-400 text-xs mt-1">{loc?.level || lang.level}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -433,19 +476,22 @@ export default function HomepageBrutalism() {
         <section className="px-6 md:px-12 py-16">
           <p className="label-tag mb-2">&lt;interests&gt;</p>
           <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
-            WHAT I <span className="pink-accent">EXPLORE</span>
+            {whatIExplore.before}<span className="pink-accent">{whatIExplore.accent}</span>{whatIExplore.after}
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {interests.map((interest, i) => (
-              <div
-                key={i}
-                className={`brutal-card p-5 sm:p-8 ${i % 2 === 0 ? 'bg-white' : 'bg-[#D4FF00]'}`}
-              >
-                <span className="label-tag">{String(i + 1).padStart(2, '0')}</span>
-                <h3 className="brutal-heading text-xl sm:text-2xl mt-2 mb-2">{interest.area.toUpperCase()}</h3>
-                <p className="text-sm leading-relaxed">{interest.description}</p>
-              </div>
-            ))}
+            {interests.map((interest, i) => {
+              const loc = localizedInterests[i];
+              return (
+                <div
+                  key={i}
+                  className={`brutal-card p-5 sm:p-8 ${i % 2 === 0 ? 'bg-white' : 'bg-[#D4FF00]'}`}
+                >
+                  <span className="label-tag">{String(i + 1).padStart(2, '0')}</span>
+                  <h3 className="brutal-heading text-xl sm:text-2xl mt-2 mb-2">{(loc?.area || interest.area).toUpperCase()}</h3>
+                  <p className="text-sm leading-relaxed">{loc?.description || interest.description}</p>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -453,20 +499,23 @@ export default function HomepageBrutalism() {
         <section className="px-6 md:px-12 py-16 bg-black text-white">
           <p className="label-tag text-gray-500 mb-2">&lt;soft-skills&gt;</p>
           <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8 sm:mb-12">
-            HOW I <span className="text-[#D4FF00]">WORK</span>
+            {howIWork.before}<span className="text-[#D4FF00]">{howIWork.accent}</span>{howIWork.after}
           </h2>
           <div className="space-y-6">
-            {softSkills.map((skill, i) => (
-              <div key={i} className="border-4 border-white p-6 md:p-8 relative">
-                <span className="absolute -top-4 left-4 bg-[#FF0066] text-white px-3 py-1 text-xs font-bold">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <h3 className="brutal-heading text-lg sm:text-2xl md:text-3xl text-[#D4FF00] mb-2">
-                  {skill.name.toUpperCase()}
-                </h3>
-                <p className="text-sm leading-relaxed text-gray-300">{skill.description}</p>
-              </div>
-            ))}
+            {softSkills.map((skill, i) => {
+              const loc = localizedSoftSkills[i];
+              return (
+                <div key={i} className="border-4 border-white p-6 md:p-8 relative">
+                  <span className="absolute -top-4 left-4 bg-[#FF0066] text-white px-3 py-1 text-xs font-bold">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="brutal-heading text-lg sm:text-2xl md:text-3xl text-[#D4FF00] mb-2">
+                    {(loc?.name || skill.name).toUpperCase()}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-gray-300">{loc?.description || skill.description}</p>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -480,15 +529,14 @@ export default function HomepageBrutalism() {
           />
           <div className="relative">
             <h2 className="brutal-heading text-3xl sm:text-5xl md:text-8xl mb-4">
-              I PLAY <span className="pink-accent">CHESS</span>.
+              {iPlayChess.before}<span className="pink-accent">{iPlayChess.accent}</span>{iPlayChess.after}
             </h2>
-            <p className="text-xl font-bold mb-4">DEAL WITH IT.</p>
+            <p className="text-xl font-bold mb-4">{t('dealWithIt')}</p>
             <p className="max-w-lg text-sm leading-relaxed">
-              Every pawn sacrifice teaches patience. Every discovered check
-              teaches creativity. The board is just another interface to debug.
+              {t('chessDescription')}
               <br />
               <span className="yellow-highlight font-bold mt-2 inline-block">
-                Strategy is strategy, whether it&apos;s code or chess.
+                {t('strategyQuote')}
               </span>
             </p>
             <div className="mt-6 text-2xl sm:text-4xl md:text-6xl select-none tracking-wide sm:tracking-[8px]">
@@ -501,7 +549,7 @@ export default function HomepageBrutalism() {
         <footer className="px-6 md:px-12 py-16">
           <p className="label-tag mb-2">&lt;footer&gt;</p>
           <h2 className="brutal-heading text-3xl sm:text-5xl md:text-7xl mb-8">
-            LET&apos;S <span className="text-[#0000FF]">TALK</span>
+            {letsTalk.before}<span className="text-[#0000FF]">{letsTalk.accent}</span>{letsTalk.after}
           </h2>
           <div className="flex gap-4 flex-wrap">
             <a href={profile.contact.github} className="brutal-link" target="_blank" rel="noopener noreferrer">
