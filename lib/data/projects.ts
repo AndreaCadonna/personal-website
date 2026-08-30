@@ -2,6 +2,142 @@ import type { Project } from "./types";
 
 export const projects: Project[] = [
   {
+    id: "canvas-agent",
+    name: "Canvas Agent",
+    tagline: "File-backed Excalidraw workspaces for AI coding agents",
+    description:
+      "A durable, provider-independent workspace that lets tool-capable AI harnesses such as Codex, Claude Code, and ChatGPT create and maintain Excalidraw diagrams alongside Markdown specifications and element-level notes.",
+    status: "production",
+    startDate: "2026-01",
+    endDate: "present",
+    technologies: [
+      "Node.js 20+",
+      "JavaScript",
+      "React 18",
+      "Vite 8",
+      "Excalidraw",
+      "CodeMirror",
+      "MCP",
+      "Markdown",
+      "npm",
+    ],
+    highlights: [
+      "Designed a file-backed format pairing standard Excalidraw scenes with Markdown documents, durable element notes, independent revisions, and recoverable snapshots",
+      "Created a Node.js CLI and MCP server for project discovery, compact context, page creation, linking, and validated patch application",
+      "Implemented optimistic revision checks and conflict-safe saves that preserve unknown fields, binary assets, application state, and unrelated metadata",
+      "Built an optional loopback browser workspace with diagram, document, and split views that follows external file changes",
+      "Published @andreacaddev/canvas-agent with generated skills for multiple AI harnesses and automated build and test checks",
+    ],
+    links: [
+      {
+        label: "npm",
+        url: "https://www.npmjs.com/package/@andreacaddev/canvas-agent",
+        type: "docs",
+      },
+    ],
+    categories: ["mcp", "ai", "library"],
+  },
+  {
+    id: "company-researcher",
+    name: "Company Researcher",
+    tagline: "Evidence-backed AI research agent with traceable sources",
+    description:
+      "A bounded company-and-domain research workflow that gathers public sources, extracts traceable evidence, preserves unknowns and collection failures, and produces cited Markdown dossiers plus structured run artifacts.",
+    status: "in-progress",
+    startDate: "2026-08",
+    technologies: [
+      "Python 3.12",
+      "LangChain",
+      "OpenAI",
+      "Tavily",
+      "LangSmith",
+      "Pydantic",
+      "Typer",
+      "pytest",
+      "Ruff",
+      "uv",
+    ],
+    highlights: [
+      "Implemented staged research, evidence extraction, synthesis, and dossier generation with explicit completed, completed-with-gaps, and failed outcomes",
+      "Integrated OpenAI models and Tavily search through LangChain with configurable, bounded query and source counts",
+      "Added optional LangSmith traces with controls for hiding traced inputs and outputs",
+      "Built deterministic, API-key-free verification using fixtures and fakes, with pytest and Ruff quality checks",
+    ],
+    links: [
+      {
+        label: "GitHub",
+        url: "https://github.com/AndreaCadonna/custom-research-agent-prototype",
+        type: "github",
+      },
+    ],
+    categories: ["ai", "backend"],
+  },
+  {
+    id: "sbobuz",
+    name: "Sbobuz",
+    tagline: "Real-time multiplayer card game with an event-sourced engine",
+    description:
+      "A browser-based multiplayer card game supporting registration, rooms, human and AI opponents, reconnect handling, and horizontally scalable WebSocket communication.",
+    status: "open-source",
+    startDate: "2026-01",
+    technologies: [
+      "Next.js",
+      "React",
+      "Node.js 20",
+      "Express",
+      "TypeScript 5.7",
+      "Socket.IO",
+      "PostgreSQL",
+      "Redis",
+      "Vitest",
+      "Docker",
+    ],
+    highlights: [
+      "Built a modular monolith with a Next.js client, Express backend, shared TypeScript contracts, PostgreSQL persistence, and Redis pub/sub",
+      "Implemented a server-authoritative, event-sourced game engine with pure state transitions and AI strategies running in worker threads",
+      "Added full state synchronization after reconnects, Socket.IO horizontal scaling, JWT authentication, health checks, and database migrations",
+      "Created unit and integration test workflows and bounded experiments with infrastructure and observability tooling",
+    ],
+    links: [
+      {
+        label: "GitHub",
+        url: "https://github.com/AndreaCadonna/sbobuz-web-game-app",
+        type: "github",
+      },
+    ],
+    categories: ["full-stack", "web"],
+  },
+  {
+    id: "redmine-cli-agent",
+    name: "Redmine CLI Agent",
+    tagline: "Local-first AI assistant for private Redmine data",
+    description:
+      "A privacy-conscious command-line assistant that answers natural-language questions about a company Redmine instance using a local LLM and a custom read-only MCP server.",
+    status: "open-source",
+    startDate: "2026-01",
+    technologies: [
+      "Python 3.11+",
+      "Ollama",
+      "Qwen3",
+      "MCP SDK",
+      "Redmine REST API",
+      "pytest",
+    ],
+    highlights: [
+      "Orchestrated local Qwen3 models through Ollama and translated user questions into five purpose-built Redmine MCP tools",
+      "Kept model inference local while isolating Redmine REST API access behind a dedicated read-only Python MCP server",
+      "Added conversation controls, debug mode, configuration examples, and pytest coverage for the client, MCP server, and representative queries",
+    ],
+    links: [
+      {
+        label: "GitHub",
+        url: "https://github.com/AndreaCadonna/redmine-ai-cli",
+        type: "github",
+      },
+    ],
+    categories: ["ai", "mcp", "backend"],
+  },
+  {
     id: "casa-negrano",
     name: "Casa Negrano",
     tagline: "Holiday apartments website with real-time booking",
@@ -253,7 +389,7 @@ export const projects: Project[] = [
     description:
       "A command-line Certificate Authority that manages X.509 digital certificates through their full lifecycle. Built in Go with zero external dependencies, leveraging only the standard library for all cryptographic operations.",
     status: "open-source",
-    startDate: "2025-01",
+    startDate: "2026-01",
     technologies: [
       "Go 1.21+",
       "X.509",
@@ -283,7 +419,7 @@ export const projects: Project[] = [
     description:
       "An educational implementation of event sourcing principles written in Go. Demonstrates how to build a system where state is reconstructed from immutable events rather than direct state updates, using a bank account scenario.",
     status: "open-source",
-    startDate: "2025-01",
+    startDate: "2026-01",
     technologies: ["Go"],
     highlights: [
       "Implemented append-only event log with in-memory indexing for efficient stream lookups",
@@ -307,7 +443,7 @@ export const projects: Project[] = [
     description:
       "A software experiment demonstrating token bucket rate limiting with independent, configurable per-user quota tracking. Proves that per-user rate limiting using lazy refill works correctly without background threads.",
     status: "open-source",
-    startDate: "2025-01",
+    startDate: "2026-01",
     technologies: ["Python 3.9+"],
     highlights: [
       "Implemented token bucket algorithm with lazy on-demand refill, no background threads needed",
@@ -331,7 +467,7 @@ export const projects: Project[] = [
     description:
       "A local, single-process Node.js runtime that automatically discovers function files in an api/ directory and exposes them as HTTP endpoints. Handles request routing and dispatching based on HTTP methods while maintaining Web-standard APIs.",
     status: "open-source",
-    startDate: "2025-01",
+    startDate: "2026-01",
     technologies: ["JavaScript", "Node.js 20+"],
     highlights: [
       "Built file-based route discovery mapping api/ directory files to HTTP endpoints automatically",
@@ -355,7 +491,7 @@ export const projects: Project[] = [
     description:
       "A local Python tool implementing two-layer envelope encryption for credential storage. Each secret gets its own Data Encryption Key (AES-256-GCM), with all keys protected by a Root Key derived from a master password using PBKDF2.",
     status: "open-source",
-    startDate: "2025-01",
+    startDate: "2026-01",
     technologies: [
       "Python 3.10+",
       "AES-256-GCM",

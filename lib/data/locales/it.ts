@@ -4,9 +4,9 @@ export const localizedData: LocalizedPortfolioData = {
   profile: {
     title: "Ingegnere del Software",
     summary:
-      "Ingegnere del Software con 5 anni di esperienza nello sviluppo fullstack, di cui gli ultimi 2 anni focalizzati su flussi di lavoro di sviluppo potenziati dall'IA e sistemi di coding agentici. A mio agio nell'utilizzo di strumenti di coding IA moderni (GitHub Copilot, Claude Code) a supporto dello sviluppo, con crescente familiarità nella pianificazione, coordinamento delle attività e revisione degli output generati dall'IA. Più esperto con framework e pattern che con la padronanza pura dei linguaggi, in continuo apprendimento.",
+      "Ingegnere del Software con oltre 5 anni di esperienza nello sviluppo di prodotti full-stack, nell'architettura di sistemi e nella leadership di flussi di lavoro potenziati dall'IA. Esperto nella realizzazione di piattaforme web, strumenti per sviluppatori, sistemi real-time, applicazioni CLI orientate alla sicurezza, integrazioni MCP e agenti IA basati su fonti verificabili. Utilizza GitHub Copilot, Claude Code e Codex per accelerare la consegna mantenendo la qualità attraverso pianificazione, context engineering, revisione sistematica, test e automazione DevOps.",
     shortBio:
-      "Ingegnere del Software con sede a Trento, Italia. 5 anni di esperienza nello sviluppo fullstack e nei flussi di lavoro potenziati dall'IA. Focalizzato su pratiche di coding agentiche, pianificazione delle attività e creazione di applicazioni web con framework moderni.",
+      "Ingegnere del Software con sede a Trento e oltre 5 anni di esperienza in prodotti full-stack, strumenti per sviluppatori, sistemi real-time e ingegneria potenziata dall'IA. Focalizzato su architettura, orchestrazione di agenti, revisione sistematica e adozione efficace dell'IA nei team.",
     locationLabel: "Trento, Italia",
   },
 
@@ -15,18 +15,29 @@ export const localizedData: LocalizedPortfolioData = {
       id: "arcoda",
       role: "Ingegnere del Software",
       summary:
-        "Ingegnere frontend che contribuisce a librerie di visualizzazione geospaziale e integrazione di mappe 3D, utilizzando strumenti di coding IA a supporto del lavoro di sviluppo quotidiano.",
+        "Ingegnere del software impegnato nello sviluppo di una piattaforma GIS configurabile, librerie condivise per la visualizzazione geospaziale e 3D e strumenti interni full-stack. Segue le funzionalità dalla progettazione al supporto post-rilascio e contribuisce all'adozione di pratiche strutturate di sviluppo assistito dall'IA.",
       responsibilities: [
-        "Contribuzione a librerie frontend per la visualizzazione e integrazione di immagini georeferenziate",
-        "Lavoro su librerie per il rendering e la manipolazione di modelli 3D all'interno di interfacce basate su mappe",
-        "Implementazione di funzionalità di visualizzazione dati geospaziali per applicazioni di mappatura",
-        "Utilizzo di strumenti di coding IA (GitHub Copilot IDE/CLI, Claude Code) nel flusso di lavoro quotidiano",
-        "Applicazione di un approccio planning-first alle attività di sviluppo: pianificazione del contesto, revisione del codice generato dall'IA e iterazione sui risultati",
+        "Sviluppo e manutenzione di applicazioni GIS configurabili per infrastrutture, servizi ambientali, edilizia, immagini aeree e modelli 3D di cantieri",
+        "Manutenzione di librerie TypeScript condivise per Google Maps, MapLibre e Leaflet e per il rendering 3D con Babylon.js",
+        "Gestione di funzionalità frontend e cartografiche dalla progettazione al rilascio e al supporto successivo",
+        "Leadership di uno strumento interno full-stack per monitorare acquisizioni 3D e ricalibrazioni con .NET, Angular, PostgreSQL, Python e Kubernetes CronJobs",
+        "Uso di GitHub Copilot, Claude Code, Codex e agenti personalizzati attraverso pianificazione, context engineering, revisione e validazione",
+        "Punto di riferimento interno per lo sviluppo assistito dall'IA e collaborazione con il management su pratiche, guardrail e misure di successo",
+        "Progettazione ed erogazione di una formazione sull'ingegneria agentica per colleghi di quattro team",
+        "Rappresentanza del team di sviluppo in un'iniziativa interfunzionale di miglioramento continuo",
       ],
       achievements: [
         {
           description:
-            "Adozione di strumenti di coding IA per lo sviluppo di librerie geospaziali in ambiente di produzione",
+            "Progettazione, rilascio e supporto della visualizzazione multi-ortofoto con stato a collezione, controlli sincronizzati e gestione automatica della viewport",
+        },
+        {
+          description:
+            "Rapida evoluzione dalla consegna di funzionalità su quattro progetti al mentoring di uno stagista, alla guida di uno strumento full-stack interno e alla rappresentanza del team nel miglioramento continuo",
+        },
+        {
+          description:
+            "Avvio di un programma di adozione dell'IA sostenuto dal management e formazione inter-team sulle pratiche di ingegneria agentica",
         },
       ],
     },
@@ -174,6 +185,54 @@ export const localizedData: LocalizedPortfolioData = {
   ],
 
   projects: [
+    {
+      id: "canvas-agent",
+      tagline: "Workspace Excalidraw persistenti su file per agenti di coding IA",
+      description:
+        "Workspace durevole e indipendente dal provider che consente a strumenti come Codex, Claude Code e ChatGPT di creare e mantenere diagrammi Excalidraw insieme a specifiche Markdown e note a livello di elemento.",
+      highlights: [
+        "Progettato un formato su file che abbina scene Excalidraw standard, documenti Markdown, note persistenti, revisioni indipendenti e snapshot recuperabili",
+        "Creati CLI Node.js e server MCP per scoperta dei progetti, contesto compatto, creazione di pagine, collegamenti e patch validate",
+        "Implementati controlli di revisione ottimistici e salvataggi sicuri in caso di conflitto",
+        "Realizzato un workspace browser locale con viste diagramma, documento e affiancata",
+        "Pubblicato @andreacaddev/canvas-agent con skill per più strumenti IA e controlli automatici di build e test",
+      ],
+    },
+    {
+      id: "company-researcher",
+      tagline: "Agente di ricerca IA basato su fonti verificabili",
+      description:
+        "Flusso di ricerca aziendale e di settore con limiti espliciti, raccolta di fonti pubbliche, evidenze tracciabili, gestione delle informazioni mancanti e dossier Markdown con citazioni.",
+      highlights: [
+        "Implementate fasi di ricerca, estrazione delle evidenze, sintesi e generazione del dossier con esiti espliciti",
+        "Integrati modelli OpenAI e ricerca Tavily tramite LangChain con limiti configurabili",
+        "Aggiunte tracce LangSmith opzionali con controlli sulla visibilità di input e output",
+        "Creata una verifica deterministica senza chiavi API con fixture, fake, pytest e Ruff",
+      ],
+    },
+    {
+      id: "sbobuz",
+      tagline: "Gioco di carte multiplayer real-time con motore event-sourced",
+      description:
+        "Gioco di carte multiplayer nel browser con registrazione, stanze, avversari umani e IA, riconnessione e comunicazione WebSocket scalabile orizzontalmente.",
+      highlights: [
+        "Realizzato un monolite modulare con client Next.js, backend Express, contratti TypeScript condivisi, PostgreSQL e Redis pub/sub",
+        "Implementato un motore di gioco event-sourced e autoritativo lato server con transizioni pure e strategie IA in worker thread",
+        "Aggiunti sincronizzazione completa dopo la riconnessione, scaling Socket.IO, autenticazione JWT, health check e migrazioni",
+        "Creati test unitari e di integrazione ed esperimenti delimitati con strumenti di infrastruttura e osservabilità",
+      ],
+    },
+    {
+      id: "redmine-cli-agent",
+      tagline: "Assistente IA local-first per dati Redmine privati",
+      description:
+        "Assistente da riga di comando attento alla privacy che risponde a domande in linguaggio naturale su un'istanza Redmine aziendale usando un LLM locale e un server MCP personalizzato in sola lettura.",
+      highlights: [
+        "Orchestrati modelli Qwen3 locali tramite Ollama e tradotte le domande in chiamate a cinque strumenti MCP dedicati",
+        "Mantenuta locale l'inferenza isolando l'accesso alle API REST di Redmine dietro un server MCP Python in sola lettura",
+        "Aggiunti controlli di conversazione, modalità debug, esempi di configurazione e copertura pytest",
+      ],
+    },
     {
       id: "casa-negrano",
       tagline: "Sito web per appartamenti vacanza con prenotazione in tempo reale",
@@ -362,19 +421,19 @@ export const localizedData: LocalizedPortfolioData = {
 
   interests: [
     {
-      area: "Strumenti di Coding Agentici",
+      area: "Ingegneria Potenziata dall'IA",
       description:
-        "Seguire l'evoluzione degli assistenti di coding IA come GitHub Copilot e Claude Code, e come cambiano il lavoro di sviluppo quotidiano",
+        "Seguire l'evoluzione di strumenti, pattern e buone pratiche di coding agentico e il loro impatto sul lavoro di ingegneria del software",
+    },
+    {
+      area: "Evoluzione dell'Ingegneria",
+      description:
+        "Esplorare il passaggio dall'implementazione verso architettura, orchestrazione, revisione e supporto ai team",
     },
     {
       area: "Flussi di Lavoro di Sviluppo",
       description:
-        "Esplorare come pianificazione, preparazione del contesto e revisione si integrano nello sviluppo assistito dall'IA",
-    },
-    {
-      area: "Ecosistema di Coding IA",
-      description:
-        "Restare aggiornati su server MCP, framework per agenti IA e nuovi strumenti nello spazio del coding agentico",
+        "Praticare context engineering, pianificazione, validazione sistematica degli output, test e uso responsabile degli strumenti IA",
     },
     {
       area: "Scacchi",
@@ -385,24 +444,19 @@ export const localizedData: LocalizedPortfolioData = {
 
   softSkills: [
     {
-      name: "Pianificazione delle Attività",
+      name: "Leadership",
       description:
-        "Suddivisione del lavoro in passi gestibili, definizione delle priorità e strutturazione delle attività di sviluppo prima dell'esecuzione",
-    },
-    {
-      name: "Multitasking",
-      description:
-        "Gestione di molteplici flussi di lavoro paralleli e passaggio efficace tra le attività, specialmente nei flussi di lavoro di coding agentici",
-    },
-    {
-      name: "Delega",
-      description:
-        "Distribuzione del lavoro tra agenti IA e strumenti, revisione degli output e coordinamento degli sforzi di sviluppo paralleli",
+        "Guida di iniziative tecniche, mentoring degli sviluppatori e supporto ai team nell'adozione di pratiche efficaci",
     },
     {
       name: "Comunicazione",
       description:
-        "A proprio agio nelle interazioni con i clienti, nelle discussioni di team e nella traduzione dei requisiti in attività concrete",
+        "Collaborazione sicura con clienti, stakeholder, team di ingegneria e colleghi di diversi reparti",
+    },
+    {
+      name: "Problem Solving",
+      description:
+        "Individuazione proattiva di problemi tecnici e di processo, valutazione dei compromessi e consegna di soluzioni manutenibili",
     },
     {
       name: "Adattabilità",

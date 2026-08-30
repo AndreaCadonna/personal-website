@@ -4,9 +4,9 @@ export const localizedData: LocalizedPortfolioData = {
   profile: {
     title: "Softwareingenieur",
     summary:
-      "Softwareingenieur mit 5 Jahren Erfahrung in der Fullstack-Entwicklung, wobei die letzten 2 Jahre auf KI-gestutzte Entwicklungsworkflows und agentische Codierungssysteme fokussiert waren. Vertraut im Umgang mit modernen KI-Codierungswerkzeugen (GitHub Copilot, Claude Code) zur Unterstutzung der Entwicklung, mit wachsender Vertrautheit in Planung, Aufgabenkoordination und Uberprufung KI-generierter Ergebnisse. Erfahrener mit Frameworks und Mustern als mit reiner Sprachexpertise, und kontinuierlich lernend.",
+      "Softwareingenieur mit über 5 Jahren Erfahrung in Full-Stack-Produktentwicklung, Systemarchitektur und der Leitung KI-gestützter Engineering-Workflows. Erfahrung mit Webplattformen, Entwicklerwerkzeugen, Echtzeitsystemen, sicherheitsorientierten Kommandozeilenanwendungen, MCP-Integrationen und evidenzbasierten KI-Agenten. Nutzt GitHub Copilot, Claude Code und Codex, um die Bereitstellung zu beschleunigen und die Qualität durch Planung, Context Engineering, systematische Reviews, Tests und DevOps-Automatisierung zu sichern.",
     shortBio:
-      "Softwareingenieur mit Sitz in Trento, Italien. 5 Jahre Erfahrung in Fullstack-Entwicklung und KI-gestutzten Workflows. Fokussiert auf agentische Codierungspraktiken, Aufgabenplanung und Erstellung von Webanwendungen mit modernen Frameworks.",
+      "Softwareingenieur in Trento mit über 5 Jahren Erfahrung in Full-Stack-Produkten, Entwicklerwerkzeugen, Echtzeitsystemen und KI-gestütztem Engineering. Schwerpunkt auf Architektur, Agenten-Orchestrierung, systematischen Reviews und wirksamer KI-Einführung in Teams.",
     locationLabel: "Trento, Italien",
   },
 
@@ -15,18 +15,29 @@ export const localizedData: LocalizedPortfolioData = {
       id: "arcoda",
       role: "Softwareingenieur",
       summary:
-        "Frontend-Ingenieur, der zu Geodaten-Visualisierungsbibliotheken und 3D-Kartenintegration beitragt und KI-Codierungswerkzeuge zur Unterstutzung der taglichen Entwicklungsarbeit einsetzt.",
+        "Softwareingenieur für eine konfigurierbare GIS-Plattform, gemeinsame Geodaten- und 3D-Visualisierungsbibliotheken sowie interne Full-Stack-Werkzeuge. Verantwortet Funktionen vom Entwurf bis zum Support nach der Veröffentlichung und unterstützt das Team bei strukturierten KI-gestützten Entwicklungspraktiken.",
       responsibilities: [
-        "Beitrag zu Frontend-Bibliotheken fur die Visualisierung und Integration georeferenzierter Bilder",
-        "Arbeit an Bibliotheken fur das Rendering und die Manipulation von 3D-Modellen innerhalb kartenbasierter Oberflachen",
-        "Implementierung von Geodaten-Visualisierungsfunktionen fur Kartenanwendungen",
-        "Einsatz von KI-Codierungswerkzeugen (GitHub Copilot IDE/CLI, Claude Code) im taglichen Entwicklungsworkflow",
-        "Anwendung eines Planning-First-Ansatzes bei Entwicklungsaufgaben: Kontextplanung, Uberprufung KI-generierten Codes und Iteration der Ergebnisse",
+        "Entwicklung und Pflege konfigurierbarer GIS-Anwendungen für Infrastruktur, Umweltdienste, Bauwesen, Luftbilder und 3D-Baustellenmodelle",
+        "Pflege gemeinsamer TypeScript-Bibliotheken für Google Maps, MapLibre und Leaflet sowie 3D-Rendering mit Babylon.js",
+        "Verantwortung für Frontend- und Kartenfunktionen von Entwurf und Implementierung bis Veröffentlichung und Support",
+        "Leitung eines internen Full-Stack-Werkzeugs zur Überwachung von 3D-Aufnahmen und Rekalibrierungen mit .NET, Angular, PostgreSQL, Python und Kubernetes CronJobs",
+        "Einsatz von GitHub Copilot, Claude Code, Codex und eigenen Agenten mit Planung, Context Engineering, Review und Validierung",
+        "Interne Ansprechperson für KI-gestützte Entwicklung und Zusammenarbeit mit dem Management zu Praktiken, Leitplanken und Erfolgsmessung",
+        "Konzeption und Durchführung einer Schulung zu agentischem Engineering für Kollegen aus vier Teams",
+        "Vertretung des Entwicklungsteams in einer bereichsübergreifenden Initiative zur kontinuierlichen Verbesserung",
       ],
       achievements: [
         {
           description:
-            "Einfuhrung von KI-Codierungswerkzeugen fur die Entwicklung von Geodaten-Bibliotheken in der Produktionsumgebung",
+            "Entwurf, Veröffentlichung und Support einer Multi-Orthofoto-Visualisierung mit sammlungsbasiertem Zustand, synchronisierten Bedienelementen und automatischer Viewport-Steuerung",
+        },
+        {
+          description:
+            "Schnelle Entwicklung von der Feature-Bereitstellung in vier Projekten zum Mentoring eines Praktikanten, zur Leitung eines internen Full-Stack-Werkzeugs und zur Vertretung des Teams bei kontinuierlicher Verbesserung",
+        },
+        {
+          description:
+            "Aufbau eines vom Management unterstützten KI-Einführungsprogramms und Durchführung teamübergreifender Schulungen zu agentischen Engineering-Praktiken",
         },
       ],
     },
@@ -174,6 +185,54 @@ export const localizedData: LocalizedPortfolioData = {
   ],
 
   projects: [
+    {
+      id: "canvas-agent",
+      tagline: "Dateibasierte Excalidraw-Arbeitsbereiche für KI-Coding-Agenten",
+      description:
+        "Ein dauerhafter, anbieterunabhängiger Arbeitsbereich, in dem Werkzeuge wie Codex, Claude Code und ChatGPT Excalidraw-Diagramme zusammen mit Markdown-Spezifikationen und elementbezogenen Notizen pflegen können.",
+      highlights: [
+        "Entwurf eines dateibasierten Formats mit Standard-Excalidraw-Szenen, Markdown-Dokumenten, dauerhaften Notizen, unabhängigen Revisionen und wiederherstellbaren Snapshots",
+        "Erstellung einer Node.js-CLI und eines MCP-Servers für Projektsuche, kompakten Kontext, Seitenerstellung, Verknüpfung und validierte Patches",
+        "Implementierung optimistischer Revisionsprüfungen und konfliktsicherer Speichervorgänge",
+        "Erstellung eines lokalen Browser-Arbeitsbereichs mit Diagramm-, Dokument- und geteilter Ansicht",
+        "Veröffentlichung von @andreacaddev/canvas-agent mit Skills für mehrere KI-Werkzeuge sowie automatisierten Build- und Testprüfungen",
+      ],
+    },
+    {
+      id: "company-researcher",
+      tagline: "Evidenzbasierter KI-Rechercheagent mit nachvollziehbaren Quellen",
+      description:
+        "Ein begrenzter Rechercheablauf für Unternehmen und Fachgebiete, der öffentliche Quellen sammelt, nachvollziehbare Evidenz extrahiert, Wissenslücken erhält und zitierte Markdown-Dossiers erzeugt.",
+      highlights: [
+        "Implementierung gestufter Recherche, Evidenzextraktion, Synthese und Dossiererstellung mit expliziten Ergebniszuständen",
+        "Integration von OpenAI-Modellen und Tavily-Suche über LangChain mit konfigurierbaren Grenzen",
+        "Optionale LangSmith-Traces mit Steuerelementen zum Ausblenden von Ein- und Ausgaben",
+        "Deterministische, API-schlüsselfreie Verifikation mit Fixtures, Fakes, pytest und Ruff",
+      ],
+    },
+    {
+      id: "sbobuz",
+      tagline: "Echtzeit-Multiplayer-Kartenspiel mit Event-Sourcing-Engine",
+      description:
+        "Ein browserbasiertes Multiplayer-Kartenspiel mit Registrierung, Räumen, menschlichen und KI-Gegnern, Wiederverbindung und horizontal skalierbarer WebSocket-Kommunikation.",
+      highlights: [
+        "Aufbau eines modularen Monolithen mit Next.js-Client, Express-Backend, gemeinsamen TypeScript-Verträgen, PostgreSQL und Redis Pub/Sub",
+        "Implementierung einer serverautoritativen Event-Sourcing-Spielengine mit reinen Zustandsübergängen und KI-Strategien in Worker Threads",
+        "Vollständige Statussynchronisierung nach Wiederverbindung, Socket.IO-Skalierung, JWT-Authentifizierung, Health Checks und Migrationen",
+        "Unit- und Integrationstests sowie klar begrenzte Experimente mit Infrastruktur- und Observability-Werkzeugen",
+      ],
+    },
+    {
+      id: "redmine-cli-agent",
+      tagline: "Local-First-KI-Assistent für private Redmine-Daten",
+      description:
+        "Ein datenschutzbewusster Kommandozeilenassistent, der natürlichsprachliche Fragen zu einer Unternehmens-Redmine-Instanz mit einem lokalen LLM und einem eigenen schreibgeschützten MCP-Server beantwortet.",
+      highlights: [
+        "Orchestrierung lokaler Qwen3-Modelle über Ollama und Übersetzung von Fragen in fünf speziell entwickelte Redmine-MCP-Werkzeuge",
+        "Lokale Modellinferenz und isolierter Zugriff auf die Redmine-REST-API über einen schreibgeschützten Python-MCP-Server",
+        "Konversationssteuerung, Debug-Modus, Konfigurationsbeispiele und pytest-Abdeckung hinzugefügt",
+      ],
+    },
     {
       id: "casa-negrano",
       tagline: "Ferienwohnungs-Website mit Echtzeit-Buchung",
@@ -362,19 +421,19 @@ export const localizedData: LocalizedPortfolioData = {
 
   interests: [
     {
-      area: "Agentische Codierungswerkzeuge",
+      area: "KI-gestütztes Engineering",
       description:
-        "Verfolgen der Entwicklung von KI-Codierungsassistenten wie GitHub Copilot und Claude Code und wie sie die tagliche Entwicklungsarbeit verandern",
+        "Verfolgen der Entwicklung agentischer Coding-Werkzeuge, Muster und bewährter Praktiken und ihres Einflusses auf die Softwareentwicklung",
+    },
+    {
+      area: "Entwicklung des Engineerings",
+      description:
+        "Erkunden des Wandels von implementierungsorientierter Arbeit zu Architektur, Orchestrierung, Review und Teamunterstützung",
     },
     {
       area: "Entwicklungsworkflows",
       description:
-        "Erkunden, wie Planung, Kontextvorbereitung und Review in die KI-gestutzte Entwicklung integriert werden",
-    },
-    {
-      area: "KI-Codierungs-Okosystem",
-      description:
-        "Auf dem Laufenden bleiben uber MCP-Server, KI-Agenten-Frameworks und neue Werkzeuge im Bereich des agentischen Codierens",
+        "Praktizieren von Context Engineering, Planung, systematischer Ausgabevalidierung, Tests und verantwortungsvollem Einsatz von KI-Werkzeugen",
     },
     {
       area: "Schach",
@@ -385,24 +444,19 @@ export const localizedData: LocalizedPortfolioData = {
 
   softSkills: [
     {
-      name: "Aufgabenplanung",
+      name: "Leadership",
       description:
-        "Aufteilen der Arbeit in handhabbare Schritte, Festlegen von Prioritaten und Strukturieren von Entwicklungsaufgaben vor der Ausfuhrung",
-    },
-    {
-      name: "Multitasking",
-      description:
-        "Verwaltung mehrerer paralleler Arbeitsablaufe und effektives Wechseln zwischen Aufgaben, insbesondere in agentischen Codierungsworkflows",
-    },
-    {
-      name: "Delegation",
-      description:
-        "Verteilung der Arbeit auf KI-Agenten und Werkzeuge, Uberprufung der Ergebnisse und Koordination paralleler Entwicklungsanstrengungen",
+        "Leitung technischer Initiativen, Mentoring von Entwicklern und Unterstützung von Teams bei wirksamen Engineering-Praktiken",
     },
     {
       name: "Kommunikation",
       description:
-        "Sicher in Kundeninteraktionen, Teamdiskussionen und der Ubersetzung von Anforderungen in umsetzbare Aufgaben",
+        "Sichere Zusammenarbeit mit Kunden, Stakeholdern, Engineering-Teams und Kollegen aus anderen Abteilungen",
+    },
+    {
+      name: "Problemlösung",
+      description:
+        "Proaktives Erkennen technischer und prozessbezogener Probleme, Abwägen von Kompromissen und Lieferung wartbarer Lösungen",
     },
     {
       name: "Anpassungsfahigkeit",

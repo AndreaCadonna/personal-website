@@ -11,25 +11,44 @@ export const experience: ExperienceEntry[] = [
     startDate: "2025-12",
     endDate: "present",
     summary:
-      "Frontend engineer contributing to geospatial visualization libraries and 3D mapping integration, using AI coding tools to support daily development work.",
+      "Software engineer developing a configurable GIS platform, shared geospatial and 3D visualization libraries, and internal full-stack tooling. Owns features from design through post-release support while helping the engineering team adopt structured AI-assisted development practices.",
     responsibilities: [
-      "Contributing to frontend libraries for georeferenced imagery visualization and integration",
-      "Working on libraries enabling 3D model rendering and manipulation within map-based interfaces",
-      "Implementing geospatial data visualization features for mapping applications",
-      "Using AI coding tools (GitHub Copilot IDE/CLI, Claude Code) in daily development workflow",
-      "Applying planning-first approach to development tasks: planning context, reviewing AI-generated code, and iterating on results",
+      "Develop and maintain configurable GIS applications for infrastructure, environmental services, construction, aerial imagery, and 3D worksite models",
+      "Maintain shared TypeScript libraries that abstract Google Maps, MapLibre, and Leaflet and render 3D models with Babylon.js",
+      "Own frontend and mapping features from design and implementation through release and post-release support",
+      "Lead an internal full-stack tool for monitoring 3D-model acquisitions and managing recalibration workflows using .NET, Angular, PostgreSQL, Python, and Kubernetes CronJobs",
+      "Use GitHub Copilot, Claude Code, Codex, and custom agents through structured planning, context engineering, review, and validation workflows",
+      "Serve as an internal reference for AI-assisted development and partner with management on adoption practices, guardrails, and success measures",
+      "Designed and delivered agentic-engineering training for colleagues across four teams",
+      "Represent the development team in a cross-functional continuous-improvement initiative",
     ],
     technologies: [
+      "Angular",
       "TypeScript",
-      "Geospatial Libraries",
-      "3D Rendering",
+      ".NET",
+      "PostgreSQL",
+      "Python",
+      "Kubernetes CronJobs",
+      "Google Maps",
+      "MapLibre",
+      "Leaflet",
+      "Babylon.js",
       "GitHub Copilot",
       "Claude Code",
+      "Codex",
     ],
     achievements: [
       {
         description:
-          "Adopted AI coding tools for geospatial library development in production environment",
+          "Designed, released, and supported multi-orthophoto visualization with collection-based layer state, synchronized controls, and automatic viewport handling",
+      },
+      {
+        description:
+          "Rapidly expanded from feature delivery across four projects to mentoring an intern, leading an internal full-stack tool, and representing the development team in continuous improvement",
+      },
+      {
+        description:
+          "Initiated and shaped a management-backed, team-wide AI enablement program and delivered cross-team training on agentic engineering practices",
       },
     ],
   },

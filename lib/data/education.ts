@@ -19,19 +19,19 @@ export const languages: Language[] = [
 
 export const interests: Interest[] = [
   {
-    area: "Agentic Coding Tools",
+    area: "AI-Augmented Engineering",
     description:
-      "Following the evolution of AI coding assistants like GitHub Copilot and Claude Code, and how they change daily development work",
+      "Following the evolution of agentic coding tools, patterns, and best practices and how they reshape software engineering work",
+  },
+  {
+    area: "Engineering Evolution",
+    description:
+      "Exploring the shift from implementation-focused work toward architecture, orchestration, review, and team enablement",
   },
   {
     area: "Development Workflows",
     description:
-      "Exploring how planning, context preparation, and review fit into AI-assisted development",
-  },
-  {
-    area: "AI Coding Ecosystem",
-    description:
-      "Keeping up with MCP servers, AI agent frameworks, and new tools in the agentic coding space",
+      "Practicing context engineering, planning, systematic output validation, testing, and responsible use of AI development tools",
   },
   {
     area: "Chess",
@@ -42,24 +42,19 @@ export const interests: Interest[] = [
 
 export const softSkills: SoftSkill[] = [
   {
-    name: "Task Planning",
+    name: "Leadership",
     description:
-      "Breaking down work into manageable steps, defining priorities, and structuring development tasks before execution",
-  },
-  {
-    name: "Multitasking",
-    description:
-      "Managing multiple parallel workstreams and switching between tasks effectively, especially in agentic coding workflows",
-  },
-  {
-    name: "Delegation",
-    description:
-      "Distributing work across AI agents and tools, reviewing outputs, and coordinating parallel development efforts",
+      "Leading technical initiatives, mentoring developers, and helping teams adopt effective engineering practices",
   },
   {
     name: "Communication",
     description:
-      "Comfortable in client interactions, team discussions, and translating requirements into actionable tasks",
+      "Working confidently with clients, stakeholders, engineering teams, and colleagues across departments",
+  },
+  {
+    name: "Problem Solving",
+    description:
+      "Proactively identifying technical and workflow problems, evaluating tradeoffs, and delivering maintainable solutions",
   },
   {
     name: "Adaptability",
